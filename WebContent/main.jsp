@@ -12,14 +12,14 @@
     <title>Widget Store - OSS</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="css/stylish-portfolio.css" rel="stylesheet">
+    <link href="WidgetClientPage/css/stylish-portfolio.css" rel="stylesheet">
 	<!-- bootsnipp down -->
-	<link href="css/login.css" rel="stylesheet">
+	<link href="WidgetClientPage/css/login.css" rel="stylesheet">
     <!-- Custom Fonts -->
-    <link href="font-awesome/font-awesome.css" rel="stylesheet" type="text/css">
+    <link href="WidgetClientPage/font-awesome/font-awesome.css" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -82,7 +82,7 @@
     	<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header" align="center">
-					<img class="img-circle" id="img_logo" src="img/test1.jpg">
+					<img class="img-circle" id="img_logo" src="WidgetClientPage/img/test1.jpg">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
 					</button>
@@ -171,10 +171,10 @@
     <!-- END # MODAL LOGIN -->
 
     <!-- jQuery -->
-    <script src="js/jquery.js"></script>
+    <script src="WidgetClientPage/js/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="WidgetClientPage/js/bootstrap.min.js"></script>
 
     <!-- Custom Theme JavaScript -->
     <script>
