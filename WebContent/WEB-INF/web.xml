@@ -9,14 +9,7 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  <servlet>
-    <servlet-name>helloBuzz</servlet-name>
-    <servlet-class>puppyrush.helloBuzz.mainPage</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>helloBuzz</servlet-name>
-    <url-pattern>/HelloBuzz</url-pattern>
-  </servlet-mapping>
+
   <error-page>
     <error-code>404</error-code>
     <location>/error/404code.jsp</location>
