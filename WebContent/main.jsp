@@ -178,6 +178,23 @@
 
     <!-- Custom Theme JavaScript -->
     <script>
+	
+	//login session
+	window.onload=function(){
+			<%
+			try{ 
+				//이미 로그인 했던 기록이 있다면 자동로그인 한다.   
+				if( session.getAttribute("alreadyLogon") != null &&
+						((String) session.getAttribute("alreadyLogon")).equals("true")){
+								response.sendRedirect("main.jsp");
+				}
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+			%>	
+		}
+		
     // Closes the sidebar menu
     $("#menu-close").click(function(e) {
         e.preventDefault();
@@ -215,12 +232,16 @@
             case "login-form":
                 var $lg_username=$('#login_username').val();
                 var $lg_password=$('#login_password').val();
-                if ($lg_username == "ERROR") {
+				<%
+                if (request.getAttribute("innerLogon") == "false") {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "error", "glyphicon-remove", "Login error");
                 } else {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "success", "glyphicon-ok", "Login OK");
+					session.setAttribute("alreadyLogon", "true");
+					response.sendRedirect("main.jsp");
 					return true;
                 }
+				%>
                 return false;
                 break;
             case "lost-form":
