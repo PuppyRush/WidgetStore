@@ -232,16 +232,18 @@
             case "login-form":
                 var $lg_username=$('#login_username').val();
                 var $lg_password=$('#login_password').val();
-				<%
-                if (request.getAttribute("innerLogon") == "false") {
+				
+                if (<%request.getAttribute("innerLogon")%> == "false") {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "error", "glyphicon-remove", "Login error");
                 } else {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "success", "glyphicon-ok", "Login OK");
+					<%
 					session.setAttribute("alreadyLogon", "true");
 					response.sendRedirect("main.jsp");
+					%>
 					return true;
                 }
-				%>
+				
                 return false;
                 break;
             case "lost-form":
