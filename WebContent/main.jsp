@@ -60,19 +60,19 @@
                 <a href="#top"  onclick = $("#menu-close").click(); >Widget Store</a>
             </li>
             <li>
-                <a href="#top" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#login-modal">Sign in</a>
+                <a href="#Sign In" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#login-modal">Sign in</a>
             </li>
             <li>
-                <a href="#about" onclick = $("#menu-close").click(); >Store</a>
+                <a href="#Store" onclick = $("#menu-close").click(); >Store</a>
             </li>
             <li>
-                <a href="#services" onclick = $("#menu-close").click(); >Custom</a>
+                <a href="#Custom" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#Register-edit-modal">Custom</a>
             </li>
             <li>
-                <a href="#portfolio" onclick = $("#menu-close").click(); >Setting</a>
+                <a href="#Setting" onclick = $("#menu-close").click(); >Setting</a>
             </li>
             <li>
-                <a href="#contact" onclick = $("#menu-close").click(); >About</a>
+                <a href="#About" onclick = $("#menu-close").click(); >About</a>
             </li>
         </ul>
     </nav>
@@ -152,7 +152,7 @@
             			</div>
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+                                <button type="submit" onclick="chkNickname()" class="btn btn-primary btn-lg btn-block">Register</button>
                             </div>
                             <div>
                                 <button id="register_login_btn" type="button" class="btn btn-link">Log In</button>
@@ -161,7 +161,6 @@
 		    		    </div>
                     </form>
                     <!-- End | Register Form -->
-                    
                 </div>
                 <!-- End # DIV Form -->
                 
@@ -170,6 +169,43 @@
 	</div>
     <!-- END # MODAL LOGIN -->
 
+	<div class="modal fade" id="Register-edit-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    	<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header" align="center">
+					<img class="img-circle" id="img_logo2" src="WidgetClientPage/img/test1.jpg">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+					</button>
+				</div>
+                
+                <!-- Begin # DIV Form -->
+                <div id="div-forms">
+					<!-- Begin | Register Edit Form -->
+					<form id="register-edit-form"  method="GET" ACTION="join.do">
+            		    <div class="modal-body">
+		    				<div id="div-edit-register-msg">
+                                <div id="icon-edit-register-msg" class="glyphicon glyphicon-chevron-right"></div>
+                                <span id="text-register-msg">Edit User info</span>
+                            </div>
+                            <input id="register_edit_password" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
+            			</div>
+		    		    <div class="modal-footer">
+                            <div>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+                            </div>
+		    		    </div>
+                    </form>
+					<!-- End | Register Edit Form -->
+                </div>
+                <!-- End # DIV Form -->
+			</div>
+		</div>
+	</div>
+
+	<form method="GET" ACTION="verify.do" id="nickname_chk_form">
+				<input type = "hidden" name = "nickname" value = "" >
+	</form>
     <!-- jQuery -->
     <script src="WidgetClientPage/js/jquery.js"></script>
 
@@ -178,8 +214,6 @@
 
     <!-- Custom Theme JavaScript -->
     <script>
-	
-	//login session
 	window.onload=function(){
 			<%
 			try{ 
@@ -222,6 +256,7 @@
     var $formLogin = $('#login-form');
     var $formLost = $('#lost-form');
     var $formRegister = $('#register-form');
+	var $formEditRegister = $('#register-edit-form');
     var $divForms = $('#div-forms');
     var $modalAnimateTime = 300;
     var $msgAnimateTime = 150;
@@ -239,8 +274,9 @@
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "success", "glyphicon-ok", "Login OK");
 					<%
 					session.setAttribute("alreadyLogon", "true");
-					response.sendRedirect("main.jsp");
+					session.setMaxInactiveInterval(60*60);
 					%>
+					window.location.reload();
 					return true;
                 }
 				
@@ -270,6 +306,10 @@
                 }
                 return false;
                 break;
+			case "register-edit-form":
+				if(){
+					//여기에 새로생긴 비밀번호,,
+				}
             default:
                 return false;
         }
@@ -282,6 +322,7 @@
     $('#lost_login_btn').click( function () { modalAnimate($formLost, $formLogin); });
     $('#lost_register_btn').click( function () { modalAnimate($formLost, $formRegister); });
     $('#register_lost_btn').click( function () { modalAnimate($formRegister, $formLost); });
+	//$('#register_lost_btn').click( function () { modalAnimate($formRegister, $$formEditRegister); });
     
     function modalAnimate ($oldForm, $newForm) {
         var $oldH = $oldForm.height();
@@ -314,9 +355,14 @@
   		}, $msgShowTime);
     }
 
+	function chkNickname(){
+		document.getElementsByName("nickname")[1].value = document.getElementById("register_username").value;
+		document.forms["nickname_chk_form"].submit();
+	}
+
 	function CheckName(){
 		var flag = true;
-		var specialChars="~`!@#$%^&*-=+\|[](){};:'<.,>/?_";
+		var specialChars=" ~`!@#$%^&*-=+\|[](){};:'<.,>/?_";
 		var wordadded = $('#register_username').val();
 		if(wordadded = "") flag = false;
 		for (i = 0; i < wordadded.length; i++) {
