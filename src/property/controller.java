@@ -125,7 +125,7 @@ public class controller extends HttpServlet {
 				String command = request.getRequestURI();
 		        if(command.indexOf(request.getContextPath()) == 0) 
 		           command = command.substring(request.getContextPath().length());
-		        
+		        	
 		        com = (commandAction)commandMap.get(command);  
 		        preSplit = com.requestPro(request, response);
 		        	view = preSplit.get("view");

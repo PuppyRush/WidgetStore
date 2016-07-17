@@ -23,10 +23,10 @@ public class innerLogon implements commandAction {
 		memberProcessBean lb = new memberProcessBean();
 		HashMap<String , String> returns = new HashMap<String , String>();
 		
-		if(request.getParameter("kind") == null)
+		if(request.getParameter("idType") == null)
 			throw new Exception( request.getRequestURI() + "에 kind가 없습니다");
 		
-		if( ((String)request.getParameter("kind")).equals("inner") ){
+		if( ((String)request.getParameter("idType")).equals("inner") ){
 			
 			String email = (String)request.getParameter("inner_email");
 			String pw = (String)request.getParameter("inner_password");
@@ -45,7 +45,7 @@ public class innerLogon implements commandAction {
 
 		}
 		
-		returns.put("view", "logonPage/entryPage.jsp");
+		returns.put("view", "/");
 		
 		return returns;
 		

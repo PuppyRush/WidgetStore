@@ -18,6 +18,7 @@ public class joinProcess implements commandAction {
 	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
+		
 		memberDataBean mdb = new memberDataBean();
 		memberProcessBean lb = new memberProcessBean();
 		HashMap<String , String> returns = new HashMap<String , String>();
@@ -25,9 +26,9 @@ public class joinProcess implements commandAction {
 
 		
 		mdb.setId(0);
-		mdb.setEmail((String) request.getParameter("email"));
+		mdb.setEmail((String) request.getParameter("register_email"));
 		mdb.setIdType((String) request.getParameter("idType"));
-		mdb.setNickname((String) request.getParameter("nickname"));
+		mdb.setNickname((String) request.getParameter("register_username"));
 		mdb.setReg_date(new Timestamp(System.currentTimeMillis()));
 		
 		switch (idType) {
@@ -42,7 +43,7 @@ public class joinProcess implements commandAction {
 	
 			case "inner":
 				
-				mdb.setPassword((String) request.getParameter("password"));
+				mdb.setPassword((String) request.getParameter("register_password"));
 				
 				break;
 	
@@ -57,7 +58,7 @@ public class joinProcess implements commandAction {
 		else
 			returns.put("message", "이전에 가입하셨습니다.");
 		
-		returns.put("view", "logonPage/entryPage.jsp");
+		returns.put("view", "/");
 		returns.put("innerJoin", "true");
 				
 	return returns;

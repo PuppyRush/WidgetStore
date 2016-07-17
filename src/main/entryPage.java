@@ -14,7 +14,7 @@ import property.commandAction;
 		
 			
 			HashMap<String, String> r = new HashMap<String, String>();
-			r.put("view", "WidgetClientPage/main.jsp");
+			r.put("view", "main.jsp");
 			
 			return r;
 		}

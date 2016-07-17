@@ -98,8 +98,8 @@
                                 <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
                                 <span id="text-login-msg">Type your username and password.</span>
                             </div>
-				    		<input id="login_username" class="form-control" type="text" placeholder="Username" required>
-				    		<input id="login_password" class="form-control" type="password" placeholder="Password" required>
+				    		<input id="login_username" name="login_username" class="form-control" type="text" placeholder="Username" required>
+				    		<input id="login_password" name="login_password" class="form-control" type="password" placeholder="Password" required>
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"> Remember me
@@ -115,6 +115,7 @@
                                 <button id="login_register_btn" type="button" class="btn btn-link">Register</button>
                             </div>
 				        </div>
+				        <input type="hidden" name="idType" value="inner">
                     </form>
                     <!-- End # Login Form -->
                     
@@ -146,9 +147,9 @@
                                 <div id="icon-register-msg" class="glyphicon glyphicon-chevron-right"></div>
                                 <span id="text-register-msg">Register an account.</span>
                             </div>
-		    				<input id="register_username" class="form-control" title="Username may only contain alphanumeric characters" type="text" placeholder="Username" required>
-                            <input id="register_email" class="form-control" type="email" placeholder="E-Mail" required>
-                            <input id="register_password" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
+		    				<input id="register_username" name="register_username" class="form-control" title="Username may only contain alphanumeric characters" type="text" placeholder="Username" required>
+                            <input id="register_email" name="register_email" class="form-control" type="email" placeholder="E-Mail" required>
+                            <input id="register_password" name=register_password" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
             			</div>
 		    		    <div class="modal-footer">
                             <div>
@@ -159,6 +160,7 @@
                                 <button id="register_lost_btn" type="button" class="btn btn-link">Lost Password?</button>
                             </div>
 		    		    </div>
+		    		  			  <input type="hidden" name="idType" value="inner">
                     </form>
                     <!-- End | Register Form -->
                 </div>
@@ -221,6 +223,7 @@
 				if( session.getAttribute("alreadyLogon") != null &&
 						((String) session.getAttribute("alreadyLogon")).equals("true")){
 								response.sendRedirect("main.jsp");
+							
 				}
 			}
 			catch(Exception e){
@@ -307,7 +310,7 @@
                 return false;
                 break;
 			case "register-edit-form":
-				if(){
+				if(true){
 					//여기에 새로생긴 비밀번호,,
 				}
             default:
