@@ -17,6 +17,8 @@ package org.mindrot.jbcrypt;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 
+import property.constMysql;
+
 /**
  * BCrypt implements OpenBSD-style Blowfish password hashing using
  * the scheme described in "A Future-Adaptable Password Scheme" by
@@ -760,11 +762,14 @@ public class BCrypt {
 	public static boolean checkpw(String plaintext, String hashed) {
 		byte hashed_bytes[];
 		byte try_bytes[];
+
 		try {
-			String try_pw = hashpw(plaintext, hashed);
+			String try_pw = hashpw(plaintext, hashed );
 			hashed_bytes = hashed.getBytes("UTF-8");
 			try_bytes = try_pw.getBytes("UTF-8");
 		} catch (UnsupportedEncodingException uee) {
+			System.out.println(uee.getMessage());
+			uee.printStackTrace();
 			return false;
 		}
 		if (hashed_bytes.length != try_bytes.length)
@@ -772,6 +777,7 @@ public class BCrypt {
 		byte ret = 0;
 		for (int i = 0; i < try_bytes.length; i++)
 			ret |= hashed_bytes[i] ^ try_bytes[i];
+		
 		return ret == 0;
 	}
 }
