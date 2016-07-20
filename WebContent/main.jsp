@@ -150,6 +150,7 @@
 		    				<input id="register_username" name="register_username" class="form-control" title="Username may only contain alphanumeric characters" type="text" placeholder="Username" required>
                             <input id="register_email" name="register_email" class="form-control" type="email" placeholder="E-Mail" required>
                             <input id="register_password" name=register_password" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
+							<input id="register_password2" onchange="" class="form-control" type="password" placeholder="Rewrite password" required>
             			</div>
 		    		    <div class="modal-footer">
                             <div>
@@ -194,7 +195,7 @@
             			</div>
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Register</button>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">submit</button>
                             </div>
 		    		    </div>
                     </form>
@@ -205,8 +206,9 @@
 		</div>
 	</div>
 
-	<form method="GET" ACTION="verify.do" id="nickname_chk_form">
+	<form method="GET" ACTION="verify.do" id="chkRegister_chk_form">
 				<input type = "hidden" name = "nickname" value = "" >
+				<input type = "hidden" name = "email" value = "" >
 	</form>
     <!-- jQuery -->
     <script src="WidgetClientPage/js/jquery.js"></script>
@@ -298,12 +300,15 @@
                 var $rg_username=$('#register_username').val();
                 var $rg_email=$('#register_email').val();
                 var $rg_password=$('#register_password').val();
+				var $rg_password2=$('#register_password2').val();
 				
 				if (!CheckName()) {
                     msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "error", "glyphicon-remove", "CHECK USERNAME");
-                } else if(!chkPwd($rg_password)) {
+                } else if(!chkPwd($rg_password, &rg_password2)) {
                     msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "error", "glyphicon-remove", "CHECK PASSWORD");
-                } else {
+                } else if(chkRegister()&&<%=request.getAttribute("isDuplicatedNickname")%> == "true"){
+					msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "error", "glyphicon-remove", "CHECK NICKNAME");
+				} else{
                     msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "success", "glyphicon-ok", "Register OK");
 					return true;
                 }
@@ -325,7 +330,6 @@
     $('#lost_login_btn').click( function () { modalAnimate($formLost, $formLogin); });
     $('#lost_register_btn').click( function () { modalAnimate($formLost, $formRegister); });
     $('#register_lost_btn').click( function () { modalAnimate($formRegister, $formLost); });
-	//$('#register_lost_btn').click( function () { modalAnimate($formRegister, $$formEditRegister); });
     
     function modalAnimate ($oldForm, $newForm) {
         var $oldH = $oldForm.height();
@@ -358,9 +362,12 @@
   		}, $msgShowTime);
     }
 
-	function chkNickname(){
-		document.getElementsByName("nickname")[1].value = document.getElementById("register_username").value;
-		document.forms["nickname_chk_form"].submit();
+	function chkRegister(){
+		document.getElementsByName("rg_nickname")[1].value = document.getElementById("register_username").value;
+		document.getElementsByName("rg_emali")[1].value = document.getElementById("register_email").value;
+		document.forms["chkRegister_chk_form"].submit();
+		
+		return true;
 	}
 
 	function CheckName(){
@@ -379,8 +386,9 @@
 		return flag;
 	}
 
-	function chkPwd(str){
+	function chkPwd(str, str2){
 		var pw = str;
+		var pw2 = str2;
 		var num = pw.search(/[0-9]/g);
 		var eng = pw.search(/[a-z]/ig);
 		var spe = pw.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);
@@ -389,15 +397,21 @@
 			alert("8자리 ~ 20자리 이내로 입력해주세요.");
 			return false;
 		 }
-		 if(pw.search(/₩s/) != -1){
+		 else if(pw.search(/₩s/) != -1){
 			alert("비밀번호는 공백업이 입력해주세요.");
 			return false;
 		 } 
-		 if(num < 0 || eng < 0 || spe < 0 ){
+		 else if(num < 0 || eng < 0 || spe < 0 ){
 			alert("영문,숫자, 특수문자를 혼합하여 입력해주세요.");
 			return false;
 		 }
-		 return true;
+		 else if(str != str2){
+			alert("비밀번호가 서로 맞지 않습니다.");
+			return false;
+		 }
+		 else {
+			return true;
+		 }
 	}
 });
 	function innerLogon(){
