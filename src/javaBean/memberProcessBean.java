@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import org.mindrot.jbcrypt.BCrypt;
 //import com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException;
-import property.constString;
+import property.constMysql;
 
 public class memberProcessBean {
 	
@@ -72,7 +72,7 @@ public class memberProcessBean {
 					ps = conn.prepareStatement(sql);
 					
 					ps.setString(1, (String)val);
-
+					break;
 				case "email" :
 					sql = " SELECT count(*) FROM user WHERE email = ? ";
 					ps = conn.prepareStatement(sql);
@@ -126,7 +126,7 @@ public class memberProcessBean {
 	
 
 	
-	private String MailToId(String email){
+	private int somethingToId(String attr, String val){
 		
 		
 		ResultSet rs = null;
@@ -134,14 +134,28 @@ public class memberProcessBean {
 		int id;
 		try {
 
-
-			pstmt = conn.prepareStatement("select user_num from user where email = ? ");
-			pstmt.setString(1, email);
+			switch(attr){
+			
+				case "email":
+					pstmt = conn.prepareStatement("select user_num from user where email = ? ");
+					pstmt.setString(1, attr);
+					
+					break;
+					
+				case "nickname":
+					pstmt = conn.prepareStatement("select user_num from user where nickname = ? ");
+					pstmt.setString(1, attr);
+					break;
+			
+			
+			}
+			
+			
 			rs = pstmt.executeQuery();
 			rs.next();
 			id = rs.getInt(1);
 			if(id == 0)
-				throw new SQLException("해당하는 메일이 존재하지 않습니다");
+				throw new SQLException("해당하는 " +  attr +" " + val +"이 존재하지 않습니다");
 			
 			
 			
@@ -150,7 +164,7 @@ public class memberProcessBean {
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
-			return null;
+			return -1;
 		}
 		finally {
 			if (pstmt != null)
@@ -165,7 +179,7 @@ public class memberProcessBean {
 				}
 		}
 		
-		return String.valueOf(id);
+		return id;
 		
 		
 	}
@@ -182,7 +196,8 @@ public class memberProcessBean {
 
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
-
+		long key=-1;
+		
 		try {
 			conn.setAutoCommit(false);
 			
@@ -194,16 +209,16 @@ public class memberProcessBean {
 					isExist("user", "nickname" ,member.getNickname() );
 			
 			if(isDuplicated_email){
-				throw new Exception(member.getEmail() + " 중복됩니다" );
+				throw new SQLException(member.getEmail() + " 중복됩니다" );
 			}
 			if(isDuplicated_nickname){
-				throw new Exception(member.getNickname() + " 중복됩니다" );
+				throw new SQLException(member.getNickname() + " 중복됩니다" );
 			}
 			
+			////////user table
 			
-		
 			pstmt = conn.prepareStatement(
-					"insert into user ( email, nickname, password, regstryDate, isDeveloper) values (?,?,?,?,?)",
+					"insert into user ( email, nickname, password, regstryDate) values (?,?,?,?)",
 					PreparedStatement.RETURN_GENERATED_KEYS);
 
 			
@@ -211,31 +226,52 @@ public class memberProcessBean {
 			pstmt.setString(2, member.getNickname());
 		
 			pstmt.setTimestamp(4, member.getReg_date());
-			pstmt.setInt(5, 0);
-			
+
 			if(member.getIdType().equals("inner")){
-				constString s = constString.salt;
-				int salt = Integer.valueOf(s.getString());
-				String pw = BCrypt.hashpw( member.getPassword(), BCrypt.gensalt(salt));
+
+				String pw = BCrypt.hashpw( member.getPassword(), BCrypt.gensalt());
 				pstmt.setString(3, pw);
 			}
 			else
 				pstmt.setString(3, "");
 
-				pstmt.executeUpdate();
+			
+			pstmt.executeUpdate();
+			rs = pstmt.getGeneratedKeys();
+
+			if (rs.next()) {
+			    key = rs.getLong(1);
+			}	
+			else
+				throw new SQLException("-");
+	
+			
+			////////userState table
+			
+			pstmt = conn.prepareStatement("insert into userState (u_num , isBlocked, isDeveloper,"
+					+ "blockedReasonCode, lastLoginDate, lastModifiedDate) values(?,?,?,?,?,?)" );
+			
+			pstmt.setLong(1,key);
+			pstmt.setInt(2, 0);
+			pstmt.setInt(3,0);
+			pstmt.setInt(4,0);
+			pstmt.setTimestamp(5, member.getReg_date());
+			pstmt.setTimestamp(6, member.getReg_date());
+			
+			pstmt.executeUpdate();
 				
-				conn.commit();
+			conn.commit();
 				
 		}
 		catch(SQLException ex){
 			System.out.println(ex.getMessage());
 			ex.printStackTrace();
-			/*if(conn!=null) 
+			if(conn!=null) 
 				try{conn.rollback();}// Exception 발생시 rollback 한다.
 					catch(SQLException ex1){
 						System.out.println(ex1.getMessage());
 						ex1.printStackTrace();
-					}*/
+					}
 		}
 		catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -256,7 +292,7 @@ public class memberProcessBean {
 		}
 		
 		
-	//	conn.commit();
+	  conn.commit();
 		
 
 		return true;
@@ -268,29 +304,39 @@ public class memberProcessBean {
 	 * @return 로그인 무사히 성사됐는지 여부를 반환
 	 * @throws  
 	 */
-	public boolean logonMember(memberDataBean member) throws SQLException {
+	public boolean loginMember(memberDataBean member) throws SQLException {
 		
-		Statement st;
+		PreparedStatement ps = null;
 		ResultSet rs;
-		boolean res;
+		boolean res=false;
+		String uniqID;
 		try {
-			res = isExist("UserMapping", "email", member.getEmail());
-			
-			if(res == false){
-				throw new SQLException("값이 존재하지 않습니다");
-				
+			if(member.getEmail() != null){
+				res = isExist("user", "email", member.getEmail() );	
+				ps = conn.prepareStatement("select password from user where email = ? ");
+				ps.setString(1, member.getEmail());
+			}
+			else if(member.getNickname() != null ){
+				res = isExist("user", "nickname", member.getNickname() );	
+				ps = conn.prepareStatement("select password from user where nickname = ? ");
+				ps.setString(1, member.getNickname());
+			}
+			else{
+				throw new SQLException("닉네임과 메일이 입력되지 않았습니다.");
 			}
 			
-			String uniqID = MailToId(member.getEmail());
+			if(res == false){
+				throw new SQLException("메일 혹은 닉네임이 존재하지 않습니다.");
+			}
 			
-			st = conn.createStatement();
-			rs = st.executeQuery(" select Passwd from User where Id = " + uniqID);
+			rs = ps.executeQuery();
 			rs.next();
 			String hasedpw =  rs.getString(1);
-			if( !BCrypt.checkpw(member.getPassword(), hasedpw ) )
-				res =  false;
+			
+			if( BCrypt.checkpw( member.getPassword(), hasedpw ) )
+				res =  true;
 			else
-				res = true;
+				res = false;
 		
 		}catch (SQLException e){
 			e.printStackTrace();
@@ -306,6 +352,15 @@ public class memberProcessBean {
 		
 	
 		return res;
+	}
+	
+	
+	public boolean createTempPasswd(memberDataBean member){
+		
+		
+		
+	
+		return true;
 	}
 	
 }

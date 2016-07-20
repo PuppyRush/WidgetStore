@@ -1,8 +1,12 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
-<html>
+
+<html lang="ko">
 
 <head>
-
+<meta http-equiv = "Content-Type" content="text/html; charset=utf-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -92,7 +96,7 @@
                 <div id="div-forms">
                 
                     <!-- Begin # Login Form -->
-                    <form id="login-form" method="GET" ACTION="innerLogon.do" >
+                    <form id="login-form" method="GET" ACTION="login.do" >
 		                <div class="modal-body">
 				    		<div id="div-login-msg">
                                 <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -108,7 +112,7 @@
         		    	</div>
 				        <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block" onClick="innerLogon()">Login</button>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block" onClick="innerLogin()">Login</button>
                             </div>
 				    	    <div>
                                 <button id="login_lost_btn" type="button" class="btn btn-link">Lost Password?</button>
@@ -120,7 +124,7 @@
                     <!-- End # Login Form -->
                     
                     <!-- Begin | Lost Password Form -->
-                    <form id="lost-form" style="display:none;">
+                    <form id="lost-form" style="display:none;" ACTION="lostpasswd.do">
     	    		    <div class="modal-body">
 		    				<div id="div-lost-msg">
                                 <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -219,7 +223,7 @@
 	window.onload=function(){
 			<%
 			try{ 
-				//이미 로그인 했던 기록이 있다면 자동로그인 한다.   
+				//ì´ë¯¸ ë¡ê·¸ì¸ íë ê¸°ë¡ì´ ìë¤ë©´ ìëë¡ê·¸ì¸ íë¤.   
 				if( session.getAttribute("alreadyLogon") != null &&
 						((String) session.getAttribute("alreadyLogon")).equals("true")){
 								response.sendRedirect("main.jsp");
@@ -271,7 +275,7 @@
                 var $lg_username=$('#login_username').val();
                 var $lg_password=$('#login_password').val();
 				
-                if (<%=request.getAttribute("innerLogon")%> == "false") {
+                if (<%=request.getAttribute("innerLogin")%> == "false") {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "error", "glyphicon-remove", "Login error");
                 } else {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "success", "glyphicon-ok", "Login OK");
@@ -311,7 +315,7 @@
                 break;
 			case "register-edit-form":
 				if(true){
-					//여기에 새로생긴 비밀번호,,
+					//ì¬ê¸°ì ìë¡ìê¸´ ë¹ë°ë²í¸,,
 				}
             default:
                 return false;
@@ -383,24 +387,24 @@
 		var pw = str;
 		var num = pw.search(/[0-9]/g);
 		var eng = pw.search(/[a-z]/ig);
-		var spe = pw.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);
+		var spe = pw.search(/[`~!@@#$%^&*|â©â©â©'â©";:â©/?]/gi);
 
 		 if(pw.length < 8 || pw.length > 20){
-			alert("8자리 ~ 20자리 이내로 입력해주세요.");
+			alert("8ìë¦¬ ~ 20ìë¦¬ ì´ë´ë¡ ìë ¥í´ì£¼ì¸ì.");
 			return false;
 		 }
-		 if(pw.search(/₩s/) != -1){
-			alert("비밀번호는 공백업이 입력해주세요.");
+		 if(pw.search(/â©s/) != -1){
+			alert("ë¹ë°ë²í¸ë ê³µë°±ìì´ ìë ¥í´ì£¼ì¸ì.");
 			return false;
 		 } 
 		 if(num < 0 || eng < 0 || spe < 0 ){
-			alert("영문,숫자, 특수문자를 혼합하여 입력해주세요.");
+			alert("ìë¬¸,ì«ì, í¹ìë¬¸ìë¥¼ í¼í©íì¬ ìë ¥í´ì£¼ì¸ì.");
 			return false;
 		 }
 		 return true;
 	}
 });
-	function innerLogon(){
+	function innerLogin(){
 		document.forms["login-form"].submit();
 	}
 	function innerJoin(){
