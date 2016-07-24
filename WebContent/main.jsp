@@ -60,7 +60,10 @@
                 <a href="#top"  onclick = $("#menu-close").click(); >Widget Store</a>
             </li>
             <li>
-                <a href="#Sign In" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#login-modal">Sign in</a>
+                <a href="#Sign In" id="signIn" style="display:''" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#login-modal">Sign in</a>
+            </li>
+			<li>
+                <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" $("#menu-close").click(); >Sign out</a>
             </li>
             <li>
                 <a href="#Store" onclick = $("#menu-close").click(); >Store</a>
@@ -120,17 +123,17 @@
                     <!-- End # Login Form -->
                     
                     <!-- Begin | Lost Password Form -->
-                    <form id="lost-form" style="display:none;">
+                    <form id="lost-form" style="display:none;" method="GET" ACTION="emailChk.do" >
     	    		    <div class="modal-body">
 		    				<div id="div-lost-msg">
                                 <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
                                 <span id="text-lost-msg">Type your e-mail.</span>
                             </div>
-		    				<input id="lost_email" class="form-control" type="text" placeholder="E-Mail (type ERROR for error effect)" required>
+		    				<input id="lost_email" name="lost_email" class="form-control" type="text" placeholder="E-Mail" required>
             			</div>
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Send</button>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="lostpassword()">Send</button>
                             </div>
                             <div>
                                 <button id="lost_login_btn" type="button" class="btn btn-link">Log In</button>
@@ -225,15 +228,40 @@
 				if( session.getAttribute("alreadyLogon") != null &&
 						((String) session.getAttribute("alreadyLogon")).equals("true")){
 								response.sendRedirect("main.jsp");
-							
+			%>
+				</script>
+				<script>
+					signChange('signOut');
+				</script>
+			<%
 				}
 			}
 			catch(Exception e){
 				e.printStackTrace();
 			}
-			%>	
-		}
+			%>
+	}
+
+	<script>
+	function fun_signOut(){
+		session.removeAttribute("alreadyLogon");
+		response.sendRedirect("main.jsp");
+	}
+	function signChange(id){
+	var div = document.getElementById(id);
+		if(div.style.display=='none'){
+          div.style.display='';
 		
+		  if(id=="signOut"){
+		    var div_sp = document.getElementById('signIn');
+			div_sp.style.display='none';
+		  }else{
+		   var div_sp = document.getElementById('signOut');
+			div_sp.style.display='none';
+		  }
+		}
+   }
+
     // Closes the sidebar menu
     $("#menu-close").click(function(e) {
         e.preventDefault();
@@ -289,7 +317,7 @@
                 break;
             case "lost-form":
                 var $ls_email=$('#lost_email').val();
-                if ($ls_email=="ERROR") {
+                if (<%=request.getAttribute("inputMail")%> == "false") {
                     msgChange($('#div-lost-msg'), $('#icon-lost-msg'), $('#text-lost-msg'), "error", "glyphicon-remove", "Send error");
                 } else {
                     msgChange($('#div-lost-msg'), $('#icon-lost-msg'), $('#text-lost-msg'), "success", "glyphicon-ok", "Send OK");
@@ -419,6 +447,9 @@
 	}
 	function innerJoin(){
 		document.forms["register-form"].submit();
+	}
+	function lostpassword(){
+		document.forms["lost-form"].submit();
 	}
 
 
