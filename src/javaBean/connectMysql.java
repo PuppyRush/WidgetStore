@@ -1,7 +1,7 @@
 package javaBean;
 
 import java.sql.*;
-import property.constString;
+import property.*;
 
 
 public class connectMysql {
@@ -12,10 +12,10 @@ public class connectMysql {
 		Connection conn = null;
 		try {
 			
-			constString url = constString.dbUrl;
-			constString id = constString.dbId;
-			constString pw = constString.dbPasswd;
-			constString driver = constString.dbDriver;
+			constMysql url = constMysql.dbUrl;
+			constMysql id = constMysql.dbId;
+			constMysql pw = constMysql.dbPasswd;
+			constMysql driver = constMysql.dbDriver;
 			
 			String jdbcUrl = url.getString();
 			String dbId = id.getString();
