@@ -40,5 +40,7 @@
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/catalina-ha.jar"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/catalina-storeconfig.jar"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/tomcat-jni.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/javax.mail.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/activation.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

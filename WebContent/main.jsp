@@ -134,6 +134,13 @@
 		    		    <div class="modal-footer">
                             <div>
                                 <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="lostpassword()">Send</button>
+=======
+		    				<input id="lost_email" class="form-control" name="email" type="text" placeholder="E-Mail (type ERROR for error effect)" required>
+            			</div>
+		    		    <div class="modal-footer">
+                            <div>
+                                <button type="submit"  class="btn btn-primary btn-lg btn-block" onClick="innerLost()">Send</button>
+>>>>>>> 6bc3b5a784420aea9c52ef342d2b27250822c00b
                             </div>
                             <div>
                                 <button id="lost_login_btn" type="button" class="btn btn-link">Log In</button>
@@ -300,7 +307,7 @@
             case "login-form":
                 var $lg_username=$('#login_username').val();
                 var $lg_password=$('#login_password').val();
-				
+
                 if (<%=request.getAttribute("innerLogon")%> == "false") {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "error", "glyphicon-remove", "Login error");
                 } else {
@@ -539,7 +546,7 @@
 	function addLoadEvent(func) {
 	  var oldonload = window.onload;
 	  if (typeof window.onload != 'function') {
-		window.onload = func;
+		window.onload = func
 	  } else {
 		window.onload = function() {
 		  if (oldonload) {

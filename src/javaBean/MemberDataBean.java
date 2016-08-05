@@ -3,7 +3,7 @@ package javaBean;
 import java.sql.Timestamp;
 
 //User Table 참조
-public class memberDataBean {
+public class MemberDataBean {
 
 	private int id;
 	private String nickname;
@@ -12,10 +12,10 @@ public class memberDataBean {
 	private String email;
 	private Timestamp reg_date;
 	
-	public memberDataBean(){
+	public MemberDataBean(){
 	}
 	
-	public memberDataBean(memberDataBean mdb){
+	public MemberDataBean(MemberDataBean mdb){
 		id = mdb.id;
 		nickname = mdb.nickname;
 		password = mdb.password;
@@ -23,7 +23,7 @@ public class memberDataBean {
 		reg_date = mdb.reg_date;
 	}
 	
-	public memberDataBean(int id, String email, String name, String pw, String idType, Timestamp reg_date){
+	public MemberDataBean(int id, String email, String name, String pw, String idType, Timestamp reg_date){
 		this.id = id;
 		this.email = email;
 		this.nickname = name;

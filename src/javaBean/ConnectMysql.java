@@ -1,10 +1,10 @@
 package javaBean;
 
 import java.sql.*;
+
 import property.*;
 
-
-public class connectMysql {
+public class ConnectMysql {
 
 	public static Connection getConnector(){
 		

@@ -113,6 +113,7 @@ public class controller extends HttpServlet {
 		requestPro(request, response);
 	}
 	
+	//크라이언트가 URL을 입력한 뒤 서버로 전송하면 호출됨 
 	private void requestPro(
 			HttpServletRequest request, HttpServletResponse response) 
 			throws ServletException, IOException {
