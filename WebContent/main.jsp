@@ -123,7 +123,7 @@
                     <!-- End # Login Form -->
                     
                     <!-- Begin | Lost Password Form -->
-                    <form id="lost-form" style="display:none;" method="GET" ACTION="emailChk.do" >
+                    <form id="lost-form" style="display:none;" method="GET" ACTION="InputMailforAuth.do" >
     	    		    <div class="modal-body">
 		    				<div id="div-lost-msg">
                                 <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -195,7 +195,7 @@
                 <!-- Begin # DIV Form -->
                 <div id="div-forms">
 					<!-- Begin | Register Edit Form -->
-					<form id="register-edit-form"  method="GET" ACTION="join.do">
+					<form id="register-edit-form"  method="GET" ACTION="ChangePasswd.do">
             		    <div class="modal-body">
 		    				<div id="div-edit-register-msg">
                                 <div id="icon-edit-register-msg" class="glyphicon glyphicon-chevron-right"></div>
