@@ -1,15 +1,15 @@
-<%
-java.io.PrintWriter
-java.util.UUID
-java.io.File
-java.io.FileOutputStream
-java.io.OutputStream
-java.io.InputStream
-java.util.List
-org.apache.commons.fileupload.disk.DiskFileItemFactory
-org.apache.commons.fileupload.servlet.ServletFileUpload
-org.apache.commons.fileupload.FileItem
+<%@ page import="java.io.PrintWriter" %>
+<%@ page import="java.util.UUID" %>
+<%@ page import="java.io.File" %>
+<%@ page import="java.io.FileOutputStream" %>
+<%@ page import="java.io.OutputStream" %>
+<%@ page import="java.io.InputStream" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %>
+<%@ page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %>
+<%@ page import="org.apache.commons.fileupload.FileItem" %>
 
+<%
 if (ServletFileUpload.isMultipartContent(request)){
     ServletFileUpload uploadHandler = new ServletFileUpload(new DiskFileItemFactory());
     //UTF-8 인코딩 설정

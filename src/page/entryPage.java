@@ -11,11 +11,10 @@ import property.commandAction;
 		@Override
 		public HashMap<String, String> requestPro(HttpServletRequest request,
 				HttpServletResponse response) throws Throwable {
-		
-			
+				
 			HashMap<String, String> r = new HashMap<String, String>();
 			r.put("view", "main.jsp");
-			
+			//r.put("view", "/StoreEditor/pages/trex/file.jsp");
 			return r;
 		}
 	}

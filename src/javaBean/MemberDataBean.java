@@ -71,7 +71,24 @@ public class MemberDataBean {
 		this.reg_date = reg_date;
 	}
 	
+	@Override 
+	public String toString(){
+		
+		return new String("해당 객체는 사이트에서... ");
+		
+	}
 	
-	
+	@Override
+	public boolean equals(Object mdb){
+		
+		if( mdb == null)
+			throw new NullPointerException();
+		else if( !(mdb instanceof MemberDataBean))
+			throw new IllegalArgumentException("비교대상으로 적합하지 않은 객체가 비교시도 되었습니다.");
+		
+		MemberDataBean m = (MemberDataBean )mdb;
+		
+		return ( id==m.getId() && password.equals(m.getPassword()) ) ? true : false;
+	}
 	
 }

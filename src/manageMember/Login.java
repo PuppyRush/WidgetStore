@@ -4,14 +4,9 @@ package manageMember;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Date;
+
 import java.util.HashMap;
 import javaBean.MemberProcessBean;
-import mail.PostMan;
 import javaBean.MemberDataBean;
 import property.commandAction;
 import property.constUserstate;
@@ -19,6 +14,8 @@ import property.constUserstate;
 /**
  *  JSP페이지에서 폼을 통하여 값을 전달받아 회원가입을 처리받는다.
  *  	  외부로그인 경우(내부로그인이면 가입한 경우) 이전에 로그인한 적이 있다면 가입절차를 밟지 않는다.
+ *  
+ *       해당 클래스의 기능순서도는  114.129.211.123/boards/2/topics/64 참고
 */
 public class Login implements commandAction {
 
@@ -92,15 +89,17 @@ public class Login implements commandAction {
 					else{
 						
 						if(MemberProcessBean.isPassingDate(mdb)){
-							returns.put("excssDateOfChange", "ture");
-							returns.put("view", "WHERHE");
+							returns.put("excessDateOfChange", "ture");
+							returns.put("view", "password_Reset.html");
 						}
-						else
+						else{
 							returns.put("innerLogin", "false");
+							returns.put("view", "/");
+						}
 					}
 					
 					
-					returns.put("view", "ChangePasswd.jsp");
+					
 					
 				}
 				else if((code & Integer.valueOf( constUserstate.SLEEP.getString()) ) == Integer.valueOf( constUserstate.SLEEP.getString())  ){

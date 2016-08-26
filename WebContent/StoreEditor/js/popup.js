@@ -1,25 +1,25 @@
 var CORE_FILES = [
-	"scopeVariable.js",
+	"StoreEditor/js/scopeVariable.js",
 	/** common library */
-	"lib/txlib.js",
-	"lib/hyperscript.js",
-	"lib/template.js",
-	"lib/dgetty.js",
-	"lib/xgetty.js",
-	"lib/rubber.js",
+	"StoreEditor/js/lib/txlib.js",
+	"StoreEditor/js/lib/hyperscript.js",
+	"StoreEditor/js/lib/template.js",
+	"StoreEditor/js/lib/dgetty.js",
+	"StoreEditor/js/lib/xgetty.js",
+	"StoreEditor/js/lib/rubber.js",
 	/** trex engine & config */
-	"trex/trex.js",
-	"trex/config.js",
-	"trex/event.js",
+	"StoreEditor/js/trex/trex.js",
+	"StoreEditor/js/trex/config.js",
+	"StoreEditor/js/trex/event.js",
 	/** trex library */
-	"trex/lib/markup.js",
-	"trex/lib/domutil.js",
-	"trex/lib/utils.js",
+	"StoreEditor/js/trex/lib/markup.js",
+	"StoreEditor/js/trex/lib/domutil.js",
+	"StoreEditor/js/trex/lib/utils.js",
 	/** trex mixins */
-	"trex/mixins/ajax.js",
-	"trex/mixins/observable.js",
+	"StoreEditor/js/trex/mixins/ajax.js",
+	"StoreEditor/js/trex/mixins/observable.js",
 	/** trex common */
-	"popuputil.js"
+	"StoreEditor/js/popuputil.js"
 ];
 
 try {
