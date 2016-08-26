@@ -107,7 +107,7 @@
                                 <h1 id='widgetName'></h1>
                                 <h4 id='widgetDeveloperName'></h4>
                                 <h4 id='star'></h4>
-                                <h5 id = 'grade'></h5>
+                                <h5 id='grade'></h5>
                                 <div class='btnBuy'>Download</div>
                             </div>
                             <!-- 위젯의 설명용 사진과 설명 -->
@@ -116,148 +116,169 @@
                                 <h5 id='widgetExplain'></h5>
                             </div>
                             <!-- 리뷰 -->
-							<div class="well">
-								 <div class="row">
-									<div class="col-md-12">
-                            <div class='goodsReview'>
-                                <div id = 'widgetReview'></div>
-                                <div>
-                                    <label>로그인한 작성자의 이름을 표시함</label>
-                                    <!-- 덧글 다는 부분 -->
-                                    <textarea id='msg'></textarea>
-                                    <button onclick="submit()">댓글달기</button>
+                            <div class="well">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <strong><ins>Comments</ins></strong>
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                        <div class='goodsReview'>
+                                            <div id='widgetReview'></div>
+                                            <div>
+                                                <!-- 덧글 다는 부분 -->
+                                                <div class="dropdown">
+												<label>[사용자 ID 표시 부분]</label>
+                                                    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+    ★★★★★
+    <span class="caret"></span>
+  </button>
+                                                    <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">★★★★★</a></li>
+                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">★★★★☆</a></li>
+                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">★★★☆☆</a></li>
+                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">★★☆☆☆</a></li>
+                                                        <li role="presentation"><a role="menuitem" tabindex="-1" href="#">★☆☆☆☆</a></li>
+                                                    </ul>
+													
+                                                </div>
+												
+                                                <div class="input-group">
+                                                    <textarea id='msg' class="form-control" rows="2"></textarea>
+                                                    <span class="input-group-btn">
+        <button class="btn btn-default btn-lg" type="submit">댓글등록</button>
+      </span>
+                                                </div>
+                                                <!-- /input-group -->
+
+
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
-                            <div class='goodsRank'>
-                                <select name="rank" onchange="javascript:getWidget()" style="width:140px;margin:10px;">
-                                    <option value='5' selected>★★★★★</option>
-                                    <option value='4' selected>★★★★☆</option>
-                                    <option value='3' selected>★★★☆☆</option>
-                                    <option value='2' selected>★★☆☆☆</option>
-                                    <option value='1' selected>★☆☆☆☆</option>
-                                    <option value='' selected></option>
-                                    
-                                    </select>
-                            </div>
-							</div>
-							</div>
-							</div>
                         </div>
                     </div>
                     <div id="field" class="row">
                         <script type="text/javascript">
-                        function init() {
-                            // db에서 불러온 위젯의 id에 따라 적절한 위젯을 붙임.
-                            addItem(1);
-                            addItem(2);
-                            addItem(3);
-                            addItem(4);
-                            addItem(5);
-                            addItem(6);
-                        }
-
-                        // 덧글을 다는 함수
-                        function submit() {
-                            //
-                            // 서버에 저장하는 부분이 필요함.
-                            // 
-                            // 
-                            // 
-                            // 
-                            // 
-                            var text = document.getElementById('msg');
-                            if (text.value == "") {
-                                alert("내용이 없음");
-                                return;
+                            function init() {
+                                // db에서 불러온 위젯의 id에 따라 적절한 위젯을 붙임.
+                                addItem(1);
+                                addItem(2);
+                                addItem(3);
+                                addItem(4);
+                                addItem(5);
+                                addItem(6);
                             }
 
-                            showReview("아이디", text.value);
-                            text.value = "";
-                        }
+                            // 덧글을 다는 함수
+                            function submit() {
+                                //
+                                // 서버에 저장하는 부분이 필요함.
+                                // 
+                                // 
+                                // 
+                                // 
+                                // 
+                                var text = document.getElementById('msg');
+                                if (text.value == "") {
+                                    alert("내용이 없음");
+                                    return;
+                                }
 
-                        // 전체 내용을 표시하는 함수
-                        function open_detail(widgetId) {
-                            // 숨겨졌던 폼을 로드함.
-                            if (!document.getElementById('widgetInfo').style.display == "") {
-                                document.getElementById('widgetInfo').style.display = '';
+                                showReview("아이디", text.value);
+                                text.value = "";
                             }
 
-                            if(typeof(reviews)!='undefined')
-                            {
-                                document.getElementById('reviews').remove();
+                            // 전체 내용을 표시하는 함수
+                            function open_detail(widgetId) {
+                                // 숨겨졌던 폼을 로드함.
+                                if (!document.getElementById('widgetInfo').style.display == "") {
+                                    document.getElementById('widgetInfo').style.display = '';
+                                }
+
+                                if (typeof(reviews) != 'undefined') {
+                                    document.getElementById('reviews').remove();
+                                }
+
+                                document.getElementById("widgetName").innerText = "" + widgetId + "의 위젯 이름임";
+                                document.getElementById('widgetDeveloperName').innerText = "" + widgetId + "의 개발자 이름임";
+                                document.getElementById('grade').innerText = "평점 :  4.5";
+                                document.getElementById('star').innerText = "★★★★☆";
+                                document.getElementById('widgetExplain').innerText =
+
+                                    "오늘도 또 우리 수탉이 막 쫓기었다.\n"
+
+                                +
+                                "내가 점심을 먹고 나무를 하러 갈 양으로 나올 때이었다.\n"
+
+                                +
+                                "산으로 올라서려니까 등뒤에서 푸르득푸드득, 하고 닭의 횃소리가 야단이다.\n"
+
+                                +
+                                "깜짝 놀라서 고개를 돌려보니 아니나다르랴, 두 놈이 또 얼리었다.\n"
+
+                                +
+                                "점순네 수탉(은 대강이가 크고 똑 오소리같이 실팍하게 생긴 놈)"
+
+                                +
+                                "이 덩저리 작은 우리 수탉을 함부로 해내는 것이다.\n"
+
+                                +
+                                " 그것도 그냥 해내는 것이 아니라 푸드득 하고 면두를 쪼고 물러섰다가 좀 사이를 두고 또 푸드득 하고 모가지를 쪼았다. \n\n"
+
+                                +
+                                "김유정\n"
+
+                                +
+                                "<동백꽃>\n";
+
+                                // 댓글을 한번에 지우기 위해
+                                // 댓글 부븐을 동적으로 추가함
+
+
+                                var div = document.createElement('div');
+                                div.id = 'reviews';
+                                document.getElementById('widgetReview').appendChild(div);
+
+                                // 덧글을 로드함
+                                showReview("디바", "이것도 너프해보시지");
+                                showReview("라인하르트", "바스티온이 나가신다");
+                                showReview("정크랫", "폭탄 받아라");
                             }
 
-                            document.getElementById("widgetName").innerText = "" + widgetId + "의 위젯 이름임";
-                            document.getElementById('widgetDeveloperName').innerText = "" + widgetId + "의 개발자 이름임";
-                            document.getElementById('grade').innerText = "평점 :  4.5";
-                            document.getElementById('star').innerText = "★★★★☆";
-                            document.getElementById('widgetExplain').innerText =
+                            function showReview(name, text) {
+                                // 위젯 번호에 따른 덧글을 표시함
 
-                                "오늘도 또 우리 수탉이 막 쫓기었다.\n"
+                                var div = document.createElement('div');
 
-                            + "내가 점심을 먹고 나무를 하러 갈 양으로 나올 때이었다.\n"
+                                var strHTML =
+                                    "<h4 id='userName'> " + name + " </h4>" + "<h5 id='userReview'>" + text + "</h5><hr>";
 
-                            + "산으로 올라서려니까 등뒤에서 푸르득푸드득, 하고 닭의 횃소리가 야단이다.\n"
+                                div.innerHTML = strHTML;
+                                document.getElementById('reviews').appendChild(div);
+                            }
 
-                            + "깜짝 놀라서 고개를 돌려보니 아니나다르랴, 두 놈이 또 얼리었다.\n"
+                            function addItem(widgetID) {
+                                var div = document.createElement('div');
+                                // 방법 1.
+                                // div.innerHTML = document.getElementById('aaa').outerHTML;
+                                // document.getElementById('field').appendChild(div);
 
-                            + "점순네 수탉(은 대강이가 크고 똑 오소리같이 실팍하게 생긴 놈)"
+                                // 방법 2.
+                                // divId : field 내부의 div ID
+                                // document.getElementById('divId').innerHTML = document.getElementById('aaa').outerHTML;
 
-                            + "이 덩저리 작은 우리 수탉을 함부로 해내는 것이다.\n"
+                                // 방법 3.
+                                var strHTML =
+                                    "<div class='col-sm-4 col-lg-4 col-md-4' id ='testID" + widgetID + "'>" + "<div class='thumbnail'>" + "<img src='http://placehold.it/320x150' alt=''>" + "<div class='caption'>" + "<h4 class='pull-right'></h4>" +
 
-                            + " 그것도 그냥 해내는 것이 아니라 푸드득 하고 면두를 쪼고 물러섰다가 좀 사이를 두고 또 푸드득 하고 모가지를 쪼았다. \n\n"
+                                    '<h4 ><a href="JavaScript:;" onclick="JavaScript: open_detail(' + widgetID + ');">' + widgetID + "</a></h4>" +
 
-                            + "김유정\n"
+                                    "<p>이것은 실험용이다.</p></div>" + "<div class='ratings'>" + "<p class='pull-right'>18 reviews</p>" + "</div></div></div>";
 
-                            + "<동백꽃>\n";
-
-                            // 댓글을 한번에 지우기 위해
-                            // 댓글 부븐을 동적으로 추가함
-                            
-
-                            var div = document.createElement('div');
-                            div.id = 'reviews';
-                            document.getElementById('widgetReview').appendChild(div);
-
-                            // 덧글을 로드함
-                            showReview("디바", "이것도 너프해보시지");
-                            showReview("라인하르트", "바스티온이 나가신다");
-                            showReview("정크랫", "폭탄 받아라");
-                        }
-
-                        function showReview(name, text) {
-                            // 위젯 번호에 따른 덧글을 표시함
-
-                            var div = document.createElement('div');
-
-                            var strHTML =
-                                "<h4 id='userName'> " + name + " </h4>" + "<h5 id='userReview'>" + text + "</h5>";
-
-                            div.innerHTML = strHTML;
-                            document.getElementById('reviews').appendChild(div);
-                        }
-
-                        function addItem(widgetID) {
-                            var div = document.createElement('div');
-                            // 방법 1.
-                            // div.innerHTML = document.getElementById('aaa').outerHTML;
-                            // document.getElementById('field').appendChild(div);
-
-                            // 방법 2.
-                            // divId : field 내부의 div ID
-                            // document.getElementById('divId').innerHTML = document.getElementById('aaa').outerHTML;
-
-                            // 방법 3.
-                            var strHTML =
-                                "<div class='col-sm-4 col-lg-4 col-md-4' id ='testID" + widgetID + "'>" + "<div class='thumbnail'>" + "<img src='http://placehold.it/320x150' alt=''>" + "<div class='caption'>" + "<h4 class='pull-right'></h4>" +
-
-                                '<h4 ><a href="JavaScript:;" onclick="JavaScript: open_detail(' + widgetID + ');">' + widgetID + "</a></h4>" +
-
-                                "<p>이것은 실험용이다.</p></div>" + "<div class='ratings'>" + "<p class='pull-right'>18 reviews</p>" + "</div></div></div>";
-
-                            div.innerHTML = strHTML;
-                            document.getElementById('field').appendChild(div);
-                        }
+                                div.innerHTML = strHTML;
+                                document.getElementById('field').appendChild(div);
+                            }
                         </script>
                         <!--
                         <div class="col-sm-4 col-lg-4 col-md-4" id="aaa">
