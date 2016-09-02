@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-1.7.0-openjdk-1.7.0.101.x86_64">
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-1.7.0-openjdk-1.7.0.101.x86_64">
 		<attributes>
 			<attribute name="owner.project.facets" value="java"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/widgetstoreServer">
+	<classpathentry exported="true" kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/widgetstoreServer">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.web"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
-	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/commons-collections4-4.1.jar"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/commons-dbcp2-2.1.1.jar"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/commons-pool2-2.4.2.jar"/>
@@ -42,5 +42,8 @@
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/tomcat-jni.jar"/>
 	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/javax.mail.jar"/>
 	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/activation.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/jsoup-1.9.2.jar"/>
+	<classpathentry kind="lib" path="/home/cmk/workspace/WidgetStore/WebContent/WEB-INF/lib/cos.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/portlet-2.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

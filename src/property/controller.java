@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(
 		urlPatterns = { 
 				"/",
-				"*.do"
+				"*.do",
 		}, 
 		initParams = { 
 				@WebInitParam(name = "propertyConfig", value = "commandMapping.properties")
@@ -126,20 +126,29 @@ public class controller extends HttpServlet {
 				String command = request.getRequestURI();
 		        if(command.indexOf(request.getContextPath()) == 0) 
 		           command = command.substring(request.getContextPath().length());
-		        	
-		        com = (commandAction)commandMap.get(command);  
-		        preSplit = com.requestPro(request, response);
-		        	view = preSplit.get("view");
-		        	if(preSplit.size() > 1){
-		        		preSplit.remove("view");
-		        	
-	        			Set<Entry<String, String>> set = preSplit.entrySet();
-        				Iterator<Entry<String, String>> it = set.iterator();
-	        			while(it.hasNext()){
-	        				Map.Entry<String, String> e = (Map.Entry<String, String>)it.next();
-        					request.setAttribute(e.getKey(), e.getValue());
-	        				}
-		        		}
+		        
+		        System.out.println(command);	
+		        
+					/*if(command.indexOf(".html")!=-1){
+							view = "main.jsp";
+							command = "/";
+					}*/
+					
+					       
+					com = (commandAction)commandMap.get(command);  
+					preSplit = com.requestPro(request, response);
+					view = preSplit.get("view");
+					if(preSplit.size() > 1){
+						preSplit.remove("view");
+					
+						Set<Entry<String, String>> set = preSplit.entrySet();
+						Iterator<Entry<String, String>> it = set.iterator();
+						while(it.hasNext()){
+							Map.Entry<String, String> e = (Map.Entry<String, String>)it.next();
+							request.setAttribute(e.getKey(), e.getValue());
+						}
+					
+					}
 			}catch(Throwable e) {
 				e.printStackTrace();
 			}

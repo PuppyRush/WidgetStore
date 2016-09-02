@@ -10,6 +10,10 @@
     <meta name="author" content="">
 
     <title>Widget Store - OSS</title>
+    
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script language="Javascript" type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
     <!-- Bootstrap Core CSS -->
     <link href="WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
@@ -66,7 +70,7 @@
                 <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" $("#menu-close").click(); >Sign out</a>
             </li>
             <li>
-                <a href="#Store" onclick = $("#menu-close").click(); >Store</a>
+                <a href="Store.jsp" onclick = $("#menu-close").click(); >Store</a>
             </li>
             <li>
                 <a href="#Custom" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#Register-edit-modal">Custom</a>
@@ -95,7 +99,7 @@
                 <div id="div-forms">
                 
                     <!-- Begin # Login Form -->
-                    <form id="login-form" method="GET" ACTION="innerLogon.do" >
+                    <form id="login-form" method="POST" ACTION="login.do" >
 		                <div class="modal-body">
 				    		<div id="div-login-msg">
                                 <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -134,13 +138,6 @@
 		    		    <div class="modal-footer">
                             <div>
                                 <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="lostpassword()">Send</button>
-=======
-		    				<input id="lost_email" class="form-control" name="email" type="text" placeholder="E-Mail (type ERROR for error effect)" required>
-            			</div>
-		    		    <div class="modal-footer">
-                            <div>
-                                <button type="submit"  class="btn btn-primary btn-lg btn-block" onClick="innerLost()">Send</button>
->>>>>>> 6bc3b5a784420aea9c52ef342d2b27250822c00b
                             </div>
                             <div>
                                 <button id="lost_login_btn" type="button" class="btn btn-link">Log In</button>
@@ -195,7 +192,7 @@
                 <!-- Begin # DIV Form -->
                 <div id="div-forms">
 					<!-- Begin | Register Edit Form -->
-					<form id="register-edit-form"  method="GET" ACTION="ChangePasswd.do">
+					<form id="register-edit-form"  method="GET" ACTION="changePasswd.do">
             		    <div class="modal-body">
 		    				<div id="div-edit-register-msg">
                                 <div id="icon-edit-register-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -231,15 +228,12 @@
 	window.onload=function(){
 			<%
 			try{ 
-				//이미 로그인 했던 기록이 있다면 자동로그인 한다.   
+				//Ã¬ÂÂ´Ã«Â¯Â¸ Ã«Â¡ÂÃªÂ·Â¸Ã¬ÂÂ¸ Ã­ÂÂÃ«ÂÂ ÃªÂ¸Â°Ã«Â¡ÂÃ¬ÂÂ´ Ã¬ÂÂÃ«ÂÂ¤Ã«Â©Â´ Ã¬ÂÂÃ«ÂÂÃ«Â¡ÂÃªÂ·Â¸Ã¬ÂÂ¸ Ã­ÂÂÃ«ÂÂ¤.   
 				if( session.getAttribute("alreadyLogon") != null &&
 						((String) session.getAttribute("alreadyLogon")).equals("true")){
 								response.sendRedirect("main.jsp");
 			%>
-				</script>
-				<script>
 					signChange('signOut');
-				</script>
 			<%
 				}
 			}
@@ -247,9 +241,8 @@
 				e.printStackTrace();
 			}
 			%>
-	}
+	};
 
-	<script>
 	function fun_signOut(){
 		session.removeAttribute("alreadyLogon");
 		response.sendRedirect("main.jsp");
@@ -340,7 +333,7 @@
 				
 				if (!CheckName()) {
                     msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "error", "glyphicon-remove", "CHECK USERNAME");
-                } else if(!chkPwd($rg_password, &rg_password2)) {
+                } else if(!chkPwd($rg_password, $rg_password2)) {
                     msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "error", "glyphicon-remove", "CHECK PASSWORD");
                 } else if(chkRegister()&&<%=request.getAttribute("isDuplicatedNickname")%> == "true"){
 					msgChange($('#div-register-msg'), $('#icon-register-msg'), $('#text-register-msg'), "error", "glyphicon-remove", "CHECK NICKNAME");
@@ -352,7 +345,7 @@
                 break;
 			case "register-edit-form":
 				if(true){
-					//여기에 새로생긴 비밀번호,,
+					//Ã¬ÂÂ¬ÃªÂ¸Â°Ã¬ÂÂ Ã¬ÂÂÃ«Â¡ÂÃ¬ÂÂÃªÂ¸Â´ Ã«Â¹ÂÃ«Â°ÂÃ«Â²ÂÃ­ÂÂ¸,,
 				}
             default:
                 return false;
@@ -427,22 +420,22 @@
 		var pw2 = str2;
 		var num = pw.search(/[0-9]/g);
 		var eng = pw.search(/[a-z]/ig);
-		var spe = pw.search(/[`~!@@#$%^&*|₩₩₩'₩";:₩/?]/gi);
+		var spe = pw.search(/[`~!@@#$%^&*|Ã¢ÂÂ©Ã¢ÂÂ©Ã¢ÂÂ©'Ã¢ÂÂ©";:Ã¢ÂÂ©/?]/gi);
 
 		 if(pw.length < 8 || pw.length > 20){
-			alert("8자리 ~ 20자리 이내로 입력해주세요.");
+			alert("8Ã¬ÂÂÃ«Â¦Â¬ ~ 20Ã¬ÂÂÃ«Â¦Â¬ Ã¬ÂÂ´Ã«ÂÂ´Ã«Â¡Â Ã¬ÂÂÃ«Â Â¥Ã­ÂÂ´Ã¬Â£Â¼Ã¬ÂÂ¸Ã¬ÂÂ.");
 			return false;
 		 }
-		 else if(pw.search(/₩s/) != -1){
-			alert("비밀번호는 공백업이 입력해주세요.");
+		 else if(pw.search(/Ã¢ÂÂ©s/) != -1){
+			alert("Ã«Â¹ÂÃ«Â°ÂÃ«Â²ÂÃ­ÂÂ¸Ã«ÂÂ ÃªÂ³ÂµÃ«Â°Â±Ã¬ÂÂÃ¬ÂÂ´ Ã¬ÂÂÃ«Â Â¥Ã­ÂÂ´Ã¬Â£Â¼Ã¬ÂÂ¸Ã¬ÂÂ.");
 			return false;
 		 } 
 		 else if(num < 0 || eng < 0 || spe < 0 ){
-			alert("영문,숫자, 특수문자를 혼합하여 입력해주세요.");
+			alert("Ã¬ÂÂÃ«Â¬Â¸,Ã¬ÂÂ«Ã¬ÂÂ, Ã­ÂÂ¹Ã¬ÂÂÃ«Â¬Â¸Ã¬ÂÂÃ«Â¥Â¼ Ã­ÂÂ¼Ã­ÂÂ©Ã­ÂÂÃ¬ÂÂ¬ Ã¬ÂÂÃ«Â Â¥Ã­ÂÂ´Ã¬Â£Â¼Ã¬ÂÂ¸Ã¬ÂÂ.");
 			return false;
 		 }
 		 else if(str != str2){
-			alert("비밀번호가 서로 맞지 않습니다.");
+			alert("Ã«Â¹ÂÃ«Â°ÂÃ«Â²ÂÃ­ÂÂ¸ÃªÂ°Â Ã¬ÂÂÃ«Â¡Â Ã«Â§ÂÃ¬Â§Â Ã¬ÂÂÃ¬ÂÂµÃ«ÂÂÃ«ÂÂ¤.");
 			return false;
 		 }
 		 else {
