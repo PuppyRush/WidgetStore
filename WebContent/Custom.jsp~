@@ -6,22 +6,22 @@
 
 <body onload="setWidgetList();">
     <script>
-    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®
+    // º¸µå À§Á¬ ¸®½ºÆ®
     var listBoard = [];
 
-    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ò·ï¿½ï¿½Í¼ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ü¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+    // À¯Àú Á¤º¸¿¡ µû¶ó ºÒ·¯¿Í¼­ À¯Àú°¡ ´Ù¿î¹ÞÀº À§Á¬À» ¸®¸ðÄÜ¿¡ Áý¾î³ÖÀ½ 
     function setWidgetList() {
-        /* ï¿½Ì¹ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò·ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Îºï¿½ */
-        obMouse.setWidget('Twice', '<iframe width=100% height=100% src="https://www.youtube.com/embed/hs3lIhlTRJM" frameborder="0" allowfullscreen></iframe>');
+        /* ÀÌ¹Ì ¹èÄ¡µÈ À§Á¬À» ºÒ·¯¿À´Â ºÎºÐ */
+        obMouse.setWidget('Æ®¿ÍÀÌ½º', '<iframe width=100% height=100% src="https://www.youtube.com/embed/hs3lIhlTRJM" frameborder="0" allowfullscreen></iframe>');
         obMouse.setLocation(100, 150);
         setModeOn();
        
-        /* ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ü¿ï¿½ ï¿½ß°ï¿½ï¿½Ñ´ï¿½ */
-        addWidget('Choa', "<iframe width=100% height=100% src='https://www.youtube.com/embed/G9zL-A78oRg' frameborder='0' allowfullscreen></iframe>");
-        addWidget('Teayoun', "<iframe width=100% height=100% src='https://www.youtube.com/embed/Ri6wvGjuoOg' frameborder='0' allowfullscreen></iframe>");
+        /* À¯Àú°¡ ³»·Á¹ÞÀº À§Á¬À» ¸®¸ðÄÜ¿¡ Ãß°¡ÇÑ´Ù */
+        addWidget('ÃÊ¾Æ', "<iframe width=100% height=100% src='https://www.youtube.com/embed/G9zL-A78oRg' frameborder='0' allowfullscreen></iframe>");
+        addWidget('ÅÂ¿¬', "<iframe width=100% height=100% src='https://www.youtube.com/embed/Ri6wvGjuoOg' frameborder='0' allowfullscreen></iframe>");
     }
 
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+    // ¸®¸ðÄÜ Æû¿¡ ´ëÇÑ µå·¡±× ÀÌº¥Æ®
     var x = 0
     var y = 0
     drag = 0
@@ -58,9 +58,9 @@
     </head>
     <div id="board" onclick="pos(event);" style="width:100%; height:100%;">
         <script type="text/javascript">
-        // ï¿½ï¿½ï¿½ï¿½Îºï¿½ ï¿½ï¿½ï¿½ì½º Å¬ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+        // º¸µåºÎºÐ ¸¶¿ì½º Å¬¸¯ ÀÌº¥Æ®
         function pos(event) {
-            // ï¿½ï¿½ï¿½ì½ºï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ return;
+            // ¸¶¿ì½º¿¡ °´Ã¼°¡ ¾øÀ»°æ¿ì return;
             if (!obMouse.getHave()) return;
             obMouse.setLocation(event.pageX, event.pageY);
         }
@@ -78,7 +78,7 @@
                             </OPTION>
                             <script type="text/javascript">
                             /**
-                             * select controlï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½Îºï¿½
+                             * select control¿¡ Á¤º¸ Áý¾î³Ö´Â ºÎºÐ
                              */
                             function addWidget(name, tag) {
                                 var op = document.createElement("option");
@@ -89,13 +89,13 @@
                                 document.form.widgetSel.options.add(op);
                             }
 
-                            // select box ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ã½ï¿½
+                            // select box ¿¡¼­ À§Á¬ ¼±ÅÃ½Ã
                             function getWidget() {
 
                                 var f = document.form.widgetSel;
-                                var idx = f.selectedIndex; //ï¿½Îµï¿½ï¿½ï¿½
-                                var widgetTag = f.options[idx].value; //ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½
-                                var name = f.options[idx].text; // ï¿½ï¿½ï¿½Ø½ï¿½ ï¿½Ì¸ï¿½
+                                var idx = f.selectedIndex; //ÀÎµ¦½º
+                                var widgetTag = f.options[idx].value; //ÀÎµ¦½º °ª
+                                var name = f.options[idx].text; // ÀÎÅØ½º ÀÌ¸§
 
                                 if (widgetTag != '') {
                                     obMouse.setWidget(name, widgetTag);
@@ -109,47 +109,47 @@
             <tr>
                 <td>
                     <p align="center" class="page">
-                        <input type=button value="ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½" onclick="setModeOn()" style="width:140px;margin:10px 0px 5px 0px;">
+                        <input type=button value="¼öÁ¤¿Ï·á" onclick="setModeOn()" style="width:140px;margin:10px 0px 5px 0px;">
                         <script type="text/javascript">
                         function setModeOn() {
-                            // listBoradï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Â±×¿ï¿½
-                            // ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï¿ï¿½ divï¿½ï¿½ iframeï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½
+                            // listBorad¿¡ ÀúÀåµÈ ÅÂ±×¿Í
+                            // ÁÂÇ¥¸¦ ÀÌ¿ëÇÏ¿© div¸¦ iframeÀ¸·Î ¹Ù²Þ
                             // 
                             // 
-                            // Å°ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+                            // Å°°í ²ø °æ¿ì ¸®¸ðÄÜÀ» º¸ÀÌ°í ¾È º¸ÀÌ°í ¸¸µé¾î¾ß ÇÔ
                             // 
                             // 
                             for (var i in listBoard) {
-                                // divï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Þ¾Æ¿ï¿½
+                                // div¿¡¼­ ÁÂÇ¥¸¦ ¹Þ¾Æ¿È
                                 var div = listBoard[i];
 
-                                // ï¿½ï¿½ï¿½ ï¿½Ö´ÂºÎºï¿½ 
+                                // Áý¾î ³Ö´ÂºÎºÐ 
                                 div.innerHTML = div.getObjectTag();
                             }
                         }
                         </script>
                         <br>
-                        <input type=button value="ï¿½ï¿½ï¿½ï¿½" onclick="setModeOff()" style="width:140px;margin:0px 0px 10px 0px;">
+                        <input type=button value="¼öÁ¤" onclick="setModeOff()" style="width:140px;margin:0px 0px 10px 0px;">
                         <script type="text/javascript">
                         function setModeOff() {
-                            // listBoradï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Â±×¿ï¿½
-                            // ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï¿ï¿½ divï¿½ï¿½ iframeï¿½ï¿½ï¿½ï¿½ ï¿½Ù²ï¿½
+                            // listBorad¿¡ ÀúÀåµÈ ÅÂ±×¿Í
+                            // ÁÂÇ¥¸¦ ÀÌ¿ëÇÏ¿© div¸¦ iframeÀ¸·Î ¹Ù²Þ
                             for (var i in listBoard) {
-                                // divï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Þ¾Æ¿ï¿½
+                                // div¿¡¼­ ÁÂÇ¥¸¦ ¹Þ¾Æ¿È
                                 var div = listBoard[i];
 
-                                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ÂºÎºï¿½
+                                // ³ÖÀº°Å »©´ÂºÎºÐ
                                 div.innerHTML = div.id;
-                                div.innerText = div.id + "widget (Click to remove)";
+                                div.innerText = div.id + "widget (´õºíÅ¬¸¯ÇÏ¸é »èÁ¦)";
                             }
                         }
                         </script>
-                        <input type=button value="ï¿½ï¿½" onclick="" style="width:65px;margin:0px 3px 10px 0px;">
+                        <input type=button value="À¥" onclick="" style="width:65px;margin:0px 3px 10px 0px;">
                         <script type="text/javascript">
-                        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Îºï¿½ ï¿½Û¼ï¿½
+                        // ÀúÀå ÇÏ´Â ºÎºÐ ÀÛ¼º
                         </script>
-                        <input type=button value="ï¿½ï¿½ï¿½ï¿½" onclick="localSave()" style="width:65px;margin:0px 0px 10px 3px;">
-                        <!-- ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ó½ï¿½ iframe -->
+                        <input type=button value="·ÎÄÃ" onclick="localSave()" style="width:65px;margin:0px 0px 10px 3px;">
+                        <!-- ÀúÀåÀ» À§ÇÑ ÀÓ½º iframe -->
                         <script type="text/javascript">
                         function localSave() {
                             alert(document.documentElement.outerHTML);
@@ -181,20 +181,20 @@
     <script type="text/javascript">
     /*************************************************************************************/
 
-    // ï¿½ï¿½ï¿½ì½º Å¬ï¿½ï¿½ï¿½ï¿½
+    // ¸¶¿ì½º Å¬·¡½º
     var obMouse = new mouse();
     /**
-     * ï¿½ï¿½ï¿½ì½º Å¬ï¿½ï¿½ï¿½ï¿½
-     * ï¿½ï¿½ï¿½ï¿½ï¿½Ü¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½
-     * ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ù°ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½
+     * ¸¶¿ì½º Å¬·¡½º
+     * ¸®¸ðÄÜ¿¡¼­ À§Á¬À» ¼±ÅÃÇÏ¸é
+     * ±× À§Á¬°ªÀ» °¡Áö°í ÀÖ´Ù°¡ ¹èÄ¡ÇØÁÜ
      */
     function mouse() {
-        // ï¿½ï¿½ï¿½ì½ºï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        // ¸¶¿ì½º°¡ ÇöÁ¦ °´Ã¼¸¦ °¡Áö°í ÀÖ´ÂÁöÀÇ ¿©ºÎ
         var have = 0;
         var widgetTag;
         var name;
 
-        //ï¿½ï¿½Ç¥
+        //ÁÂÇ¥
         var px, py;
 
         this.setWidget = function(name, tag) {
@@ -204,12 +204,12 @@
         }
 
         this.setLocation = function(x, y) {
-            // ï¿½Ê±ï¿½È­
+            // ÃÊ±âÈ­
             var div = document.createElement("div");
             var objectTag = this.widgetTag;
 
             div.id = this.name;
-            div.innerText = div.id + "widget (ï¿½ï¿½ï¿½ï¿½Å¬ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½)";
+            div.innerText = div.id + "widget (´õºíÅ¬¸¯ÇÏ¸é »èÁ¦)";
             div.style.width = "560px";
             div.style.height = "315px";
             div.style.backgroundColor = "red";
@@ -220,9 +220,9 @@
             div.getObjectTag = function() {
                 return objectTag;
             };
-            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ ï¿½Ìºï¿½Æ®
+            // À§ÀíÀÇ µå·¡±× ÀÌº¥Æ®
             div.onmousedown = function(event) {
-                // offsetLeft,offsetTop : ï¿½Î¸ï¿½ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ï¿½ï¿½.
+                // offsetLeft,offsetTop : ºÎ¸ð¿ä¼Ò¸¦ ±âÁØÇÑ ÁÂÇ¥ÁöÁ¡.
                 px = event.clientX - event.srcElement.offsetLeft;
                 py = event.clientY - event.srcElement.offsetTop;
                 flag = 1;
@@ -242,7 +242,7 @@
                     event.srcElement.style.top = event.clientY - py + "px";
             };
 
-            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 
+            // »èÁ¦ÇÔ 
             div.ondblclick = function(event) {
                 document.getElementById('board').removeChild(this);
             };
@@ -254,10 +254,10 @@
 
             document.getElementById('board').appendChild(div);
 
-            // divï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ß±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+            // div¸¦ ¹èÄ¡Çß±â ¶§¹®¿¡ ÃÊ±âÈ­
             have = 0;
 
-            // ï¿½ï¿½Â¥ div ï¿½Â±×¸ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            // ÁøÂ¥ div ÅÂ±×¸¦ ¸®½ºÆ®¿¡ ÀúÀå
             listBoard.push(div);
         }
 
