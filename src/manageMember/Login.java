@@ -33,7 +33,7 @@ public class Login implements commandAction {
 		if( ((String)request.getParameter("idType")).equals("inner") ){
 			
 			String nick_or_mail = (String)request.getParameter("login_username");
-						
+					//주석	
 			if( nick_or_mail.contains("@") ){			
 				mdb.setEmail(nick_or_mail);
 				mdb.setId( MemberProcessBean.somethingToId("email", nick_or_mail) );
