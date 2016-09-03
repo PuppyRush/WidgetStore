@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
 import property.constUserstate;
 
@@ -21,7 +21,7 @@ public class ChangePasswd implements commandAction {
 			throws Throwable {
 		
 
-		MemberDataBean mdb = new MemberDataBean();
+		Member mdb = new Member();
 		HashMap<String , String> returns = new HashMap<String , String>();
 	
 		if(request.getParameter("email") == null)

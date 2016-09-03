@@ -55,7 +55,7 @@
     function addEditorEnvIndicator() {
         if (window.Editor && Editor.__EDITOR_LOADED) {
             var indicator = document.createElement("span");
-            indicator.innerHTML = "DEVELOPMENT MODE";
+            //indicator.innerHTML = "DEVELOPMENT MODE";
             $tx.setStyle(indicator, {
                 position: "absolute",
                 fontSize: "13px",

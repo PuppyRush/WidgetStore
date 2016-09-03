@@ -61,7 +61,7 @@
         <ul class="sidebar-nav">
             <a id="menu-close" href="#" class="btn btn-light btn-md pull-right toggle"><i class="fa fa-times"></i></a>
             <li class="sidebar-brand">
-                <a href="#top"  onclick = $("#menu-close").click(); >Widget Store</a>
+                <a href="#top"  onclick =  $("#menu-close").click(); >Widget Store</a>
             </li>
             <li>
                 <a href="#Sign In" id="signIn" style="display:''" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#login-modal">Sign in</a>
@@ -70,7 +70,7 @@
                 <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" $("#menu-close").click(); >Sign out</a>
             </li>
             <li>
-                <a href="Store.jsp" onclick = $("#menu-close").click(); >Store</a>
+                <a href="Store.jsp" onclick ="fun_Store()"; >Store</a>
             </li>
             <li>
                 <a href="#Custom" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#Register-edit-modal">Custom</a>
@@ -107,6 +107,7 @@
                             </div>
 				    		<input id="login_username" name="login_username" class="form-control" type="text" placeholder="Username" required>
 				    		<input id="login_password" name="login_password" class="form-control" type="password" placeholder="Password" required>
+				    			<input id="sessionId" name="sessionId" class="form-control" type="hidden" />
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"> Remember me
@@ -115,7 +116,7 @@
         		    	</div>
 				        <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block" onClick="innerLogon()">Login</button>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block" onClick="innerLogin()">Login</button>
                             </div>
 				    	    <div>
                                 <button id="login_lost_btn" type="button" class="btn btn-link">Lost Password?</button>
@@ -226,15 +227,24 @@
     <!-- Custom Theme JavaScript -->
     <script>
 	window.onload=function(){
+				
 			<%
 			try{ 
 				//Ã¬ÂÂ´Ã«Â¯Â¸ Ã«Â¡ÂÃªÂ·Â¸Ã¬ÂÂ¸ Ã­ÂÂÃ«ÂÂ ÃªÂ¸Â°Ã«Â¡ÂÃ¬ÂÂ´ Ã¬ÂÂÃ«ÂÂ¤Ã«Â©Â´ Ã¬ÂÂÃ«ÂÂÃ«Â¡ÂÃªÂ·Â¸Ã¬ÂÂ¸ Ã­ÂÂÃ«ÂÂ¤.   
-				if( session.getAttribute("alreadyLogon") != null &&
-						((String) session.getAttribute("alreadyLogon")).equals("true")){
-								response.sendRedirect("main.jsp");
-			%>
-					signChange('signOut');
-			<%
+				if(false &&  session.getAttribute("alreadyLogin") != null &&
+						((String) session.getAttribute("alreadyLogin")).equals("true")){
+								//response.sendRedirect("main.jsp");
+							%>
+									signChange('signOut');
+							<%
+					}
+				
+				else if( session.getAttribute("is_successLogin") != null && ((String)session.getAttribute("succ_login")).equals("true")){
+					
+					
+				}
+				else if( ((String)session.getAttribute("is_successLogin")).equals("false") == true ){
+					
 				}
 			}
 			catch(Exception e){
@@ -243,9 +253,17 @@
 			%>
 	};
 
+	function fun_Store(){
+		 $("#menu-close").click();
+		response.forward("./store.jsp");
+		
+	}
+	
 	function fun_signOut(){
-		session.removeAttribute("alreadyLogon");
+		
+		session.removeAttribute("alreadyLogin");
 		response.sendRedirect("main.jsp");
+		
 	}
 	function signChange(id){
 	var div = document.getElementById(id);
@@ -261,7 +279,7 @@
 		  }
 		}
    }
-
+	
     // Closes the sidebar menu
     $("#menu-close").click(function(e) {
         e.preventDefault();
@@ -301,12 +319,13 @@
                 var $lg_username=$('#login_username').val();
                 var $lg_password=$('#login_password').val();
 
-                if (<%=request.getAttribute("innerLogon")%> == "false") {
+                if (<%=request.getAttribute("innerLogin")%> == "false") {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "error", "glyphicon-remove", "Login error");
                 } else {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "success", "glyphicon-ok", "Login OK");
 					<%
-					session.setAttribute("alreadyLogon", "true");
+		
+					session.setAttribute("alreadyLogin", "true");
 					session.setMaxInactiveInterval(60*60);
 					%>
 					window.location.reload();
@@ -443,7 +462,9 @@
 		 }
 	}
 });
-	function innerLogon(){
+	function innerLogin(){
+		var id = "<%= (String)session.getId() %>";
+		$("#sessionId").val(id);
 		document.forms["login-form"].submit();
 	}
 	function innerJoin(){

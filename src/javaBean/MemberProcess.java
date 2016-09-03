@@ -12,19 +12,19 @@ import org.mindrot.jbcrypt.BCrypt;
 import property.*;
 
 
-public class MemberProcessBean {
+public class MemberProcess {
 	
 	private static Connection conn = ConnectMysql.getConnector();
-	private static MemberDataBean instance = new MemberDataBean();
+	private static Member instance = new Member();
 
-	public static MemberDataBean getInstance() {
+	public static Member getInstance() {
 		return instance;
 	}
 
-	public MemberProcessBean() {
+	public MemberProcess() {
 	}
 
-	public static int isLockingMember(MemberDataBean mdb){
+	public static int isLockingMember(Member mdb){
 
 		Statement st = null;
 		PreparedStatement ps = null;
@@ -191,17 +191,17 @@ public class MemberProcessBean {
 		
 		int id;
 		try {
-
+			
 			switch(attr){
 			
 				case "email":
-					pstmt = conn.prepareStatement("select user_num from user where email = ? ");
+					pstmt = conn.prepareStatement("select userNum from user where email = ? ");
 					pstmt.setString(1, val);
 					
 					break;
 					
 				case "nickname":
-					pstmt = conn.prepareStatement("select user_num from user where nickname = ? ");
+					pstmt = conn.prepareStatement("select userNum from user where nickname = ? ");
 					pstmt.setString(1, val);
 					break;
 			
@@ -259,7 +259,7 @@ public class MemberProcessBean {
 	 * 홈페이지 내부가입자가 아닌 외부인증을 통하여 가입한 유저는 비밀번호가 공백이다.
 	 */
 	@SuppressWarnings("resource")
-	public static boolean joinMember(MemberDataBean member) throws SQLException {
+	public static boolean joinMember(Member member) throws SQLException {
 
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;
@@ -296,7 +296,7 @@ public class MemberProcessBean {
 
 			if(member.getIdType().equals("inner")){
 
-				String pw = BCrypt.hashpw( member.getPassword(), BCrypt.gensalt());
+				String pw = BCrypt.hashpw( member.getPassword(), BCrypt.gensalt(12));
 				pstmt.setString(3, pw);
 			}
 			else
@@ -315,15 +315,18 @@ public class MemberProcessBean {
 			
 			////////userState table
 			
-			pstmt = conn.prepareStatement("insert into userState (u_num , isBlocked, isDeveloper,"
-					+ "blockedReasonCode, lastLoginDate, lastModifiedDate) values(?,?,?,?,?,?)" );
+			pstmt = conn.prepareStatement("insert into userState (u_num , isAbnormal, isDeveloper,"
+					+ "abnormalCode, lastLoginDate, lastModifiedDate, loginCount, failedLoginCount, denyChangePwDate) values(?,?,?,?,?,?,?,?,?)" );
 			
 			pstmt.setLong(1,key);
-/*			pstmt.setInt(2, 0);
+			pstmt.setInt(2, 0);
 			pstmt.setInt(3,0);
-			pstmt.setInt(4,0);*/
+			pstmt.setInt(4,0);
 			pstmt.setTimestamp(5, member.getReg_date());
-			/*pstmt.setTimestamp(6, member.getReg_date());*/
+			pstmt.setTimestamp(6, member.getReg_date());
+			pstmt.setInt(7,0);
+			pstmt.setInt(8,0);
+			pstmt.setTimestamp(9, member.getReg_date());
 			
 			pstmt.executeUpdate();
 				
@@ -373,7 +376,7 @@ public class MemberProcessBean {
 	 * @return 로그인 무사히 성사됐는지 여부를 반환
 	 * @throws  
 	 */
-	public static boolean loginMember(MemberDataBean member) throws SQLException {
+	public static boolean loginMember(Member member) throws SQLException {
 		
 		Statement st = conn.createStatement();
 		PreparedStatement ps = null;
@@ -408,10 +411,11 @@ public class MemberProcessBean {
 			
 			rs = ps.executeQuery();
 			rs.next();
-			String hasedpw =  rs.getString(1);
-			
+			String hashedpw =  rs.getString(1);
+
+			String hashed = BCrypt.hashpw(member.getPassword(), BCrypt.gensalt(12));	
 			//비밀번호 일치.
-			if( BCrypt.checkpw( member.getPassword(), hasedpw ) ){
+			if( BCrypt.checkpw( member.getPassword(), hashed ) ){
 				
 				res =  true;
 				
@@ -516,9 +520,9 @@ public class MemberProcessBean {
 	 * @param mdb
 	 * @return	3개월 이상 지났다면 true 아니면 false
 	 */
-	public static boolean isPassingDate(MemberDataBean mdb){
+	public static boolean isPassingDate(Member mdb){
 		
-		Timestamp time = (Timestamp)MemberProcessBean.getSomethingJustOne("losingPasswd", "u_num", mdb.getId(), "sendedMailDate");
+		Timestamp time = (Timestamp)MemberProcess.getSomethingJustOne("losingPasswd", "u_num", mdb.getId(), "sendedMailDate");
 		//int dateGap = Calendar.getInstance().get
 																 
 		Date today = new Date ( );
@@ -555,11 +559,11 @@ public class MemberProcessBean {
 	 * @param mdb
 	 * @return	true if redirect to inputmailPage, false if to inputAuthnumPage
 	 */
-	public static boolean isSendmail(MemberDataBean mdb, int userState){
+	public static boolean isSendmail(Member mdb, int userState){
 		
 		//이미 전송하였는가?
-		if( (boolean)MemberProcessBean.getSomethingJustOne("losingPassword", "u_num", mdb.getId(), "isSendedMail")){
-			Timestamp time = (Timestamp)MemberProcessBean.getSomethingJustOne("losingPasswd", "u_num", mdb.getId(), "sendedMailDate");
+		if( (boolean)MemberProcess.getSomethingJustOne("losingPassword", "u_num", mdb.getId(), "isSendedMail")){
+			Timestamp time = (Timestamp)MemberProcess.getSomethingJustOne("losingPasswd", "u_num", mdb.getId(), "sendedMailDate");
 			//int dateGap = Calendar.getInstance().get
 																	 
 			Date today = new Date ( );
@@ -599,7 +603,7 @@ public class MemberProcessBean {
 	 * @return						쿼리결과에 따라 하나의 날짜가 리턴됨 
 	 */
 	
-	public static boolean isConcordTempValue(MemberDataBean mdb, String value ){
+	public static boolean isConcordTempValue(Member mdb, String value ){
 		
 		mdb.setId( somethingToId(mdb.getEmail(), "email" ));
 		String tempPw = (String)getSomethingJustOne("losingPasswd","u_num",mdb.getId(), "tempPassword");
@@ -613,7 +617,7 @@ public class MemberProcessBean {
 		
 	}
 	
-	public static boolean changePassword(MemberDataBean mdb, String newPasswd){
+	public static boolean changePassword(Member mdb, String newPasswd){
 		
 		mdb.setId( somethingToId(mdb.getEmail(), "email") );
 		

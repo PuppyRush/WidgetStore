@@ -41,7 +41,7 @@ TrexConfig.addAttacher(
 	"image",
 	{	
 		multiple: _TRUE,
-		multipleuse: _FALSE,
+		multipleuse: _TRUE,
 		checksize: _TRUE,
 		boxonly: _FALSE,
 		wysiwygonly: _TRUE,
@@ -69,7 +69,7 @@ Trex.Attacher.Image = Trex.Class.create({
 	$extend: Trex.Attacher,
 	name: 'image',
 	title: TXMSG("@image.title"),
-	canModified: _FALSE,
+	canModified: _TRUE,
 	canResized: _TRUE,
     matchRegexStartTag: /<(\w+)/,// 첨부시에 dispHtml을 기준으로 속성 및 스타일을 적용 할 태그를 찾을 때 사용
 	oninitialized: function() {

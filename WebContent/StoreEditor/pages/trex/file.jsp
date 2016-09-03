@@ -48,6 +48,10 @@
 		<dl class="alert">
 		    <dt>íì¼ ì²¨ë¶ íì¸</dt>
 		    <dd>
+		     	<form id="frm" action="/uploadTemporaryImageFromEditor.do" method="post">
+          <input onchange="javascript:changeValue(this);" id="image_file"  type="file" name="image_file"/>
+   					<input type="text" readonley="readonly" id="image_name"/>
+      </form>
 			    확인 누르면 파일 추가
 			</dd>
 		</dl>

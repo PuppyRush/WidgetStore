@@ -1,3 +1,17 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+
+	pageEncoding="UTF-8"%>
+
+<%@page import="java.util.*"%>
+
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
+
+
+
 <!doctype html>
 <html lang="en">
  <head>
@@ -28,8 +42,8 @@
 			<div class="modal-body">
 				<div class="modal-footer">
                     <div>
-                         <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="location.href='StoreEditor/widgetUploadPage.jsp'">직접 파일 업로드</button>
-						 <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="location.href='StoreEditor/gitUploadPage.jsp'">깃을 통한 업로드</button>
+         	          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun_our()">직접 파일 업로드</button>
+						 									<button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun_git()">깃을 통한 업로드</button>
 					</div>
                 </div>
 			</div>
@@ -39,4 +53,19 @@
     <script src="WidgetClientPage/js/jquery.js"></script>
     <script src="WidgetClientPage/js/bootstrap.min.js"></script>
  </body>
+ 
+ <script>
+ 
+	function fun_git(){
+		location.replace("/StoreEditor/gitUploadPage.jsp");
+		
+	}
+	
+	function fun_our(){
+		location.replace("/StoreEditor/widgetUploadPage.jsp");
+		
+	}
+ 
+ </script>
+ 
 </html>

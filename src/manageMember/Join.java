@@ -4,8 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
 
 /**
@@ -19,7 +19,7 @@ public class Join implements commandAction {
 			throws Throwable {
 		
 		
-		MemberDataBean mdb = new MemberDataBean();
+		Member mdb = new Member();
 		HashMap<String , String> returns = new HashMap<String , String>();
 		String idType = (String) request.getParameter("idType");
 
@@ -51,7 +51,7 @@ public class Join implements commandAction {
 				
 		}
 
-		if (MemberProcessBean.joinMember(mdb))		
+		if (MemberProcess.joinMember(mdb))		
 			returns.put("message", "가입에 성공하였습니다.");
 		else
 			returns.put("message", "이전에 가입하셨습니다.");

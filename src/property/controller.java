@@ -7,6 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import javaBean.Member;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,13 +22,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebInitParam;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Servlet implementation class controller
  */
@@ -121,20 +117,16 @@ public class controller extends HttpServlet {
 			HashMap<String, String>preSplit = null;
 			String view = null;
 			commandAction com=null;
+	
 			
 			try {
 				String command = request.getRequestURI();
 		        if(command.indexOf(request.getContextPath()) == 0) 
 		           command = command.substring(request.getContextPath().length());
 		        
+
 		        System.out.println(command);	
-		        
-					/*if(command.indexOf(".html")!=-1){
-							view = "main.jsp";
-							command = "/";
-					}*/
-					
-					       
+		        					       
 					com = (commandAction)commandMap.get(command);  
 					preSplit = com.requestPro(request, response);
 					view = preSplit.get("view");

@@ -2,17 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>Daum에디터 - 이미지 첨부</title> 
+<title>Daumìëí° - ì´ë¯¸ì§ ì²¨ë¶</title> 
 <script src="/StoreEditor/js/popup.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="/StoreEditor/css/popup.css" type="text/css"  charset="utf-8"/>
 
-<!-- 쿼리 링크 -->
-<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-<script type="text/javascript" src="jquery.form.js"></script>
+<!-- ì¿¼ë¦¬ ë§í¬ -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="http://malsup.github.io/jquery.form.js"></script>
 
 <script type="text/javascript">
 // <![CDATA[
-	
 	$(function(){
         $("#saveBtn").click(function(){
             $("#frm").submit();
@@ -22,7 +21,7 @@
             beforeSubmit: function (data,form,option) {
                 //validation체크 
                 //막기위해서는 return false를 잡아주면됨
-                return false;
+                return true;
             },
             success: function(response,status){
                 //성공후 서버에서 받은 데이터 처리
@@ -34,16 +33,27 @@
             }                               
         });
     })
+    
+
     function done(response) {
         if (typeof(execAttach) == 'undefined') { //Virtual Function
-			alert("1");
             return;
-        }
-        var response_object = $.parseJSON( response );
-        execAttach(response_object);
+        }               
+        
+        var data = $.parseJSON( response );
+        
+      	var _mockdata = {
+    			'attachurl': data.upload_path + '/' + data.save_file_name,
+    			'filemime': data.real_file_name,
+    			'filename': data.file_size,
+    			'imagealign' : "L"
+    		};
+
+        execAttach(data);
         closeWindow();
     }
- 
+ 		
+	
     function initUploader(){
         var _opener = PopupUtil.getOpener();
         if (!_opener) {
@@ -53,7 +63,29 @@
          
         var _attacher = getAttacher('image', _opener);
         registerAction(_attacher);
-    }
+  		  }
+    
+    function changeValue(object){
+    			var value = $(object).val();
+    			if(value != ''){
+    					var ext = value.split('.').pop().toLowerCase();
+  						if($.inArray(ext, ['gif','png','jpg','jpeg','tif']) == -1){
+  								alert("gif,png,jpg,jpeg,tif만 업로드 가능합니다 ");
+  								$(object).val("");
+ 									$("#image_name").val("");
+ 									return;  						
+  							}		
+  						
+							var array = value.split("\\");
+							var a = 0 ;
+							if(array.length > 1){
+								document.getElementById('image_name').value == array[array.length-1];
+							}else{
+								document.getElementById('image_name').vlaue = value;
+							}
+							
+    			}    	    	
+    		}
 
 // ]]>
 </script>
@@ -61,23 +93,24 @@
 <body onload="initUploader();">
 <div class="wrapper">
 	<div class="header">
-		<h1>사진 첨부</h1>
+		<h1>ì¬ì§ ì²¨ë¶</h1>
 	</div>	
 	<div class="body">
 		<dl class="alert">
-		    <dt>사진 첨부 확인</dt>
+		    <dt>사진첨부 확인 git, png, jpg, jpeg, tif만 업로드 가능합니다.</dt>
 		    <dd>
-		    	<form id="frm" action="/fileupload.jsp" method="post">
-                <input type="file" name="image_file"/>
-                </form>
+		    	<form id="frm" action="/uploadTemporaryImageFromEditor.do" method="post">
+          <input onchange="javascript:changeValue(this);" id="image_file"  type="file" name="image_file"/>
+   					<input type="text" readonley="readonly" id="image_name"/>
+      </form>
 			</dd>
 		</dl>
 	</div>
 	<div class="footer">
-		<p><a href="#" onclick="closeWindow();" title="닫기" class="close">닫기</a></p>
+		<p><a href="#" onclick="closeWindow();" title="ë«ê¸°" class="close">ë«ê¸°</a></p>
 		<ul>
-			<li class="submit"><a href="#" onclick="done();" title="등록" class="btnlink">등록</a> </li>
-			<li class="cancel"><a href="#" onclick="closeWindow();" title="취소" class="btnlink">취소</a></li>
+ 								<li class="submit"><a href="#" id="saveBtn" title="등록" class="btnlink">등록</a> </li>
+            <li class="cancel"><a href="#" onclick="closeWindow();" title="취소" class="btnlink">취소</a></li>
 		</ul>
 	</div>
 </div>

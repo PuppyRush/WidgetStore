@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
 
 /**
@@ -29,7 +29,7 @@ public class VerifyDuplicatedValue implements commandAction {
 			String nickname = (String)request.getParameter("nickname");
 	
 	
-			if(!MemberProcessBean.isExist("user","nickname",nickname)){
+			if(!MemberProcess.isExist("user","nickname",nickname)){
 				returns.put("message", "닉네임이 중복됩니다.");
 				returns.put("isDuplicatedNickname", "true");
 			}
@@ -43,7 +43,7 @@ public class VerifyDuplicatedValue implements commandAction {
 			
 			String email = (String)request.getParameter("email");
 			
-			if(!MemberProcessBean.isExist("user","email" ,email)){
+			if(!MemberProcess.isExist("user","email" ,email)){
 				returns.put("message", "닉네임이 중복됩니다.");
 				returns.put("isDuplicatedEmail", "true");
 			}

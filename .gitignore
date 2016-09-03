@@ -3,3 +3,6 @@ const*
 [bB]uild/
 *.jar
 *.log
+WebContent/upload
+WebContent/Widget
+WebContent/org

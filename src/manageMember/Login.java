@@ -6,8 +6,8 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
 import property.constUserstate;
 
@@ -25,29 +25,48 @@ public class Login implements commandAction {
 		
 	
 		HashMap<String , String> returns = new HashMap<String , String>();
-		MemberDataBean mdb = new MemberDataBean();
+		Member member = null;
+		String nick_or_mail = null;
+		
+		if(request.getParameter("sessionId")!=null){
+			String id = (String)request.getParameter("sessionId");
+			if(Member.MemberMap.containsKey(id)){
+				member = Member.MemberMap.get(id);
+			}
+			else{
+				
+				member = new Member();
+				member.setSessionId(id);
+				Member.MemberMap.put(id, member);
+			}
+		}
+		else{
+			returns.put("is_successLogin", "false");
+			returns.put("view", "/");		
+			throw new Exception( request.getRequestURI() + "에 sessionId가 없습니다");
+		}
 		
 		if(request.getParameter("idType") == null)
 			throw new Exception( request.getRequestURI() + "에 kind가 없습니다");
 		
 		if( ((String)request.getParameter("idType")).equals("inner") ){
 			
-			String nick_or_mail = (String)request.getParameter("login_username");
+			nick_or_mail = (String)request.getParameter("login_username");
 					//주석	
 			if( nick_or_mail.contains("@") ){			
-				mdb.setEmail(nick_or_mail);
-				mdb.setId( MemberProcessBean.somethingToId("email", nick_or_mail) );
+				member.setEmail(nick_or_mail);
+				member.setId( MemberProcess.somethingToId("email", nick_or_mail) );
 			}
 			else{
-				mdb.setNickname(nick_or_mail);
-				mdb.setId( MemberProcessBean.somethingToId("nickname", nick_or_mail) );
+				member.setNickname(nick_or_mail);
+				member.setId( MemberProcess.somethingToId("nickname", nick_or_mail) );
 			}
 			String pw = (String)request.getParameter("login_password");
-			mdb.setPassword(pw);			
+			member.setPassword(pw);			
 				
 			int code;
 			//잠김상태인가?
-			if( (code = MemberProcessBean.isLockingMember(mdb)) !=0){
+			if( (code = MemberProcess.isLockingMember(member)) !=0){
 				
 				//비밀번호 분실상태인가?
 				//아래의 두 상태는 비밀번호 일치여부를 검사할 필요 없음.
@@ -55,7 +74,7 @@ public class Login implements commandAction {
 									
 					returns.put("userState","lostpw");		
 					
-					if(MemberProcessBean.isSendmail(mdb, Integer.valueOf(constUserstate.LOSTPW.getString())))
+					if(MemberProcess.isSendmail(member, Integer.valueOf(constUserstate.LOSTPW.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -70,7 +89,7 @@ public class Login implements commandAction {
 					returns.put("userState","faild_login");
 					returns.put("excessFaildcount","true");
 					
-					if(MemberProcessBean.isSendmail(mdb, Integer.valueOf(constUserstate.LOSTPW.getString())))
+					if(MemberProcess.isSendmail(member, Integer.valueOf(constUserstate.LOSTPW.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -83,12 +102,12 @@ public class Login implements commandAction {
 				if((code & Integer.valueOf( constUserstate.OLD_PASSWD.getString()) ) == Integer.valueOf( constUserstate.OLD_PASSWD.getString())  ){
 				
 					//로그인 실패하면 3개월 이상 변경여부 검사 안함
-					if(MemberProcessBean.loginMember(mdb)==false){
+					if(MemberProcess.loginMember(member)==false){
 						returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
 					}
 					else{
 						
-						if(MemberProcessBean.isPassingDate(mdb)){
+						if(MemberProcess.isPassingDate(member)){
 							returns.put("excessDateOfChange", "ture");
 							returns.put("view", "password_Reset.html");
 						}
@@ -104,7 +123,7 @@ public class Login implements commandAction {
 				}
 				else if((code & Integer.valueOf( constUserstate.SLEEP.getString()) ) == Integer.valueOf( constUserstate.SLEEP.getString())  ){
 						
-					if(MemberProcessBean.isSendmail(mdb, Integer.valueOf(constUserstate.SLEEP.getString())))
+					if(MemberProcess.isSendmail(member, Integer.valueOf(constUserstate.SLEEP.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -112,15 +131,18 @@ public class Login implements commandAction {
 				}
 				
 				
-			}//isn't Locking member
+			}//isn't Locking member and Succes login process.
 			else{
 			
-				if(MemberProcessBean.loginMember(mdb)==false){
+				if(MemberProcess.loginMember(member)==false){
 					returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
-					returns.put("succ_login", "true");
+					returns.put("is_successLogin", "false");
+					
 				}
 				else{
-					returns.put("succ_login", "false");			
+					member.setSessionId((String)request.getParameter("sessionId"));
+					returns.put("is_successLogin", "true");
+					returns.put("id", nick_or_mail);
 				}
 				
 				returns.put("view", "/");				
