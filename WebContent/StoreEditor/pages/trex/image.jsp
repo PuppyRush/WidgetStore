@@ -38,18 +38,14 @@
     function done(response) {
         if (typeof(execAttach) == 'undefined') { //Virtual Function
             return;
-        }               
-        
-        var data = $.parseJSON( response );
-        
-      	var _mockdata = {
-    			'attachurl': data.upload_path + '/' + data.save_file_name,
-    			'filemime': data.real_file_name,
-    			'filename': data.file_size,
-    			'imagealign' : "L"
-    		};
+        }
+        var response_object = new Array();
 
-        execAttach(data);
+		for (var i=0;i<response_object.length;i++){
+			response_object[i] = $.parseJSON( response );
+
+			execAttach(response_object[i]); 
+		}
         closeWindow();
     }
  		
