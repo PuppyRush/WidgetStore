@@ -39,8 +39,13 @@
 			alert("1");
             return;
         }
-        var response_object = $.parseJSON( response );
-        execAttach(response_object);
+        var response_object = new Array();
+
+		for (var i=0;i<response_object.length;i++){
+			response_object[i] = $.parseJSON( response );
+
+			execAttach(response_object[i]); 
+		}
         closeWindow();
     }
  
