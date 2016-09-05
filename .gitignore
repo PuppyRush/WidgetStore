@@ -1,6 +1,8 @@
-const*
+constMysql
+
 *.class
-./build/
+/build/*
+./build/classes
 *.jar
 *.log
 WebContent/upload

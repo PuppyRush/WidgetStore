@@ -10,8 +10,8 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import org.mindrot.jbcrypt.BCrypt;
 import property.*;
-import property.enums.constStandard;
-import property.enums.constUserState;
+import property.enums.enumStandard;
+import property.enums.enumUserState;
 
 
 public class MemberProcess {
@@ -443,11 +443,11 @@ public class MemberProcess {
 				setSthJustOne("userState","u_num", id, "failedLoginCount", failedLoginCount);
 				//st.executeUpdate("update userState set failedCountLogin = " + failedCountLogin + " where id = " + id);
 				
-				if(failedLoginCount >= Integer.valueOf(constStandard.POSSIBILLTY_FAILD_LOGIN_NUM.getString()) ){
+				if(failedLoginCount >= Integer.valueOf(enumStandard.POSSIBILLTY_FAILD_LOGIN_NUM.getString()) ){
 					
 					setSthJustOne("userState", "u_num", id, "isAbnormal", "true");
 					int code = (int)getSthJustOne("userState", "id", member.getId(), "abnormalCode");
-					code = code & Integer.valueOf(constUserState.FAILD_LOGIN.getString());
+					code = code & Integer.valueOf(enumUserState.FAILD_LOGIN.getString());
 					setSthJustOne("userState", "u_num", id, "abnoramlCode", code);
 					
 				}
@@ -535,7 +535,7 @@ public class MemberProcess {
 			cal2.add ( Calendar.DATE, 1 ); // 다음날로 바뀜					
 		}
 		
-		int stdDate = Integer.valueOf( constStandard.PASSWD_CHANGE_STADNDATE_DATE.getString());
+		int stdDate = Integer.valueOf( enumStandard.PASSWD_CHANGE_STADNDATE_DATE.getString());
 		//인증메일을 보낸지 24시간이 아직 경과 하지 않았는가?
 		//경과하지않음.
 		if(stdDate > count)
@@ -576,7 +576,7 @@ public class MemberProcess {
 				cal2.add ( Calendar.HOUR, 1 ); // 다음날로 바뀜					
 			}
 			
-			int stdDate = Integer.valueOf( constStandard.RESEND_STANDRATE_DATE.getString());
+			int stdDate = Integer.valueOf( enumStandard.RESEND_STANDRATE_DATE.getString());
 			//인증메일을 보낸지 24시간이 아직 경과 하지 않았는가?
 			//경과하지않음.
 			if(stdDate > count)
