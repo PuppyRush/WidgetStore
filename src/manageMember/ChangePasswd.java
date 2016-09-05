@@ -8,7 +8,7 @@ import java.util.HashMap;
 import javaBean.MemberProcess;
 import javaBean.Member;
 import property.commandAction;
-import property.constUserstate;
+import property.enums.constUserState;
 
 /**
  *  JSP페이지에서 폼을 통하여 값을 전달받아 회원가입을 처리받는다.
@@ -33,5 +33,6 @@ public class ChangePasswd implements commandAction {
 		return returns;
 		
 	}
+
 	
 }

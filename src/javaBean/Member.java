@@ -7,25 +7,33 @@ import java.util.Map;
 //User Table 참조
 public class Member {
 
-	public static Map<String, Member> MemberMap = new HashMap<String, Member>();
+	private static Map<String, Member> MemberMap = new HashMap<String, Member>();
 	
+	public static final int DEFAULT_VALUE = -1;
 	private int id;
 	private String nickname;
 	private String password;
 	private String idType;
 	private String email;
-	private Timestamp reg_date;
+	private Timestamp regDate;
 	private String sessionId;
 	
 	public Member(){
+		id = DEFAULT_VALUE;
+		nickname="";
+		password="";
+		idType="";
+		email="";
+		regDate =  new Timestamp(System.currentTimeMillis());
+		sessionId= "";
 	}
 	
 	public Member(Member mdb){
 		id = mdb.id;
-		nickname = mdb.nickname;
-		password = mdb.password;
-		idType = mdb.idType;
-		reg_date = mdb.reg_date;
+		nickname = new String(mdb.nickname);
+		password = new String(mdb.password.toString());
+		idType = new String(mdb.idType);
+		regDate = (Timestamp)mdb.regDate.clone();
 	}
 	
 	public Member(int id, String email, String name, String pw, String idType, Timestamp reg_date){
@@ -34,7 +42,7 @@ public class Member {
 		this.nickname = name;
 		this.password = pw;
 		this.idType = idType;
-		this.reg_date = reg_date;
+		this.regDate = reg_date;
 	}
 	
 	public int getId() {
@@ -70,16 +78,55 @@ public class Member {
 	}
 
 	public Timestamp getReg_date() {
-		return reg_date;
+		return regDate;
 	}
-	public void setReg_date(Timestamp reg_date) {
-		this.reg_date = reg_date;
+	public void setReg_date(Timestamp regDate) {
+		this.regDate = regDate;
 	}
 	public String getSessionId(){
 		return sessionId;
 	}
 	public void setSessionId(String arg){
 		sessionId = arg;
+	}
+	
+	public static boolean isContainsMember(String sId){
+		
+		return MemberMap.containsKey(sId);
+						
+	}
+	
+	/**
+	 * 	로그인한 유저를 대상으로 HashMap으로 객체를 보유하고 없으면 새로 생성한다. 
+	 * @param sId	브라우져 sessionId를 통해 유저의 객체를 찾는다. 
+	 * @return	sId key에 맞는 객체 value를 반환. 
+	 * @throws Throwable	sId가 null이거나 sId를 통해 객체를 찾지 못핳는 경우 예외 발생. 
+	 */
+	public static Member getMember(String sId) throws Throwable{
+		
+		if(sId==null)
+			throw new NullPointerException();
+		
+		Member member = null;
+		
+
+		if(Member.MemberMap.containsKey(sId)){
+			return Member.MemberMap.get(sId);
+		}
+		else{
+			
+			member = new Member();
+			member.setSessionId(sId);
+			MemberMap.put(sId, member);
+		}
+		
+		return member;
+	}
+	
+	@Override
+	public int hashCode(){
+		
+		return 17;
 	}
 	
 	@Override 

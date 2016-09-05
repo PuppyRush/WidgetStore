@@ -48,7 +48,7 @@ TrexConfig.addAttacher(
 	"file",
 	{
 		multiple: _TRUE,
-		multipleuse: _FALSE,
+		multipleuse: _TRUE,
 		checksize: _TRUE,
 		boxonly: _FALSE,
 		wysiwygonly: _FALSE,

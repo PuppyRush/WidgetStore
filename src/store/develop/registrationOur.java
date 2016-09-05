@@ -1,4 +1,4 @@
-package store.develop.our;
+package store.develop;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

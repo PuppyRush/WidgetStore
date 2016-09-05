@@ -125,7 +125,7 @@ public class controller extends HttpServlet {
 		           command = command.substring(request.getContextPath().length());
 		        
 
-		        System.out.println(command);	
+		        	System.out.println(command);	
 		        					       
 					com = (commandAction)commandMap.get(command);  
 					preSplit = com.requestPro(request, response);
@@ -138,6 +138,7 @@ public class controller extends HttpServlet {
 						while(it.hasNext()){
 							Map.Entry<String, String> e = (Map.Entry<String, String>)it.next();
 							request.setAttribute(e.getKey(), e.getValue());
+							
 						}
 					
 					}

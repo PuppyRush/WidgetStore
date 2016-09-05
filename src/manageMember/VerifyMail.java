@@ -19,13 +19,13 @@ public class VerifyMail implements commandAction {
 			throws Throwable {
 		
 		
-		Member mdb = new Member();
+		Member member = new Member();
 		HashMap<String , String> returns = new HashMap<String , String>();
 		
 		String mail = (String) request.getParameter("mail");
 		
-		int u_num = MemberProcess.somethingToId("mail", mail);
-		String email_of_unum = (String)MemberProcess.getSomethingJustOne("user", "user_num", u_num, "email");
+		int u_num = MemberProcess.sthToId(member);
+		String email_of_unum = (String)MemberProcess.getSthJustOne("user", "user_num", u_num, "email");
 				
 		if(email_of_unum.equals(mail)){
 			

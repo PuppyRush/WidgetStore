@@ -1,3 +1,6 @@
+
+<%@page import="java.util.*"%>
+
 <!DOCTYPE html>
 <html>
 
@@ -61,13 +64,13 @@
         <ul class="sidebar-nav">
             <a id="menu-close" href="#" class="btn btn-light btn-md pull-right toggle"><i class="fa fa-times"></i></a>
             <li class="sidebar-brand">
-                <a href="#top"  onclick =  $("#menu-close").click(); >Widget Store</a>
+                <a href="#top"  onclick = $("#menu-close").click(); >Widget Store</a>
             </li>
             <li>
                 <a href="#Sign In" id="signIn" style="display:''" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#login-modal">Sign in</a>
             </li>
 			<li>
-                <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" $("#menu-close").click(); >Sign out</a>
+                <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" >Sign out</a>
             </li>
             <li>
                 <a href="Store.jsp" onclick ="fun_Store()"; >Store</a>
@@ -107,7 +110,7 @@
                             </div>
 				    		<input id="login_username" name="login_username" class="form-control" type="text" placeholder="Username" required>
 				    		<input id="login_password" name="login_password" class="form-control" type="password" placeholder="Password" required>
-				    			<input id="sessionId" name="sessionId" class="form-control" type="hidden" />
+				    			<input class="sessionId" name="sessionId" type="hidden" />
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"> Remember me
@@ -157,7 +160,7 @@
                             </div>
 		    				<input id="register_username" name="register_username" class="form-control" title="Username may only contain alphanumeric characters" type="text" placeholder="Username" required>
                             <input id="register_email" name="register_email" class="form-control" type="email" placeholder="E-Mail" required>
-                            <input id="register_password" name=register_password" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
+                            <input id="register_password" name="register_password" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
 							<input id="register_password2" onchange="" class="form-control" type="password" placeholder="Rewrite password" required>
             			</div>
 		    		    <div class="modal-footer">
@@ -169,6 +172,7 @@
                                 <button id="register_lost_btn" type="button" class="btn btn-link">Lost Password?</button>
                             </div>
 		    		    </div>
+		    		   			 <input class="sessionId" name="sessionId" type="hidden" />
 		    		  			  <input type="hidden" name="idType" value="inner">
                     </form>
                     <!-- End | Register Form -->
@@ -214,6 +218,11 @@
 		</div>
 	</div>
 
+	<form method="GET" ACTION="logout.do" id="logout-form">
+		<input id="sessionId_logout" name="sessionId" type="hidden" />
+	</form>
+	
+
 	<form method="GET" ACTION="verify.do" id="chkRegister_chk_form">
 				<input type = "hidden" name = "nickname" value = "" >
 				<input type = "hidden" name = "email" value = "" >
@@ -230,27 +239,44 @@
 				
 			<%
 			try{ 
-				//Ã¬ÂÂ´Ã«Â¯Â¸ Ã«Â¡ÂÃªÂ·Â¸Ã¬ÂÂ¸ Ã­ÂÂÃ«ÂÂ ÃªÂ¸Â°Ã«Â¡ÂÃ¬ÂÂ´ Ã¬ÂÂÃ«ÂÂ¤Ã«Â©Â´ Ã¬ÂÂÃ«ÂÂÃ«Â¡ÂÃªÂ·Â¸Ã¬ÂÂ¸ Ã­ÂÂÃ«ÂÂ¤.   
-				if(false &&  session.getAttribute("alreadyLogin") != null &&
-						((String) session.getAttribute("alreadyLogin")).equals("true")){
+				//자동로그인 처리하기    
+				if(request.getAttribute("doLogout")!= null && 	((String)request.getAttribute("doLogout")).equals("true")){
+					session.removeAttribute("alreayLogin");
+					%>
+						alert("Bye...");
+					<%
+				}
+				else if(request.getAttribute("isSuccessJoin")!= null && 	((String)request.getAttribute("isSuccessJoin")).equals("true")){
+					%>
+					alert(" <%= request.getAttribute("message") %>");
+					<%
+				}
+				else if(request.getAttribute("alreadyLogin") != null &&	((String) request.getAttribute("alreadyLogin")).equals("true")){
 								//response.sendRedirect("main.jsp");
 							%>
 									signChange('signOut');
 							<%
 					}
-				
-				else if( session.getAttribute("is_successLogin") != null && ((String)session.getAttribute("succ_login")).equals("true")){
-					
+				//로그인 결과 얻기 
+				else if( request.getAttribute("isSuccessLogin") != null && ((String)request.getAttribute("isSuccessLogin")).equals("true")){	
+					%>
+					signChange('signOut');
+					<%
+					session.setAttribute("alreadyLogin", "true");
+					session.setMaxInactiveInterval(60*60);	
 					
 				}
-				else if( ((String)session.getAttribute("is_successLogin")).equals("false") == true ){
-					
+				else if( ((String)session.getAttribute("isSuccessLogin")).equals("false") == true ){
+					if( session.getAttribute("message")!=null)
+						%>
+							alert(<%=(String)session.getAttribute("message")%>);
+						<%	
 				}
 			}
 			catch(Exception e){
 				e.printStackTrace();
-			}
-			%>
+			} %>
+			
 	};
 
 	function fun_Store(){
@@ -260,11 +286,27 @@
 	}
 	
 	function fun_signOut(){
-		
-		session.removeAttribute("alreadyLogin");
-		response.sendRedirect("main.jsp");
-		
+		var id = "<%= (String)session.getId() %>";
+//		document.getElementsByName("sessionId_logout")[0].value = id;
+		$("#sessionId_logout").val(id);
+		document.forms["logout-form"].submit();
+		return;	
 	}
+	
+	function innerLogin(){
+		var id = "<%= (String)session.getId() %>";
+		$(".sessionId").val(id);
+		document.forms["login-form"].submit();
+	}
+	function innerJoin(){
+		var id = "<%= (String)session.getId() %>";
+		$(".sessionId").val(id);
+		document.forms["register-form"].submit();
+	}
+	function lostpassword(){
+		document.forms["lost-form"].submit();
+	}
+	
 	function signChange(id){
 	var div = document.getElementById(id);
 		if(div.style.display=='none'){
@@ -323,14 +365,10 @@
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "error", "glyphicon-remove", "Login error");
                 } else {
                     msgChange($('#div-login-msg'), $('#icon-login-msg'), $('#text-login-msg'), "success", "glyphicon-ok", "Login OK");
-					<%
-		
-					session.setAttribute("alreadyLogin", "true");
-					session.setMaxInactiveInterval(60*60);
-					%>
-					window.location.reload();
-					return true;
-                }
+			
+											//window.location.reload();
+											return true;
+						                }
 				
                 return false;
                 break;
@@ -462,17 +500,7 @@
 		 }
 	}
 });
-	function innerLogin(){
-		var id = "<%= (String)session.getId() %>";
-		$("#sessionId").val(id);
-		document.forms["login-form"].submit();
-	}
-	function innerJoin(){
-		document.forms["register-form"].submit();
-	}
-	function lostpassword(){
-		document.forms["lost-form"].submit();
-	}
+
 
 
 	//------------start tooltip line

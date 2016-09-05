@@ -2,7 +2,8 @@ package mail;
 
 import javax.mail.Authenticator;
 import javax.mail.PasswordAuthentication;
-import property.constMail;
+
+import property.enums.constMail;
 /**
  * @author Ray
  *

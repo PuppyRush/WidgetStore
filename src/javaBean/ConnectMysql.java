@@ -3,6 +3,7 @@ package javaBean;
 import java.sql.*;
 
 import property.*;
+import property.enums.constMysql;
 
 public class ConnectMysql {
 

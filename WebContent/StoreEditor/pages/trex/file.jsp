@@ -1,3 +1,15 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+
+	pageEncoding="UTF-8"%>
+
+
+
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,21 +20,51 @@
 <title>파일 업로드 </title> 
 <script src="/StoreEditor/js/popup.js" type="text/javascript" charset="utf-8"></script>
 <link rel="stylesheet" href="/StoreEditor/css/popup.css" type="text/css"/>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="http://malsup.github.io/jquery.form.js"></script>
+
 <script type="text/javascript">
 // <![CDATA[
-	
-	function done() {
+	$(function(){
+        $("#saveBtn").click(function(){
+            $("#frm").submit();
+        })
+        //ajax form submit
+        $('#frm').ajaxForm({
+            beforeSubmit: function (data,form,option) {
+                //validationì²´í¬ 
+                //ë§ê¸°ìí´ìë return falseë¥¼ ì¡ìì£¼ë©´ë¨
+                return true;
+            },
+            success: function(response,status){
+                //ì±ê³µí ìë²ìì ë°ì ë°ì´í° ì²ë¦¬
+                done(response);
+            },
+            error: function(){
+                //ìë¬ë°ìì ìí codeíì´ì§
+                alert("error!!");
+            }                               
+        });
+    })
+    
+    
+	function done(response) {
 		if (typeof(execAttach) == 'undefined') { //Virtual Function
 	        return;
 	    }
 		
+		var response_object = $.parseJSON( response );
+        execAttach(response_object);
+        
+/* 	var file = $("#fileBtn").val();
 		var _mockdata = {
-			'attachurl': 'http://cfile297.uf.daum.net/attach/207C8C1B4AA4F5DC01A644',
+			'attachurl': file.fileurl,
 			'filemime': 'image/gif',
-			'filename': 'editor_bi.gif',
-			'filesize': 640
-		};
-		execAttach(_mockdata);
+			'filename': file.filename,
+			'filesize': file.filesize
+		}; 
+		execAttach(_mockdata); */
 		closeWindow();
 	}
 
@@ -47,19 +89,18 @@
 	<div class="body">
 		<dl class="alert">
 		    <dt>íì¼ ì²¨ë¶ íì¸</dt>
-		    <dd>
-		     	<form id="frm" action="/uploadTemporaryImageFromEditor.do" method="post">
-          <input onchange="javascript:changeValue(this);" id="image_file"  type="file" name="image_file"/>
+		    <dd>		     	
+	      	<form id="frm" action="/uploadTemporaryFileFromEditor.do" method="post">
+          <input id="fileBtn"  type="file" name="image_file" accept=".zip, .alz, .7z"/>
    					<input type="text" readonley="readonly" id="image_name"/>
       </form>
-			    확인 누르면 파일 추가
 			</dd>
 		</dl>
 	</div>
 	<div class="footer">
-		<p><a href="#" onclick="closeWindow();" title="ë«ê¸°" class="close">ë«ê¸°</a></p>
+		<p><a href="#" onclick="closeWindow();" title="닫기" class="close">ë«ê¸°</a></p>
 		<ul>
-			<li class="submit"><a href="#" onclick="done();" title="ë±ë¡" class="btnlink">ë±ë¡</a> </li>
+			<li class="submit"><a href="#" onclick="done();" title="업로드하기" class="btnlink">ë±ë¡</a> </li>
 			<li class="cancel"><a href="#" onclick="closeWindow();" title="ì·¨ì" class="btnlink">ì·¨ì</a></li>
 		</ul>
 	</div>

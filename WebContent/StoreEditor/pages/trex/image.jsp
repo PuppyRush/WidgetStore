@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -39,14 +40,26 @@
         if (typeof(execAttach) == 'undefined') { //Virtual Function
             return;
         }
-        var response_object = new Array();
+        
+        var response_object = $.parseJSON( response );
+        
+/*       	var data = {
+    			'attachurl': data.fileurl + '/' + data.realname,
+    			'filemime': "jpg",
+    			'filename': data.filename,
+    			'imagealign' : "L"
+    		}; */
+        
+        execAttach(response_object);
+/*         var response_object = new Array();
 
 		for (var i=0;i<response_object.length;i++){
 			response_object[i] = $.parseJSON( response );
 
 			execAttach(response_object[i]); 
-		}
+		} */
         closeWindow();
+					return;
     }
  		
 	
@@ -61,27 +74,6 @@
         registerAction(_attacher);
   		  }
     
-    function changeValue(object){
-    			var value = $(object).val();
-    			if(value != ''){
-    					var ext = value.split('.').pop().toLowerCase();
-  						if($.inArray(ext, ['gif','png','jpg','jpeg','tif']) == -1){
-  								alert("gif,png,jpg,jpeg,tif만 업로드 가능합니다 ");
-  								$(object).val("");
- 									$("#image_name").val("");
- 									return;  						
-  							}		
-  						
-							var array = value.split("\\");
-							var a = 0 ;
-							if(array.length > 1){
-								document.getElementById('image_name').value == array[array.length-1];
-							}else{
-								document.getElementById('image_name').vlaue = value;
-							}
-							
-    			}    	    	
-    		}
 
 // ]]>
 </script>
@@ -96,7 +88,7 @@
 		    <dt>사진첨부 확인 git, png, jpg, jpeg, tif만 업로드 가능합니다.</dt>
 		    <dd>
 		    	<form id="frm" action="/uploadTemporaryImageFromEditor.do" method="post">
-          <input onchange="javascript:changeValue(this);" id="image_file"  type="file" name="image_file"/>
+          <input id="image_file"  type="file" name="image_file"/>
    					<input type="text" readonley="readonly" id="image_name"/>
       </form>
 			</dd>

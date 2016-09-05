@@ -10,6 +10,8 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import org.mindrot.jbcrypt.BCrypt;
 import property.*;
+import property.enums.constStandard;
+import property.enums.constUserState;
 
 
 public class MemberProcess {
@@ -24,7 +26,7 @@ public class MemberProcess {
 	public MemberProcess() {
 	}
 
-	public static int isLockingMember(Member mdb){
+	public static int isLockingMember(Member member) throws Throwable{
 
 		Statement st = null;
 		PreparedStatement ps = null;
@@ -32,14 +34,8 @@ public class MemberProcess {
 		
 		try{
 			
-			int u_num = -1;
+			int u_num = sthToId(member);
 			
-			if(mdb.getEmail() != null)
-				u_num = somethingToId("email",mdb.getEmail());
-			else if(mdb.getNickname() != null)
-				u_num = somethingToId("nickname",mdb.getNickname());
-			else
-				throw new Exception("메일, 닉네임 값 모두 존재하지 않습니다.");
 			
 			ps = conn.prepareStatement("select isAbnormal, abnormalCode from userState where u_num = ?");
 			ps.setInt(1, u_num);			
@@ -184,36 +180,54 @@ public class MemberProcess {
 	
 
 	
-	public static int somethingToId(String attr, String val){
+	public static int sthToId(Member member) throws Throwable{
 		
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;	
+		int id=-1;
+		String attr = "";
 		
-		int id;
+		if(member.getEmail() != null && member.getEmail().equals("") == false ){
+			attr="email";
+		}
+		else if(member.getNickname() != null && member.getNickname().equals("") == false ){
+			attr="nickname";
+		}
+		else if( member.getSessionId() != null && member.getNickname().equals("") == false ){
+			attr="sessionId";
+		}
+		else{
+			throw new SQLException("닉네임과 메일이 입력되지 않았습니다.");
+		}
+		
+		
 		try {
 			
 			switch(attr){
 			
 				case "email":
 					pstmt = conn.prepareStatement("select userNum from user where email = ? ");
-					pstmt.setString(1, val);
-					
+					pstmt.setString(1, member.getEmail());
 					break;
 					
 				case "nickname":
 					pstmt = conn.prepareStatement("select userNum from user where nickname = ? ");
-					pstmt.setString(1, val);
+					pstmt.setString(1, member.getNickname());
 					break;
-			
+					
+				case "sessionId":
+					if(Member.isContainsMember(member.getSessionId()))
+						return Member.getMember(member.getSessionId()).getId();
+					else
+						throw new Exception("sessionId가 memberMap에 존재하지 않습니다. ");
 			
 			}
-			
-			
+
 			rs = pstmt.executeQuery();
 			rs.next();
 			id = rs.getInt(1);
 			if(id == 0)
-				throw new SQLException("해당하는 " +  attr +" " + val +"이 존재하지 않습니다");
+				throw new SQLException("해당하는 " +  attr +" " + id +"이 존재하지 않습니다");
 			
 			
 			
@@ -288,7 +302,6 @@ public class MemberProcess {
 					"insert into user ( email, nickname, password, registrationDate) values (?,?,?,?)",
 					PreparedStatement.RETURN_GENERATED_KEYS);
 
-			
 			pstmt.setString(1, member.getEmail());
 			pstmt.setString(2, member.getNickname());
 		
@@ -315,18 +328,20 @@ public class MemberProcess {
 			
 			////////userState table
 			
-			pstmt = conn.prepareStatement("insert into userState (u_num , isAbnormal, isDeveloper,"
-					+ "abnormalCode, lastLoginDate, lastModifiedDate, loginCount, failedLoginCount, denyChangePwDate) values(?,?,?,?,?,?,?,?,?)" );
+			pstmt = conn.prepareStatement("insert into userState (u_num , isAbnormal, isDeveloper, isLogin,"
+					+ "abnormalCode, loginCount, failedLoginCount, denyChangePwDate, lastLoginDate, lastModifiedDate, lastLogoutDate ) values(?,?,?,?,?,?,?,?,?,?,?)" );
 			
 			pstmt.setLong(1,key);
 			pstmt.setInt(2, 0);
 			pstmt.setInt(3,0);
 			pstmt.setInt(4,0);
-			pstmt.setTimestamp(5, member.getReg_date());
-			pstmt.setTimestamp(6, member.getReg_date());
-			pstmt.setInt(7,0);
-			pstmt.setInt(8,0);
+			pstmt.setInt(5,0);	
+			pstmt.setInt(6,0);
+			pstmt.setInt(7,0);	
+			pstmt.setTimestamp(8, member.getReg_date());
 			pstmt.setTimestamp(9, member.getReg_date());
+			pstmt.setTimestamp(10, member.getReg_date());
+			pstmt.setTimestamp(11, member.getReg_date());
 			
 			pstmt.executeUpdate();
 				
@@ -382,90 +397,58 @@ public class MemberProcess {
 		PreparedStatement ps = null;
 		ResultSet rs=null;
 		boolean res=false;
-		int u_num=-1;
+		int id = member.getId();
 		try {				
 			
-			if(member.getEmail() != null){
-				res = isExist("user", "email", member.getEmail() );	
-				ps = conn.prepareStatement("select password from user where email = ? ");
-				ps.setString(1, member.getEmail());
-						
-				u_num = somethingToId("email", member.getEmail());	
-			}
-			else if(member.getNickname() != null ){
-				res = isExist("user", "nickname", member.getNickname() );	
-				ps = conn.prepareStatement("select password from user where nickname = ? ");
-				ps.setString(1, member.getNickname());
-				
-				u_num = somethingToId("nickname", member.getNickname());		
-			}
-			else{
-				throw new SQLException("닉네임과 메일이 입력되지 않았습니다.");
-			}
-			
-			member.setId(u_num);
-			
-			if(res == false){
-				throw new SQLException("메일 혹은 닉네임이 존재하지 않습니다.");
-			}
+			ps = conn.prepareStatement("select password from user where userNum = ? ");
+			ps.setInt(1, member.getId());
+			rs = ps.executeQuery();	
 			
 			rs = ps.executeQuery();
 			rs.next();
 			String hashedpw =  rs.getString(1);
 
-			String hashed = BCrypt.hashpw(member.getPassword(), BCrypt.gensalt(12));	
+			//String hashed = BCrypt.hashpw(member.getPassword(), BCrypt.gensalt(12));	
 			//비밀번호 일치.
-			if( BCrypt.checkpw( member.getPassword(), hashed ) ){
+			if( BCrypt.checkpw( member.getPassword(), hashedpw ) ){
 				
 				res =  true;
 				
 				/// 로그인횟수 증가
-				
-				int loginCount=+1;				
-				rs = st.executeQuery("select loginCount from userState where u_num = " + u_num);	
-
-				if(rs.next())
-					loginCount = rs.getInt("loginCount");
-				else
-					throw new SQLException("해당하는 " + u_num + " 이 존재하지 않습니다");
-				
-				loginCount+=1;				
-				setSomethingJustOne("userState", "u_num", u_num, "loginCount" , loginCount);
-				st.executeUpdate("update userState set loginCount = " + loginCount 
-						+ "where u_num = " + u_num);
+				int loginCount = (int)getSthJustOne("userState","u_num", id ,"loginCount") + 1; 				
+				setSthJustOne("userState", "u_num", id, "loginCount" , loginCount);
 	
 				////// 마지막 로그인 날짜 갱신 
-				
 				Timestamp t = new Timestamp(System.currentTimeMillis());
-				st.executeUpdate("update userState set lastLoginDate = " + t 
-						+ "where u_num = " + u_num);
-				
+				setSthJustOne("userState", "u_num", id, "lastLoginDate" , t);
+		
 				//실패횟수 초기화			
-				setSomethingJustOne("userState", "u_num", member.getId(), "faildLoginCount", 0);
+				setSthJustOne("userState", "u_num", id, "failedLoginCount", 0);
 				
 				//잠금상태 해제 
-				setSomethingJustOne("userState", "u_num", member.getId(), "faildLoginCount", 0);
 				
+				
+				//로그인상태 변경
+				setSthJustOne("userState", "u_num", member.getId(), "isLogin", 1);
 				
 			}
 			//불일치
 			else{
 				res = false;
 				
-				int failedLoginCount=-1;				
-				//rs = st.executeQuery("select failedLoginCount from userState where u_num = " + u_num);	
-				failedLoginCount = (int)getSomethingJustOne("userState", "u_num", u_num, "failedLoginCount");
+				int failedLoginCount = (int)getSthJustOne("userState", "u_num", id, "failedLoginCount");				
+				
 				
 				failedLoginCount +=1;	
-				setSomethingJustOne("userState","u_num", u_num, "failedLoginCount", failedLoginCount);
-				//st.executeUpdate("update userState set failedCountLogin = " + failedCountLogin + " where u_num = " + u_num);
+				setSthJustOne("userState","u_num", id, "failedLoginCount", failedLoginCount);
+				//st.executeUpdate("update userState set failedCountLogin = " + failedCountLogin + " where id = " + id);
 				
-				if(failedLoginCount >= 5){
+				if(failedLoginCount >= Integer.valueOf(constStandard.POSSIBILLTY_FAILD_LOGIN_NUM.getString()) ){
 					
-					setSomethingJustOne("userState", "u_num", member.getId(), "isAbnormal", "true");
-					int code = (int)getSomethingJustOne("userState", "u_num", member.getId(), "abnormalCode");
-					code = code & Integer.valueOf(constUserstate.FAILD_LOGIN.getString());
-					setSomethingJustOne("userState", "u_num", member.getId(), "abnoramlCode", code);
+					setSthJustOne("userState", "u_num", id, "isAbnormal", "true");
+					int code = (int)getSthJustOne("userState", "id", member.getId(), "abnormalCode");
+					code = code & Integer.valueOf(constUserState.FAILD_LOGIN.getString());
+					setSthJustOne("userState", "u_num", id, "abnoramlCode", code);
 					
 				}
 				
@@ -513,16 +496,27 @@ public class MemberProcess {
 		return res;
 	}
 
-
+	/**
+	 * 	로그아웃을 위한 처리를 합니다.
+	 * @param member
+	 * @throws Throwable 
+	 */
+	public static void logoutMember(Member member) throws Throwable{
+		
+		member.setId(sthToId(member));
+		setSthJustOne("userState","u_num",member.getId(),"lastLogoutDate", new Timestamp(System.currentTimeMillis()) );
+		setSthJustOne("userState","u_num",member.getId(), "isLogin",0);
+	}
+	
 	/**
 	 * 
 	 * 
-	 * @param mdb
+	 * @param member
 	 * @return	3개월 이상 지났다면 true 아니면 false
 	 */
-	public static boolean isPassingDate(Member mdb){
+	public static boolean isPassingDate(Member member){
 		
-		Timestamp time = (Timestamp)MemberProcess.getSomethingJustOne("losingPasswd", "u_num", mdb.getId(), "sendedMailDate");
+		Timestamp time = (Timestamp)MemberProcess.getSthJustOne("losingPasswd", "u_num", member.getId(), "sendedMailDate");
 		//int dateGap = Calendar.getInstance().get
 																 
 		Date today = new Date ( );
@@ -541,7 +535,7 @@ public class MemberProcess {
 			cal2.add ( Calendar.DATE, 1 ); // 다음날로 바뀜					
 		}
 		
-		int stdDate = Integer.valueOf( constStd.PASSWD_CHANGE_STADNDATE_DATE.getString());
+		int stdDate = Integer.valueOf( constStandard.PASSWD_CHANGE_STADNDATE_DATE.getString());
 		//인증메일을 보낸지 24시간이 아직 경과 하지 않았는가?
 		//경과하지않음.
 		if(stdDate > count)
@@ -556,14 +550,14 @@ public class MemberProcess {
 	/**
 	 * 	비밀번호 분실 경우 메일을 보낼것인가 인증번호 입력페이지로 갈 것인가? 	  
 	 * 
-	 * @param mdb
+	 * @param member
 	 * @return	true if redirect to inputmailPage, false if to inputAuthnumPage
 	 */
-	public static boolean isSendmail(Member mdb, int userState){
+	public static boolean isSendmail(Member member, int userState){
 		
 		//이미 전송하였는가?
-		if( (boolean)MemberProcess.getSomethingJustOne("losingPassword", "u_num", mdb.getId(), "isSendedMail")){
-			Timestamp time = (Timestamp)MemberProcess.getSomethingJustOne("losingPasswd", "u_num", mdb.getId(), "sendedMailDate");
+		if( (boolean)MemberProcess.getSthJustOne("losingPassword", "u_num", member.getId(), "isSendedMail")){
+			Timestamp time = (Timestamp)MemberProcess.getSthJustOne("losingPasswd", "u_num", member.getId(), "sendedMailDate");
 			//int dateGap = Calendar.getInstance().get
 																	 
 			Date today = new Date ( );
@@ -582,7 +576,7 @@ public class MemberProcess {
 				cal2.add ( Calendar.HOUR, 1 ); // 다음날로 바뀜					
 			}
 			
-			int stdDate = Integer.valueOf( constStd.RESEND_STANDRATE_DATE.getString());
+			int stdDate = Integer.valueOf( constStandard.RESEND_STANDRATE_DATE.getString());
 			//인증메일을 보낸지 24시간이 아직 경과 하지 않았는가?
 			//경과하지않음.
 			if(stdDate > count)
@@ -601,12 +595,13 @@ public class MemberProcess {
 	 * @param val					찾을 테이블에서 조건인 속성에 해당할 값  
 	 * @param needSelection		찾을 테이블에서 찾고자하는 값
 	 * @return						쿼리결과에 따라 하나의 날짜가 리턴됨 
+	 * @throws Throwable 
 	 */
 	
-	public static boolean isConcordTempValue(Member mdb, String value ){
+	public static boolean isConcordTempValue(Member member, String value ) throws Throwable{
 		
-		mdb.setId( somethingToId(mdb.getEmail(), "email" ));
-		String tempPw = (String)getSomethingJustOne("losingPasswd","u_num",mdb.getId(), "tempPassword");
+		member.setId( sthToId(member));
+		String tempPw = (String)getSthJustOne("losingPasswd","u_num",member.getId(), "tempPassword");
 		
 		if(BCrypt.checkpw(value, tempPw)){
 			return true;
@@ -617,18 +612,18 @@ public class MemberProcess {
 		
 	}
 	
-	public static boolean changePassword(Member mdb, String newPasswd){
+	public static boolean changePassword(Member member, String newPasswd) throws Throwable{
 		
-		mdb.setId( somethingToId(mdb.getEmail(), "email") );
+		member.setId( sthToId(member) );
 		
 		String pw = BCrypt.hashpw( newPasswd, BCrypt.gensalt());
 		
-		setSomethingJustOne("user", "userNum", mdb.getId(),"password", pw);		
+		setSthJustOne("user", "userNum", member.getId(),"password", pw);		
 		return true;
 		
 	}
 	
-	public static Object getSomethingJustOne(String tableName, String where_attr, Object where_val, String needSelection){
+	public static Object getSthJustOne(String tableName, String where_attr, Object where_val, String needSelection){
 
 		
 		Object resultValue = null;
@@ -683,6 +678,10 @@ public class MemberProcess {
 							
 							switch(needSelection){
 							
+								case "loginCount": 
+									pstmt = conn.prepareStatement("select loginCount from userState where u_num = ? ");
+									break;
+							
 								case "lastLoginDate": 
 									pstmt = conn.prepareStatement("select lastLoginDate from userState where u_num = ? ");
 									break;
@@ -703,6 +702,10 @@ public class MemberProcess {
 									pstmt = conn.prepareStatement("select isDeveloper from userState where u_num = ? ");
 									break;
 									
+								case "isLogin":
+									pstmt = conn.prepareStatement("select isLogin from userState where u_num = ? ");
+									break;
+									
 								case "failedLoginCount":
 									pstmt = conn.prepareStatement("select failedLoginCount from userState where u_num = ? ");
 									break;
@@ -714,7 +717,7 @@ public class MemberProcess {
 							break;
 							
 						default:
-							throw new SQLException("해당하는 " +  where_attr +"나 " + where_val +"," + needSelection +"이 존재하지 않습니다");		
+							throw new SQLException(where_attr +"해당하는  " + where_val +"나 " + needSelection +"이 존재하지 않습니다");		
 						
 					}
 					break;
@@ -799,12 +802,12 @@ public class MemberProcess {
 	/** 원하는 테이블에서 조건에 맞는 값을 하나만 update하는 함수.
 	 *  
 	 * @param tableName	찾고자 하는 테이블 
-	 * @param where_attr 찾을 테이블에서의 속
-	 * @param where_val  찾을 테이블에서 조건이 속성에 해당할 
+	 * @param where_attr 찾을 테이블에서의 조건
+	 * @param where_val  찾을 테이블에서 조건에 해당할 값
 	 * @param columnName 변경할 값의 속성   
 	 * @param setValue   변경할 값
 	 */
-	public static void setSomethingJustOne(String tableName, String where_attr, Object where_val, 
+	public static void setSthJustOne(String tableName, String where_attr, Object where_val, 
 			String columnName, Object setValue){
 
 		ResultSet rs = null;
@@ -879,6 +882,12 @@ public class MemberProcess {
 								
 									break;
 									
+								case "lastLogoutDate":
+									pstmt = conn.prepareStatement("update userState set lastLogoutDate = ? where u_num = ? ");
+									pstmt.setTimestamp(1, (Timestamp)setValue );
+								
+									break;
+									
 								case "denyChangePwDate":
 									pstmt = conn.prepareStatement("update userState set denyChangePwDate = ? where u_num = ? ");
 									pstmt.setTimestamp(1, (Timestamp)setValue );
@@ -900,7 +909,16 @@ public class MemberProcess {
 								case "failedLoginCount":
 									pstmt = conn.prepareStatement("update userState set failedLoginCount = ? where u_num = ? ");
 									pstmt.setInt(1, (int)setValue );
+									break;
 									
+								case "loginCount":
+									pstmt = conn.prepareStatement("update userState set loginCount = ? where u_num = ? ");
+									pstmt.setInt(1, (int)setValue );
+									break;
+									
+								case "isLogin":
+									pstmt = conn.prepareStatement("update userState set isLogin = ? where u_num = ? ");
+									pstmt.setInt(1, (int)setValue );
 									break;
 									
 								default:
@@ -950,12 +968,10 @@ public class MemberProcess {
 							throw new SQLException("해당하는 " +  where_attr +"나 " + where_val +"," + columnName +"이 존재하지 않습니다");		
 					}
 					break;
-					
 	
 			}
 		
-			rs = pstmt.executeQuery();
-					
+			pstmt.executeUpdate();				
 			
 		}
 
