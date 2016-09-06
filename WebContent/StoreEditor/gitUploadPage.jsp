@@ -26,8 +26,38 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
+<<<<<<< HEAD
+<style>
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+.images { 
+        height:140px;
+        width:140px; 
+        border:0px; 
+        margin:15px 15px 0 0; 
+}
+</style>
+=======
     <link rel="stylesheet" href="css/editor.css" type="text/css" />
     <script src="js/editor_loader.js?environment=production" type="text/javascript" charset="utf-8"></script>
+>>>>>>> origin/master
 </head>
 
 <body>
@@ -92,6 +122,41 @@
 							<input id="repository-name" class="form-control" type="text" placeholder="Repository name" required></br>
 							<input id="git-url" class="form-control" type="text" placeholder="Git url" required></br>
 				</form>
+<<<<<<< HEAD
+				<!-- 이미지 파일 선택 -->
+				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
+					<tr>
+						<td align="left" height="105" ondragenter="return false" ondragover="return false" ondrop="dropIt(event)">    
+						<output id="thumbs"></output> 
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+						<label class="btn btn-block btn-primary">
+						Drag & drop or choose images from your local file system<input style="display: none;" type="file" id="input" multiple="true" onchange="imagesSelected(this.files)" />
+					</label>
+						</td>
+					</tr>
+				</table>
+
+				<!-- 텍스트 입력 -->
+				<p class="help-block">Input text about this widget</p>
+				<textarea class="form-control" rows="5" placeholder="이 위젯에 대한 설명을 해주세요."></textarea>
+
+
+
+					<!-- 카테고리 -->
+					<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">Category <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="javascript:;">종류1</a></li>
+                <li><a href="javascript:;">종류2</a></li>
+                <li><a href="javascript:;">종류3</a></li>
+				<li><a href="javascript:;">종류4</a></li>
+            </ul>
+        </div></br>
+
+						<!-- 주의 사항 -->
+=======
 	<!-- Ã¬ÂÂÃ«ÂÂÃ­ÂÂ° Ã¬ÂÂÃ¬ÂÂ -->
 	<!--
 		@decsription
@@ -546,6 +611,7 @@
 									<li role="presentation"><a role="menuitem" tabindex="-1" href="#">Ã¬Â¢ÂÃ«Â¥Â4</a></li>
 								</ul>
 							</div></br>
+>>>>>>> origin/master
 						<div class="modal-footer"></div>
 								<div class="alert alert-warning" role="alert">
 								1.Ã¬Â£Â¼Ã¬ÂÂÃ¬ÂÂ¬Ã­ÂÂ­1</br>
@@ -586,6 +652,9 @@
 
     </div>
     <!-- /.container -->
+<<<<<<< HEAD
+	
+=======
 	<script type="text/javascript">
 	/* 
 	var _checkConfirmWrite = false;
@@ -811,6 +880,7 @@
 	}
 </script>
 <div><button onclick='loadContent()'>SAMPLE - load contents to editor</button></div>
+>>>>>>> origin/master
     <!-- jQuery -->
     <script src="js/jquery.js"></script>
 
@@ -819,7 +889,54 @@
 
 <!-- End: Loading Contents -->
 </body>
+<script>
+ $(function () {
+    $(document).on('change', ':file', function () {
+        var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.trigger('fileselect', [
+            numFiles,
+            label
+        ]);
+    });
+    $(document).ready(function () {
+        $(':file').on('fileselect', function (event, numFiles, label) {
+            var input = $(this).parents('.input-group').find(':text'), log = numFiles > 1 ? numFiles + ' files selected' : label;
+            if (input.length) {
+                input.val(log);
+            } else {
+                if (log)
+                    alert(log);
+            }
+        });
+    });
+});
 
+$(".dropdown-menu li a").click(function(){
+  var selText = $(this).text();
+  $(this).parents('.btn-group').find('.dropdown-toggle').html(selText+' <span class="caret"></span>');
+});
+
+
+function imagesSelected(myFiles) {
+  for (var i = 0, f; f = myFiles[i]; i++) {
+    var imageReader = new FileReader();
+    imageReader.onload = (function(aFile) {
+      return function(e) {
+        var span = document.createElement('span');
+        span.innerHTML = ['<img class="images" src="', e.target.result,'" title="', aFile.name, '"/>'].join('');
+        document.getElementById('thumbs').insertBefore(span, null);
+      };
+    })(f);
+    imageReader.readAsDataURL(f);
+  }
+}
+
+function dropIt(e) {  
+   imagesSelected(e.dataTransfer.files); 
+   e.stopPropagation();  
+   e.preventDefault();   
+}  
+</script>
 </html>
 
-        </form>
+</form>
