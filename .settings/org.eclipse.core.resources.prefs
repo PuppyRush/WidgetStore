@@ -1,7 +1,8 @@
 eclipse.preferences.version=1
+encoding//WebContent/Custom.jsp=UTF-8
 encoding//WebContent/Develop.jsp=UTF-8
+encoding//WebContent/StoreEditor/gitUploadPage.jsp=UTF-8
 encoding//WebContent/StoreEditor/pages/trex/file.jsp=UTF-8
 encoding//WebContent/StoreEditor/pages/trex/fileupload.jsp=UTF-8
 encoding//WebContent/main.jsp=UTF-8
 encoding/<project>=UTF-8
-separateDerivedEncodings=true

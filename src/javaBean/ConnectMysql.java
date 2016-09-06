@@ -3,6 +3,7 @@ package javaBean;
 import java.sql.*;
 
 import property.*;
+import property.enums.enumMysql;
 
 public class ConnectMysql {
 
@@ -12,10 +13,10 @@ public class ConnectMysql {
 		Connection conn = null;
 		try {
 			
-			constMysql url = constMysql.dbUrl;
-			constMysql id = constMysql.dbId;
-			constMysql pw = constMysql.dbPasswd;
-			constMysql driver = constMysql.dbDriver;
+			enumMysql url = enumMysql.dbUrl;
+			enumMysql id = enumMysql.dbId;
+			enumMysql pw = enumMysql.dbPasswd;
+			enumMysql driver = enumMysql.dbDriver;
 			
 			String jdbcUrl = url.getString();
 			String dbId = id.getString();

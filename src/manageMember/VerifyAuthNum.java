@@ -5,8 +5,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
 
 /**
@@ -20,7 +20,7 @@ public class VerifyAuthNum implements commandAction {
 			throws Throwable {
 		
 
-		MemberDataBean mdb = new MemberDataBean();
+		Member mdb = new Member();
 		HashMap<String , String> returns = new HashMap<String , String>();
 		String authNum;	
 
@@ -44,7 +44,7 @@ public class VerifyAuthNum implements commandAction {
 		}
 		
 			
-		if(MemberProcessBean.isConcordTempValue(mdb, authNum)){
+		if(MemberProcess.isConcordTempValue(mdb, authNum)){
 			
 			returns.put("view", "password_Reset");
 			returns.put("corret_AuthNum", "true");

@@ -17,7 +17,7 @@ package org.mindrot.jbcrypt;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 
-import property.constMysql;
+import property.enums.enumMysql;
 
 /**
  * BCrypt implements OpenBSD-style Blowfish password hashing using

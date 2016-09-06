@@ -5,10 +5,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
-import property.constUserstate;
+import property.enums.enumUserState;
 
 /**
  *  JSP페이지에서 폼을 통하여 값을 전달받아 회원가입을 처리받는다.
@@ -21,7 +21,7 @@ public class ChangePasswd implements commandAction {
 			throws Throwable {
 		
 
-		MemberDataBean mdb = new MemberDataBean();
+		Member mdb = new Member();
 		HashMap<String , String> returns = new HashMap<String , String>();
 	
 		if(request.getParameter("email") == null)
@@ -33,5 +33,6 @@ public class ChangePasswd implements commandAction {
 		return returns;
 		
 	}
+
 	
 }

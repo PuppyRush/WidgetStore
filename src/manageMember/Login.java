@@ -6,10 +6,10 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
-import property.constUserstate;
+import property.enums.enumUserState;
 
 /**
  *  JSP페이지에서 폼을 통하여 값을 전달받아 회원가입을 처리받는다.
@@ -25,37 +25,47 @@ public class Login implements commandAction {
 		
 	
 		HashMap<String , String> returns = new HashMap<String , String>();
-		MemberDataBean mdb = new MemberDataBean();
+		Member member = null;
+		String nick_or_mail = null;
+		
+		if(request.getParameter("sessionId")==null){
+			returns.put("is_successLogin", "false");
+			returns.put("view", "/");		
+			throw new NullPointerException("sessionId값이 서버로 전송되지 않았습니");
+		}else
+			member = Member.getMember( (String)request.getParameter("sessionId"));
+		
+		System.out.println((String)request.getParameter("sessionId"));
 		
 		if(request.getParameter("idType") == null)
 			throw new Exception( request.getRequestURI() + "에 kind가 없습니다");
 		
 		if( ((String)request.getParameter("idType")).equals("inner") ){
 			
-			String nick_or_mail = (String)request.getParameter("login_username");
+			nick_or_mail = (String)request.getParameter("login_username");
 					//주석	
 			if( nick_or_mail.contains("@") ){			
-				mdb.setEmail(nick_or_mail);
-				mdb.setId( MemberProcessBean.somethingToId("email", nick_or_mail) );
+				member.setEmail(nick_or_mail);				
 			}
 			else{
-				mdb.setNickname(nick_or_mail);
-				mdb.setId( MemberProcessBean.somethingToId("nickname", nick_or_mail) );
+				member.setNickname(nick_or_mail);				
 			}
-			String pw = (String)request.getParameter("login_password");
-			mdb.setPassword(pw);			
+			
+			member.setId( MemberProcess.sthToId(member));
+		
+			member.setPassword((String)request.getParameter("login_password"));			
 				
 			int code;
 			//잠김상태인가?
-			if( (code = MemberProcessBean.isLockingMember(mdb)) !=0){
+			if( (code = MemberProcess.isLockingMember(member)) !=0){
 				
 				//비밀번호 분실상태인가?
 				//아래의 두 상태는 비밀번호 일치여부를 검사할 필요 없음.
-				if((code & Integer.valueOf( constUserstate.LOSTPW.getString()) ) == Integer.valueOf( constUserstate.LOSTPW.getString())  ){
+				if((code & Integer.valueOf( enumUserState.LOSTPW.getString()) ) == Integer.valueOf( enumUserState.LOSTPW.getString())  ){
 									
 					returns.put("userState","lostpw");		
 					
-					if(MemberProcessBean.isSendmail(mdb, Integer.valueOf(constUserstate.LOSTPW.getString())))
+					if(MemberProcess.isSendmail(member, Integer.valueOf(enumUserState.LOSTPW.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -65,12 +75,12 @@ public class Login implements commandAction {
 
 				}
 				//비밀번호 초과상태인가
-				else if((code & Integer.valueOf( constUserstate.FAILD_LOGIN.getString()) ) == Integer.valueOf( constUserstate.FAILD_LOGIN.getString()) ){
+				else if((code & Integer.valueOf( enumUserState.FAILD_LOGIN.getString()) ) == Integer.valueOf( enumUserState.FAILD_LOGIN.getString()) ){
 					
 					returns.put("userState","faild_login");
 					returns.put("excessFaildcount","true");
 					
-					if(MemberProcessBean.isSendmail(mdb, Integer.valueOf(constUserstate.LOSTPW.getString())))
+					if(MemberProcess.isSendmail(member, Integer.valueOf(enumUserState.LOSTPW.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -80,15 +90,15 @@ public class Login implements commandAction {
 				}
 						
 				//잠김 상태중에서도 아래 두가지는 확인이 필요함.
-				if((code & Integer.valueOf( constUserstate.OLD_PASSWD.getString()) ) == Integer.valueOf( constUserstate.OLD_PASSWD.getString())  ){
+				if((code & Integer.valueOf( enumUserState.OLD_PASSWD.getString()) ) == Integer.valueOf( enumUserState.OLD_PASSWD.getString())  ){
 				
 					//로그인 실패하면 3개월 이상 변경여부 검사 안함
-					if(MemberProcessBean.loginMember(mdb)==false){
+					if(MemberProcess.loginMember(member)==false){
 						returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
 					}
 					else{
 						
-						if(MemberProcessBean.isPassingDate(mdb)){
+						if(MemberProcess.isPassingDate(member)){
 							returns.put("excessDateOfChange", "ture");
 							returns.put("view", "password_Reset.html");
 						}
@@ -102,9 +112,9 @@ public class Login implements commandAction {
 					
 					
 				}
-				else if((code & Integer.valueOf( constUserstate.SLEEP.getString()) ) == Integer.valueOf( constUserstate.SLEEP.getString())  ){
+				else if((code & Integer.valueOf( enumUserState.SLEEP.getString()) ) == Integer.valueOf( enumUserState.SLEEP.getString())  ){
 						
-					if(MemberProcessBean.isSendmail(mdb, Integer.valueOf(constUserstate.SLEEP.getString())))
+					if(MemberProcess.isSendmail(member, Integer.valueOf(enumUserState.SLEEP.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -112,15 +122,18 @@ public class Login implements commandAction {
 				}
 				
 				
-			}//isn't Locking member
+			}//isn't Locking member and Succes login process.
 			else{
 			
-				if(MemberProcessBean.loginMember(mdb)==false){
+				if(MemberProcess.loginMember(member)==false){
 					returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
-					returns.put("succ_login", "true");
+					returns.put("isSuccessLogin", "false");
+					
 				}
 				else{
-					returns.put("succ_login", "false");			
+					member.setSessionId((String)request.getParameter("sessionId"));
+					returns.put("isSuccessLogin", "true");
+					returns.put("id", nick_or_mail);
 				}
 				
 				returns.put("view", "/");				

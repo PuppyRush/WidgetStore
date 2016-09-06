@@ -4,8 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcessBean;
-import javaBean.MemberDataBean;
+import javaBean.MemberProcess;
+import javaBean.Member;
 import property.commandAction;
 
 /**
@@ -19,15 +19,23 @@ public class Join implements commandAction {
 			throws Throwable {
 		
 		
-		MemberDataBean mdb = new MemberDataBean();
+		Member member = new Member();
 		HashMap<String , String> returns = new HashMap<String , String>();
 		String idType = (String) request.getParameter("idType");
 
-		mdb.setId(0);
-		mdb.setEmail((String) request.getParameter("register_email"));
-		mdb.setIdType((String) request.getParameter("idType"));
-		mdb.setNickname((String) request.getParameter("register_username"));
-		mdb.setReg_date(new Timestamp(System.currentTimeMillis()));
+		if(request.getParameter("sessionId")==null){
+			returns.put("is_successLogin", "false");
+			returns.put("view", "/");		
+			throw new NullPointerException("sessionId값이 서버로 전송되지 않았습니다.");
+		}else
+			member = Member.getMember( (String)request.getParameter("sessionId"));
+		
+		member.setId(0);
+		
+		member.setEmail((String) request.getParameter("register_email"));
+		member.setIdType((String) request.getParameter("idType"));
+		member.setNickname((String) request.getParameter("register_username"));
+		member.setReg_date(new Timestamp(System.currentTimeMillis()));
 		
 		switch (idType) {
 				
@@ -35,13 +43,13 @@ public class Join implements commandAction {
 			case "google":
 			case "naver":
 		
-				mdb.setPassword(" ");
+				member.setPassword(" ");
 				
 				break;
 	
 			case "inner":
 				
-				mdb.setPassword((String) request.getParameter("register_password"));
+				member.setPassword((String) request.getParameter("register_password"));
 				
 				break;
 	
@@ -50,12 +58,15 @@ public class Join implements commandAction {
 				return returns;
 				
 		}
-
-		if (MemberProcessBean.joinMember(mdb))		
-			returns.put("message", "가입에 성공하였습니다.");
-		else
-			returns.put("message", "이전에 가입하셨습니다.");
 		
+		if (MemberProcess.joinMember(member)){
+			returns.put("isSuccessJoin", "true");
+			returns.put("message", "가입에 성공하였습니다. 로그인 하세요");
+		}
+		else{
+			returns.put("isSuccessJoin", "false");
+			returns.put("message","가입에 실패하였습니다.");
+		}
 		returns.put("view", "/");
 		returns.put("innerJoin", "true");
 				
