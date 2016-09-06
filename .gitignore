@@ -1,5 +1,4 @@
-constMysql
-
+const*
 *.class
 /build/*
 ./build/classes
