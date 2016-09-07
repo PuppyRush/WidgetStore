@@ -12,10 +12,10 @@ import property.commandAction;
 	public class isDeveloperPage implements commandAction{
 
 		@Override
-		public HashMap<String, String> requestPro(HttpServletRequest request,
+		public HashMap<String, Object> requestPro(HttpServletRequest request,
 				HttpServletResponse response) throws Throwable {
 				
-			HashMap<String, String> returns = new HashMap<String, String>();
+			HashMap<String , Object> returns = new HashMap<String , Object>();
 			Member member = null;
 			
 			if(request.getParameter("sessionId")==null){

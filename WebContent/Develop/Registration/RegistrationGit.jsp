@@ -1,4 +1,4 @@
-<form method="post" action="">
+
 			<!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +16,6 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <!-- Custom CSS -->
-    <link href="css/shop-item.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,8 +24,6 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" href="css/editor.css" type="text/css" charset="utf-8"/>
-    <script src="js/editor_loader.js" type="text/javascript" charset="utf-8"></script>
 <style>
 .btn-file {
     position: relative;
@@ -106,7 +103,7 @@
 			<!-- 업로드 폼 시작 -->
             <div class="col-md-9">
 
-                <form id="widget-upload">
+                <form id="widget-upload" method="post" action="widgetUpload.do"  enctype="multipart/form-data">
 
 					<div class="modal-body">
 		    				<div id="div-lost-msg">
@@ -117,7 +114,8 @@
 		    				<input id="git-id" class="form-control" type="text" placeholder="Git ID" required></br>
 							<input id="repository-name" class="form-control" type="text" placeholder="Repository name" required></br>
 							<input id="git-url" class="form-control" type="text" placeholder="Git url" required></br>
-				</form>
+							<input id="sessionId" type="hidden">
+			
 				<!-- 이미지 파일 선택 -->
 				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
 					<tr>
@@ -163,6 +161,7 @@
 		    		    <div class="modal-footer">
                             <div>
                                 <button type="submit" class="btn btn-primary btn-lg btn-block">Upload</button>
+                                	</form>
                             </div>
 		    		    </div>
 						</div>
@@ -194,14 +193,21 @@
     <!-- /.container -->
 	
     <!-- jQuery -->
-    <script src="js/jquery.js"></script>
+<script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 <!-- End: Loading Contents -->
 </body>
 <script>
+
+function submit(){
+	var id = "<%= session.getId() %>";
+	$("#sessionId").val(id);
+	
+}
+
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
@@ -250,5 +256,3 @@ function dropIt(e) {
 }  
 </script>
 </html>
-
-</form>

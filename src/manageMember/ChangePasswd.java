@@ -8,7 +8,7 @@ import java.util.HashMap;
 import javaBean.MemberProcess;
 import javaBean.Member;
 import property.commandAction;
-import property.enums.enumUserState;
+import property.enums.*;
 
 /**
  *  JSP페이지에서 폼을 통하여 값을 전달받아 회원가입을 처리받는다.
@@ -17,12 +17,13 @@ import property.enums.enumUserState;
 public class ChangePasswd implements commandAction {
 
 	@Override
-	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
+	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
 
 		Member mdb = new Member();
-		HashMap<String , String> returns = new HashMap<String , String>();
+		HashMap<String , Object> returns = new HashMap<String , Object>();
+
 	
 		if(request.getParameter("email") == null)
 			throw new NullPointerException("이메일값이 클라이언트로부터 전송되지 않았습니다");

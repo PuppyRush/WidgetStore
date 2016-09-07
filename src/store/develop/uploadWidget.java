@@ -18,27 +18,42 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import com.oreilly.servlet.MultipartRequest;
+import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
+
 import javaBean.Member;
 import property.commandAction;
 
-public class registrationGit implements commandAction {
+public class uploadWidget implements commandAction {
 
 	@Override
-	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
+	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
 		Member mdb = new Member();
-		HashMap<String , String> returns = new HashMap<String , String>();
+		HashMap<String , Object> returns = new HashMap<String , Object>();
 		
 		String _contents = (String)request.getParameter("content");
 		String _gitUrl= (String)request.getParameter("git_url");
 		String _gitId= (String)request.getParameter("git_id");
 		String _gitRepo = (String)request.getParameter("git_repo");
-		System.out.println(_contents);
-		System.out.println(_gitUrl);
-		System.out.println(_gitId);
-		System.out.println(_gitRepo);
+
+		int sizeLimit = 1024*1024*15;
+		try{
 		
+			MultipartRequest multi = new MultipartRequest(request, "/upload/TemporaryUploadWidget", sizeLimit, "utf-8", new DefaultFileRenamePolicy());		
+		}
+		catch(IOException e){
+			returns.put("view", "StoreEditor/EditorPageGit");
+			returns.put("message", "업로드파일 저장중 문제가 발생하였습니다.");
+			returns.put("isSuccessUpload", "false");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			return returns;
+		}
+		
+		returns.put("view", "StoreEditor/EditorPageGit");
+		returns.put("isSuccessUpload", "true");
 		
 		return returns;
 	}

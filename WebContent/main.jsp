@@ -1,5 +1,13 @@
 
-<%@page import="java.util.*"%>
+<%@page import="property.enums.enumAttributeKey"%>
+<%@page import="java.util.Iterator"%>
+<%@page import="java.util.Map.Entry"%>
+<%@page import="java.util.Properties"%>
+<%@page import="java.util.Map"%>
+<%@page import="javaBean.Member"%>
+<%@page import="java.util.HashMap"%>
+<%@page import="java.util.Enumeration"%>
+
 
 <!DOCTYPE html>
 <html>
@@ -238,6 +246,8 @@
 	window.onload=function(){
 				
 			<%
+
+			
 			try{ 
 				//자동로그인 처리하기    
 				if(request.getAttribute("doLogout")!= null && 	((String)request.getAttribute("doLogout")).equals("true")){

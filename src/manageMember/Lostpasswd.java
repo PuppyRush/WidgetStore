@@ -17,12 +17,12 @@ import property.enums.enumUserState;
 public class Lostpasswd implements commandAction {
 
 	@Override
-	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
+	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
 
 		Member mdb = new Member();
-		HashMap<String , String> returns = new HashMap<String , String>();
+		HashMap<String , Object> returns = new HashMap<String , Object>();
 	
 		if(request.getParameter("email") != null){
 			

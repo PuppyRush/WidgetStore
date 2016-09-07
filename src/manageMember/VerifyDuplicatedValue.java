@@ -16,10 +16,10 @@ import property.commandAction;
 public class VerifyDuplicatedValue implements commandAction {
 
 	@Override
-	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
+	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 
-		HashMap<String , String> returns = new HashMap<String , String>();
+		HashMap<String , Object> returns = new HashMap<String , Object>();
 		
 		if(request.getParameter("nickname") == null || request.getParameter("email") == null)
 			throw new Exception( request.getRequestURI() + "검사할 항목이 없습니다.");

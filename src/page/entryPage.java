@@ -9,10 +9,10 @@ import property.commandAction;
 	public class entryPage implements commandAction{
 
 		@Override
-		public HashMap<String, String> requestPro(HttpServletRequest request,
+		public HashMap<String, Object> requestPro(HttpServletRequest request,
 				HttpServletResponse response) throws Throwable {
 				
-			HashMap<String, String> r = new HashMap<String, String>();
+			HashMap<String , Object> r = new HashMap<String , Object>();
 			r.put("view", "main.jsp");
 			//r.put("view", "/StoreEditor/pages/trex/file.jsp");
 			return r;

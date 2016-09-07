@@ -1,4 +1,4 @@
-<form method="post" action="">
+
 			<!DOCTYPE html>
 <html lang="en">
 
@@ -16,7 +16,6 @@
   <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <!-- Custom CSS -->
-    <link href="css/shop-item.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -25,8 +24,6 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" href="css/editor.css" type="text/css" charset="utf-8"/>
-    <script src="js/editor_loader.js" type="text/javascript" charset="utf-8"></script>
 <style>
 .btn-file {
     position: relative;
@@ -106,7 +103,7 @@
 			<!-- 업로드 폼 시작 -->
             <div class="col-md-9">
 
-                <form id="widget-upload">
+                <form id="widget-upload" method="post" action="widgetUpload.do"  enctype="multipart/form-data">
 
 					<div class="modal-body">
 		    				<div id="div-lost-msg">
@@ -199,11 +196,10 @@
     </div>
     <!-- /.container -->
 	
-    <!-- jQuery -->
-    <script src="js/jquery.js"></script>
+<script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">>
 
 <!-- End: Loading Contents -->
 </body>
@@ -256,5 +252,3 @@ function dropIt(e) {
 }  
 </script>
 </html>
-
-</form>

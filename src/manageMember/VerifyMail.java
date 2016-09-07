@@ -15,12 +15,12 @@ import property.commandAction;
 public class VerifyMail implements commandAction {
 
 	@Override
-	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
+	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
 		
 		Member member = new Member();
-		HashMap<String , String> returns = new HashMap<String , String>();
+		HashMap<String , Object> returns = new HashMap<String , Object>();
 		
 		String mail = (String) request.getParameter("mail");
 		

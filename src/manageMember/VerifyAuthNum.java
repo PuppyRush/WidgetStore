@@ -16,12 +16,12 @@ import property.commandAction;
 public class VerifyAuthNum implements commandAction {
 
 	@Override
-	public HashMap<String, String> requestPro(HttpServletRequest request, HttpServletResponse response)
+	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
 
 		Member mdb = new Member();
-		HashMap<String , String> returns = new HashMap<String , String>();
+		HashMap<String , Object> returns = new HashMap<String , Object>();
 		String authNum;	
 
 		if(request.getParameter("chkNum") == null){

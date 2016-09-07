@@ -21,21 +21,21 @@
     <meta name="description" content="">
     <meta name="author" content="">
   <title>Develop</title>
-  <link href="WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="WidgetClientPage/css/stylish-portfolio.css" rel="stylesheet">
+    <link href="../WidgetClientPage/css/stylish-portfolio.css" rel="stylesheet">
 	<!-- bootsnipp down -->
-	<link href="WidgetClientPage/css/login.css" rel="stylesheet">
+	<link href="../WidgetClientPage/css/login.css" rel="stylesheet">
     <!-- Custom Fonts -->
-    <link href="WidgetClientPage/font-awesome/font-awesome.css" rel="stylesheet" type="text/css">
+    <link href="../WidgetClientPage/font-awesome/font-awesome.css" rel="stylesheet" type="text/css">
     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
  </head>
  <body>
 	<div class="modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header" align="center">
-					<img class="img-circle" id="img_logo2" src="WidgetClientPage/img/test1.jpg">
+					<img class="img-circle" id="img_logo2" src="../WidgetClientPage/img/test1.jpg">
 					
 				</div>
     <div id="div-forms">
@@ -45,24 +45,24 @@
          	          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun_our()">직접 파일 업로드</button>
 						 									<button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun_git()">깃을 통한 업로드</button>
 					</div>
-                </div>
+      </div>
 			</div>
        </form>
     </div>
 
-    <script src="WidgetClientPage/js/jquery.js"></script>
-    <script src="WidgetClientPage/js/bootstrap.min.js"></script>
+    <script src="../WidgetClientPage/js/jquery.js"></script>
+    <script src="../WidgetClientPage/js/bootstrap.min.js"></script>
  </body>
  
  <script>
  
 	function fun_git(){
-		location.replace("/StoreEditor/gitUploadPage.jsp");
+		location.replace("/Develop/Registration/RegistrationGit.jsp");
 		
 	}
 	
 	function fun_our(){
-		location.replace("/StoreEditor/widgetUploadPage.jsp");
+		location.replace("/Develop/Registration/RegistrationOur.jsp");
 		
 	}
  

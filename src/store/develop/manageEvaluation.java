@@ -3,6 +3,7 @@ package store.develop;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -10,36 +11,58 @@ import property.enums.widget.enumWidgetKind;
 
 /**
  * 
- * @author PuppyRush_NB
+ * @author PuppyRush / gooddaumi@naver.com<br>
  *
  * 업로드된 위젯의 등록 및 평가를 위해 다음과 같은 순서로 진행된다.<br>
- * 1. 사용자명과 위젯명을 토대로 기본 폴더 생성 	( /upload/<i>username</i>/<i>widgetname</i>)<br>
- * 2. 제출된 압축파일을 widget 폴더를 생성하여 해제한다.<br>
+ * 1. 사용자명과 위젯명을 토대로 기본 폴더 생성 	( /upload/widget/<i><b>username</b></i>/<b><i>widgetname</i></b>)<br>
+ * 2. 제출된 압축파일을 widget폴더를 생성하여 해제한다.<br>
  * 3. 제출된 대표사진을 representiveImages 폴더를 생성하여 저장한다.<br>
- * 4. 
+ *   upload/widget/<i><b>username</b></i>/<b><i>widgetname</i></b>/representiveImages/)<br>
+ * 4. 기본적인 파일이 있는지 조사한다. (매니페스트, 루트파일)<br>
+ * 5. 참조하는 js에 문제가 없는지 조사한다. (실행이 잘 될 요건의 최소사항.)<br>
+ * 6. 매니페스트에 근거하여 위젯정보를 DB에 저장한다.<br>
+ * **각 순서에서의 설명은 메서드를 참고.
  */
 public class manageEvaluation {
 
-	private static final String defaultPath = "/upload/widget/";
-	private static final String defaultImageFolderName = "representiveu'; "
+	private String defaultPath;
+	private final String IMAGE_FOLDER_NAME = "RepresentiveImages";
 	
-	public static void makeDefaultUserFolder(String userName){
+	private String rootPath;
+	private enumWidgetKind kind;
+	private String developer;
+	private String widgetName;
+	
+	public manageEvaluation(String userName, String widgetName){
 		
+		if(userName==null)
+			throw new NullPointerException("username 파라메터가 널입니다.");
+		if(widgetName==null)
+			throw new NullPointerException("widgetName 파라메터가 널입니다.");		
 		
-		String realPath = defaultPath + userName;
-		try{
+		this.widgetName = widgetName;
+		developer = userName;
+		rootPath = (new StringBuilder(defaultPath).append("/").append(userName)).toString();
 		
-			File folder = new File(realPath);
-			if(!folder.exists())
-				folder.mkdirs();
-		}
-		catch( Exception e){
-			System.out.println(e.getMessage());
-			e.printStackTrace();					
-		}
+		defaultPath = "/upload/widget/"+widgetName;
+	}
+	
+	private void makeDefaultFolder() throws IOException{
+		
+	
+		File folder = new File(rootPath + "/" + IMAGE_FOLDER_NAME +"/");
+		if(!folder.exists())
+			folder.mkdirs();
+		
+		folder = new File(rootPath + "/source/");
+		if(!folder.exists())
+			folder.mkdirs();
 	}
 
-   public static void zipDecompress(String zipFileName, String directory) throws Throwable {
+   private void zipDecompress(String zipFileName) throws Throwable {
+	   
+	   String directory = rootPath +"/source/";
+	   
 	   
 	   File zipFile = new File(zipFileName);
 	   FileInputStream fis = null;
@@ -73,7 +96,7 @@ public class manageEvaluation {
    	  }
    
 
-   private static void createFile(File file, ZipInputStream zis) throws Throwable {
+   private void createFile(File file, ZipInputStream zis) throws Throwable {
         //디렉토리 확인
         File parentDir = new File(file.getParent());
         //디렉토리가 없으면 생성하자
@@ -94,27 +117,26 @@ public class manageEvaluation {
         }
    }
 	    	
-   private static boolean isExistRootFile(String userName,String widgetName){
+   private void makeRepresentiveImages(){
+
 	   
-	   
-	   
-   }
+   	}
    
-   private static boolean isExistManifest(String userName,String widgetName){
+   private boolean isExistRootFile(String rootFileName){
+	   	
+	   File file = new File(defaultPath+"/source/" + rootFileName );
 	   
-	   StringBuilder realPath = new StringBuilder(defaultPath);
-	   realPath.append(userName);
-	   realPath.append("/");
-	   realPath.append(widgetName);
+	   if(!file.exists())
+		   return false;
+	   else
+		   return true;
+   	
+   	}
+   
+   private boolean isExistManifest(){
 	   
-	   File folder = new File(realPath.toString());
-	   if(!folder.exists()){
-		   folder.mkdirs();
-	   }
-	   
-	   realPath.append("/");
-	   realPath.append("manifest.xml");
-	   File file = new File(realPath.toString());
+
+	   File file = new File(defaultPath+"/source/manifest.xml");
 	   
 	   if(!file.exists())
 		   return false;
