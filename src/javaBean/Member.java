@@ -17,6 +17,9 @@ public class Member {
 	private String email;
 	private Timestamp regDate;
 	private String sessionId;
+	private boolean isLogin;
+	private boolean isLogout;
+	private boolean isJoin;
 	
 	public Member(){
 		id = DEFAULT_VALUE;
@@ -89,6 +92,29 @@ public class Member {
 	public void setSessionId(String arg){
 		sessionId = arg;
 	}
+	public boolean isLogin() {
+		return isLogin;
+	}
+
+	public void setLogin(boolean isLogin) {
+		this.isLogin = isLogin;
+	}
+
+	public boolean isLogout() {
+		return isLogout;
+	}
+
+	public void setLogout(boolean isLogout) {
+		this.isLogout = isLogout;
+	}
+
+	public boolean isJoin() {
+		return isJoin;
+	}
+
+	public void setJoin(boolean isJoin) {
+		this.isJoin = isJoin;
+	}
 	
 	public static boolean isContainsMember(String sId){
 		
@@ -122,7 +148,7 @@ public class Member {
 		
 		return member;
 	}
-	
+		
 	@Override
 	public int hashCode(){
 		

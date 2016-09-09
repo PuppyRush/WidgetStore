@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import property.enums.widget.enumWidgetEvaluation;
 import property.enums.widget.enumWidgetKind;
 
 /**
@@ -23,7 +24,7 @@ import property.enums.widget.enumWidgetKind;
  * 6. 매니페스트에 근거하여 위젯정보를 DB에 저장한다.<br>
  * **각 순서에서의 설명은 메서드를 참고.
  */
-public class manageEvaluation {
+public class ManageEvaluation {
 
 	private String defaultPath;
 	private final String IMAGE_FOLDER_NAME = "RepresentiveImages";
@@ -33,7 +34,7 @@ public class manageEvaluation {
 	private String developer;
 	private String widgetName;
 	
-	public manageEvaluation(String userName, String widgetName){
+	public ManageEvaluation(String userName, String widgetName){
 		
 		if(userName==null)
 			throw new NullPointerException("username 파라메터가 널입니다.");
@@ -45,6 +46,16 @@ public class manageEvaluation {
 		rootPath = (new StringBuilder(defaultPath).append("/").append(userName)).toString();
 		
 		defaultPath = "/upload/widget/"+widgetName;
+	}
+	
+	public void BeginEvaluate(){
+		
+		(new Thread(){
+			
+			
+			
+		}).start();
+						
 	}
 	
 	private void makeDefaultFolder() throws IOException{

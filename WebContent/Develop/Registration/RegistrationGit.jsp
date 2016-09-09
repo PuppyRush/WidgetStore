@@ -4,7 +4,7 @@
 
 <head>
 
-    <meta charset="utf-8">
+    <meta charset="euc-kr">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -103,19 +103,20 @@
 			<!-- 업로드 폼 시작 -->
             <div class="col-md-9">
 
-                <form id="widget-upload" method="post" action="widgetUpload.do"  enctype="multipart/form-data">
+                <form id="upload-form" method="post" action="widgetUpload.do" enctype="multipart/form-data" >
 
 					<div class="modal-body">
 		    				<div id="div-lost-msg">
                                 <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
                                 <span id="text-lost-msg">upload git widget.</span>
 							</div>
-
-		    				<input id="git-id" class="form-control" type="text" placeholder="Git ID" required></br>
-							<input id="repository-name" class="form-control" type="text" placeholder="Repository name" required></br>
-							<input id="git-url" class="form-control" type="text" placeholder="Git url" required></br>
-							<input id="sessionId" type="hidden">
-			
+								<input id="widget-name" name="widget-name" class="form-control" type="text" placeholder="Widget Name" required></br>
+		    				<input id="git-id" name="git-id" class="form-control" type="text" placeholder="Git ID" required></br>
+							<input id="repository-name" name="repository-name" class="form-control" type="text" placeholder="Repository name" required></br>
+							<input id="git-url" name="git-url" class="form-control" type="text" placeholder="Git url(raw url)" required></br>
+							<input id="sessionId" name="sessionId" type="hidden">
+				Drag & drop or choose images from your local file system
+						<input accept="image/jpeg,image/gif,image/png" type="file" name="upload[]" multiple/>
 				<!-- 이미지 파일 선택 -->
 				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
 					<tr>
@@ -126,7 +127,7 @@
 					<tr>
 						<td align="center">
 						<label class="btn btn-block btn-primary">
-						Drag & drop or choose images from your local file system<input style="display: none;" type="file" id="input" multiple="true" onchange="imagesSelected(this.files)" />
+					
 					</label>
 						</td>
 					</tr>
@@ -135,9 +136,7 @@
 
 				<!-- 텍스트 입력 -->
 				<p class="help-block">Input text about this widget</p>
-				<textarea class="form-control" rows="5" placeholder="이 위젯에 대한 설명을 해주세요."></textarea>
-
-
+				<textarea class="form-control" id="contents" name="contents" rows="5" placeholder="이 위젯에 대한 설명을 해주세요."></textarea>
 
 					<!-- 카테고리 -->
 					<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">Category <span class="caret"></span></a>
@@ -160,7 +159,8 @@
 							
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Upload</button>
+                                			<button type="submit" class="btn btn-primary btn-lg btn-block" onclick="uploadsubmit()" >Upload</button>
+                                	
                                 	</form>
                             </div>
 		    		    </div>
@@ -202,10 +202,11 @@
 </body>
 <script>
 
-function submit(){
+function uploadsubmit(){
 	var id = "<%= session.getId() %>";
 	$("#sessionId").val(id);
-	
+	document.forms["upload-form"].submit();
+		
 }
 
  $(function () {

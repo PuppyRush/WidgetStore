@@ -322,9 +322,10 @@ public class MemberProcess {
 			if (rs.next()) {
 			    key = rs.getLong(1);
 			}	
-			else
+			else{
+				member.setJoin(false);
 				throw new SQLException("-");
-	
+			}
 			
 			////////userState table
 			
@@ -345,6 +346,8 @@ public class MemberProcess {
 			
 			pstmt.executeUpdate();
 				
+			member.setJoin(true);
+			
 			conn.commit();
 				
 		}
@@ -431,6 +434,7 @@ public class MemberProcess {
 				//로그인상태 변경
 				setSthJustOne("userState", "u_num", member.getId(), "isLogin", 1);
 				
+				member.setLogin(true);
 			}
 			//불일치
 			else{
@@ -451,6 +455,7 @@ public class MemberProcess {
 					setSthJustOne("userState", "u_num", id, "abnoramlCode", code);
 					
 				}
+				member.setLogin(false);
 				
 			}
 		
@@ -506,6 +511,8 @@ public class MemberProcess {
 		member.setId(sthToId(member));
 		setSthJustOne("userState","u_num",member.getId(),"lastLogoutDate", new Timestamp(System.currentTimeMillis()) );
 		setSthJustOne("userState","u_num",member.getId(), "isLogin",0);
+		member.setLogout(true);
+		
 	}
 	
 	/**
@@ -738,6 +745,11 @@ public class MemberProcess {
 							
 								case "registrationDate":
 									pstmt = conn.prepareStatement("select registrationDate from user where userNum = ? ");
+									pstmt.setInt(1, (int)where_val);
+									break;
+									
+								case "nickname":
+									pstmt = conn.prepareStatement("select nickname from user where userNum = ? ");
 									pstmt.setInt(1, (int)where_val);
 									break;
 								

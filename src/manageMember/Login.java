@@ -46,14 +46,16 @@ public class Login implements commandAction {
 			nick_or_mail = (String)request.getParameter("login_username");
 					//주석	
 			if( nick_or_mail.contains("@") ){			
-				member.setEmail(nick_or_mail);				
+				member.setEmail(nick_or_mail);	
+				member.setId( MemberProcess.sthToId(member));
+				member.setNickname( (String)MemberProcess.getSthJustOne("user", "userNum", member.getId(), "nickname"));
 			}
 			else{
-				member.setNickname(nick_or_mail);				
+				member.setNickname(nick_or_mail);
+				member.setId( MemberProcess.sthToId(member));
+				member.setNickname( (String)MemberProcess.getSthJustOne("user", "userNum", member.getId(), "email"));
 			}
 			
-			member.setId( MemberProcess.sthToId(member));
-		
 			member.setPassword((String)request.getParameter("login_password"));			
 				
 			int code;
