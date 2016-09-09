@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import javaBean.Member;
 import property.enums.widget.enumWidgetEvaluation;
 import property.enums.widget.enumWidgetKind;
 
@@ -24,40 +26,53 @@ import property.enums.widget.enumWidgetKind;
  * 6. 매니페스트에 근거하여 위젯정보를 DB에 저장한다.<br>
  * **각 순서에서의 설명은 메서드를 참고.
  */
-public class ManageEvaluation {
+public class ManageEvaluation implements Runnable{
 
 	private String defaultPath;
 	private final String IMAGE_FOLDER_NAME = "RepresentiveImages";
 	
+	private String zipFileName;
 	private String rootPath;
 	private enumWidgetKind kind;
-	private String developer;
+	private Member member;
 	private String widgetName;
 	
-	public ManageEvaluation(String userName, String widgetName){
+	public ManageEvaluation(Member member, String widgetName, String zipFileName, List<String> images){
 		
-		if(userName==null)
+		if(member==null)
 			throw new NullPointerException("username 파라메터가 널입니다.");
 		if(widgetName==null)
 			throw new NullPointerException("widgetName 파라메터가 널입니다.");		
+		if(zipFileName==null)
+			throw new NullPointerException("zipFileName 파라메터가 널입니다.");
+		if(images==null)
+			throw new NullPointerException("images 파라메터가 널입니다.");	
 		
 		this.widgetName = widgetName;
-		developer = userName;
+		this.member = member;
 		rootPath = (new StringBuilder(defaultPath).append("/").append(userName)).toString();
 		
 		defaultPath = "/upload/widget/"+widgetName;
 	}
-	
-	public void BeginEvaluate(){
 		
-		(new Thread(){
+
+	public void run(){
+		
+		try {
+			makeDefaultFolder();
+			zipDecompress(zipFileName);
 			
 			
-			
-		}).start();
-						
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
-	
+
 	private void makeDefaultFolder() throws IOException{
 		
 	

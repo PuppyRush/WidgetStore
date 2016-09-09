@@ -25,28 +25,46 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 
 import javaBean.Member;
 import javaBean.MemberException;
+import property.ServletContext;
 import property.commandAction;
 import property.enums.*;
 
 public class UploadWidget implements commandAction {
-
+	
+	private final int sizeLimit = 10*1024*1024;
+	private String DEFAULT_TEMP_FOLDER_NAME;
+	private String DEFAULT_PATH;
+	
+	private String _contents, _gitUrl, _gitRepo, _gitId, sessionId;
+	private String _zipFileName;
+	private List<String> _presentiveImages;
+	private boolean _isSuccessZipFile; 
+	private String _widgetName;
+	
 	@Override
 	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
 		Member mdb = new Member();
 		HashMap<String , Object> returns = new HashMap<String , Object>();
+		_isSuccessZipFile = false;
 		
-		String _contents, _gitUrl, _gitRepo, _gitId, sessionId;
-		final String _widgetName;
 		
+		String realFolder = "/upload"; //properties파일이 저장된 폴더
+		//웹어플리케이션 루트 경로
+		ServletContext context = config.getServletContext();
+		//realFolder를 웹어플리케이션 시스템상의 절대경로로 변경
+		DEFAULT_PATH = context.getRealPath(realFolder);
+		DEFAULT_TEMP_FOLDER_NAME = DEFAULT_TEMP_FOLDER_NAME+"/temp";
+	
 		try{
 			
 		
-	
-			int sizeLimit = 1024*1024*15;
-			
-			MultipartRequest multi = new MultipartRequest(request,"/home/cmk/workspace/WidgetStore/WebContent/upload/TemporaryUploadWidget/", sizeLimit, "euc-kr", new DefaultFileRenamePolicy());
+			File tempFolder = new File(DEFAULT_TEMP_FOLDER_NAME);
+			if(!tempFolder.exists())
+				tempFolder.mkdirs();
+					
+			MultipartRequest multi = new MultipartRequest(request,DEFAULT_TEMP_FOLDER_NAME, sizeLimit, "euc-kr", new DefaultFileRenamePolicy());
 			
 		
 			if(multi.getParameter("contents")==null || multi.getParameter("git-url")==null || 
@@ -67,7 +85,25 @@ public class UploadWidget implements commandAction {
 				if(multi.getFile(name) == null)
 					throw new IOException(name + " 파일 업로드에 실패하였습니다");
 				
+				File file = multi.getFile(name);
+				if(!_isSuccessZipFile && file.getName().contains(".zip") || file.getName().contains(".7z")){
+					_zipFileName = name;
+					_isSuccessZipFile = true;
+				}
+				else if(file.getName().contains("jpg") || file.getName().contains("jpeg") ||
+					file.getName().contains("tif") || file.getName().contains("bmp")){
+					_presentiveImages.add(name);
+				}
+				
 			}
+			if(_presentiveImages.size()==0)
+				throw new IOException("대표사진이 없습니다");
+			else if(!_isSuccessZipFile){
+				throw new IOException("압축파일이 전송되지 않았습니다.");
+			}
+						
+			
+		
 		}
 		
 		catch(IOException e){
@@ -98,13 +134,19 @@ public class UploadWidget implements commandAction {
 		else if(!m.isLogin())
 			throw new MemberException("이상 접근, 로그인하지 않은 유저가 접근하였습니다", enumMemberState.NOT_LOGIN);
 		
+		int 
+		
+
+		
+		Runnable me = new ManageEvaluation(member, _widgetName, _zipFileName);
+		Thread t = new Thread(me);
+		t.run();
 		
 		returns.put("view", "/Develop/Registration/RegistrationGit");
 		returns.put("isSuccessUpload", "true");
 		
 		
 		
-		ManageEvaluation me = new ManageEvaluation(m.getNickname(), _widgetName);
 		
 		return returns;
 	}
