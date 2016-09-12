@@ -42,8 +42,8 @@
 			<div class="modal-body">
 				<div class="modal-footer">
                     <div>
-         	          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun_our()">직접 파일 업로드</button>
-						 									<button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun_git()">깃을 통한 업로드</button>
+         	          <button type="button" class="btn btn-primary btn-lg btn-block" onclick="fun()">업로드</button>
+						 							
 					</div>
       </div>
 			</div>
@@ -56,15 +56,11 @@
  
  <script>
  
-	function fun_git(){
-		location.replace("/Develop/Registration/RegistrationGit.jsp");
+	function fun(){
+		location.replace("/Develop/Registration/RegistrationWidget.jsp");
 		
 	}
 	
-	function fun_our(){
-		location.replace("/Develop/Registration/RegistrationOur.jsp");
-		
-	}
  
  </script>
  

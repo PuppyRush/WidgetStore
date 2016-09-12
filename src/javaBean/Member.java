@@ -122,6 +122,10 @@ public class Member {
 						
 	}
 	
+	public static Map<String,Member> getMemberMap(){
+		return MemberMap;
+	}
+	
 	/**
 	 * 	로그인한 유저를 대상으로 HashMap으로 객체를 보유하고 없으면 새로 생성한다. 
 	 * @param sId	브라우져 sessionId를 통해 유저의 객체를 찾는다. 
@@ -147,6 +151,10 @@ public class Member {
 		}
 		
 		return member;
+	}
+	
+	public static void addMember(Member m){
+		Member.getMemberMap().put(m.getSessionId(), m);
 	}
 		
 	@Override
@@ -175,4 +183,18 @@ public class Member {
 		return ( id==m.getId() && password.equals(m.getPassword()) ) ? true : false;
 	}
 	
+	public static Member makePerfectMember(String id){
+		Member m = new Member();
+		m.setEmail("gooddaumi@naver.co");
+		
+		m.setId(32);
+		m.setSessionId(id);
+		m.setJoin(true);
+		m.setLogin(true);
+		m.setLogout(false);
+		m.setNickname("cks1023");
+		m.setPassword("1234");
+		
+		return m;
+	}
 }

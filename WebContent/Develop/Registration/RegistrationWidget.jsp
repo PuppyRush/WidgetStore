@@ -4,7 +4,7 @@
 
 <head>
 
-    <meta charset="utf-8">
+    <meta charset="euc-kr">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
@@ -100,20 +100,29 @@
                     <a href="#" class="list-group-item">Category 3</a>
                 </div>
             </div>
-			<!-- 업로드 폼 시작 -->
+			<!-- ìë¡ë í¼ ìì -->
             <div class="col-md-9">
 
-                <form id="widget-upload" method="post" action="widgetUpload.do"  enctype="multipart/form-data">
+                <form id="upload-form" method="post" action="uploadWidget.do" enctype="multipart/form-data" >
 
 					<div class="modal-body">
 		    				<div id="div-lost-msg">
                                 <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
                                 <span id="text-lost-msg">upload git widget.</span>
 							</div>
-
-		    				<input id="widget-name" class="form-control" type="text" placeholder="Widget name" required></br>
-				</form>
-				<!-- 이미지 파일 선택 -->
+								<input id="widget-name" name="widget-name" class="form-control" type="text" placeholder="Widget Name" required></br>
+													<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">등록 위치 <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="javascript:;">WidgetStore</a></li>
+                <li><a href="javascript:;">GitHub</a></li>
+            </ul>
+        </div></br>
+							<input id="sessionId" name="sessionId" type="hidden">
+							<input id="position" name="position" value="git" type="hidden">
+							<input id="kind" name="kind" value="sports" type="hidden">
+				Drag & drop or choose images from your local file system
+						<input accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z" type="file" name="upload[]" multiple/>
+				<!-- ì´ë¯¸ì§ íì¼ ì í -->
 				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
 					<tr>
 						<td align="left" height="105" ondragenter="return false" ondragover="return false" ondrop="dropIt(event)">    
@@ -123,49 +132,41 @@
 					<tr>
 						<td align="center">
 						<label class="btn btn-block btn-primary">
-						Drag & drop or choose images from your local file system<input style="display: none;" type="file" id="input" multiple="true" onchange="imagesSelected(this.files)" />
+					
 					</label>
 						</td>
 					</tr>
 				</table>
-				<!-- 위젯 파일 선택 -->
-				<div class="input-group">
-                <label class="input-group-btn">
-                    <span class="btn btn-primary">
-                        Widget File&hellip; <input type="file" style="display: none;" multiple>
-                    </span>
-                </label>
-                <input type="text" class="form-control" readonly>
-            </div>
+				
 
-				<!-- 텍스트 입력 -->
+				<!-- íì¤í¸ ìë ¥ -->
 				<p class="help-block">Input text about this widget</p>
-				<textarea class="form-control" rows="5" placeholder="이 위젯에 대한 설명을 해주세요."></textarea>
+				<textarea class="form-control" id="contents" name="contents" rows="5" placeholder="ì´ ìì ¯ì ëí ì¤ëªì í´ì£¼ì¸ì."></textarea>
 
-
-
-					<!-- 카테고리 -->
+					<!-- ì¹´íê³ ë¦¬ -->
 					<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">Category <span class="caret"></span></a>
             <ul class="dropdown-menu">
-                <li><a href="javascript:;">종류1</a></li>
-                <li><a href="javascript:;">종류2</a></li>
-                <li><a href="javascript:;">종류3</a></li>
-				<li><a href="javascript:;">종류4</a></li>
+                <li><a href="javascript:;">ì¢ë¥1</a></li>
+                <li><a href="javascript:;">ì¢ë¥2</a></li>
+                <li><a href="javascript:;">ì¢ë¥3</a></li>
+				<li><a href="javascript:;">ì¢ë¥4</a></li>
             </ul>
         </div></br>
 
-						<!-- 주의 사항 -->
+						<!-- ì£¼ì ì¬í­ -->
 						<div class="modal-footer"></div>
 								<div class="alert alert-warning" role="alert">
-								1.주의사항1</br>
-								2.주의사항2</br>
-								3.주의사항3
+								1.ì£¼ìì¬í­1</br>
+								2.ì£¼ìì¬í­2</br>
+								3.ì£¼ìì¬í­3
 								</div>
 							
 							
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">Upload</button>
+                                			<button type="submit" class="btn btn-primary btn-lg btn-block" onclick="uploadsubmit()" >Upload</button>
+                                	
+                                	</form>
                             </div>
 		    		    </div>
 						</div>
@@ -196,14 +197,23 @@
     </div>
     <!-- /.container -->
 	
+    <!-- jQuery -->
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
 <!-- End: Loading Contents -->
 </body>
 <script>
+
+function uploadsubmit(){
+	var id = "<%= session.getId() %>";
+	$("#sessionId").val(id);
+	document.forms["upload-form"].submit();
+		
+}
+
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');

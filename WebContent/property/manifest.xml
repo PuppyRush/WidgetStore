@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WidgetStore>
+    <required>
+        <manifest_version>1</manifest_version>				<!-- only use integer-->
+        <widget>
+            <name>MyWidget</name>
+            <version>1.0</version>								<!-- dont use charater only use integer or decimal-->
+            <root>./entry.html</root>
+        </widget>
+        <isGit>yes</isGit>
+        <git>
+            <id>gooddaumi@naver.com</id>
+            <repository>WidgetStore</repository>
+            <tag>1.41</tag>                               <!--default : "" -->
+            <branch>master</branch>                       <!--default : "master"-->
+        </git>
+     </required>
+
+    <recommanded>
+        <support_resolution>yes</support_resolution>      <!--default:"no", {"yes","no"}-->
+        <resolution method="ratio"/>                      <!--default:"unsupported" ,{"unsupported","ratio","free"}-->
+            <ratio>
+                <ratio first="1:1" res="300,300"/>
+                <ratio second="3:4" res="300,400"/>
+                <ratio third="16:9" res="400,300"/>
+            </ratio>
+            <free>
+                <minWidthRatio>300</minWidthRatio>
+                <minHeightRatio>300</minHeightRatio>
+                <maxWidthRatio>900</maxWidthRatio>
+                <maxHeightRatio>900</maxHeightRatio>
+            </free>           
+
+        <icon-path>./image/icon/title.jpg</icon-path>
+    </recommanded>
+
+    <optional>
+        
+
+
+    </optional>
+
+
+   
+</WidgetStore>
+
+<!--
+﻿//WidgetStore Widget Manifest
+//대소문자 구별 지켜서 작성 바랍니다. 
+//주석에 항목의 디폴트값은 default:".."로 적히며 항목의 값이 여러개인 경우 {"..",".."} 형태로 표기하였음
+-->
