@@ -15,9 +15,15 @@ import property.enums.widget.enumWidgetPosition;
 
 
 import org.w3c.dom.*;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.*;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import java.io.*;
 /**
  * 
@@ -36,7 +42,17 @@ import java.io.*;
  */
 public class ManageEvaluation implements Runnable{
 	
+	private class GitInfo{
+		
+		public String _repositoryName;
+		public String _gitId;
+		public String _tag;
+		public String _branch;
+		
+	}
 	
+	private GitInfo _git;
+	private int _manifestVersion;
 	private float _version;
 	private final String _defaultPath;
 	private final String _zipFileName;
@@ -45,8 +61,7 @@ public class ManageEvaluation implements Runnable{
 	private enumWidgetPosition _position;
 	private final Member _member;
 	private String _widgetName;
-	private String _repositoryName;
-	private String _gitId;
+
 	private String _rootUrl;
 	private final HashMap<String, String> _imagesNames;
 	private enumWidgetEvaluation _evaluationResult;
@@ -56,7 +71,6 @@ public class ManageEvaluation implements Runnable{
 	
 		if(member==null || widgetName == null || zipFileName == null || images ==null || kind==null)
 			throw new NullPointerException("ManageEvaluation 생성자의 파라메타에 null 존재합니다.");
-		
 		
 		this._kind = null;
 		
@@ -77,7 +91,7 @@ public class ManageEvaluation implements Runnable{
 		this._widgetName = widgetName;
 		this._member = member;
 		this._widgetRoot = (new StringBuilder(_defaultPath).append(member.getId()).append("/").append(widgetName).append("/")).toString();
-
+		this._git = new GitInfo();
 		
 	}
 
@@ -164,83 +178,172 @@ public class ManageEvaluation implements Runnable{
 	   
 	   enumWidgetEvaluation eval = enumWidgetEvaluation.PASS;
 	   
+	   String _manifesetPath = "/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml";
 	   String _xmlPath = _widgetRoot + "source/manifest.xml";
 	   File _mf = new File(_xmlPath );
-	   File _origin = new File("/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml");
-   	if(!_mf.exists()){
-   			enumWidgetEvaluation e = enumWidgetEvaluation.UNALLOWANCE;
-   			e.setFailCase(enumEvalFailCase.NO_MANIFEST);
-   			return e;
-   		}
+	   File _origin = new File(_manifesetPath);
+   	
+   		
 
 		try {
+					
+			if(!_mf.exists())
+		   		throw new EvaluationException("매니페스트 파일이 없습니다.", enumEvalFailCase.NO_MANIFEST);
+		   	
 			
 			// __는 위젯스토어에 존재하는 최신버전의 매니페스트 값들을 위한 변수
-			//_는 사용자의 매니페스트 값을 위한 변수
+			//_는 사용자의 매니페스트 값을 위한 변수		
+			DocumentBuilder _builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document _doc = _builder.parse(new File(_xmlPath));
+			XPath  _xpath = XPathFactory.newInstance().newXPath();
+			Node _col = (Node)_xpath.evaluate("/WidgetStore", _doc, XPathConstants.NODE);
+						
 			
-			DocumentBuilderFactory __dbFactory = DocumentBuilderFactory.newInstance();
-         DocumentBuilder __dBuilder = __dbFactory.newDocumentBuilder();
-         Document __doc = __dBuilder.parse(_origin);
-         __doc.getDocumentElement().normalize();
-         Element __root = __doc.getDocumentElement();
 			
-         DocumentBuilderFactory _dbFactory = DocumentBuilderFactory.newInstance();
-         DocumentBuilder _dBuilder = _dbFactory.newDocumentBuilder();
-         Document _doc = _dBuilder.parse(_xmlPath);
-         _doc.getDocumentElement().normalize();
-         Element _root = _doc.getDocumentElement();
-      
-			///// 비교 시작.  기본파일인 /proprty/manifest.xml과 비교하면서 없는 경우 failcase를 맞춰 리턴한다.
-         //root
-			if(! __root.getNodeName().equals( _root.getNodeName())){
-				throw new SAXException(__root.getNodeName()+"이 존재하지 않습니다.");
-			}
+			DocumentBuilder __builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document __doc = __builder.parse(new File(_manifesetPath));
+			XPath  __xpath = XPathFactory.newInstance().newXPath();
+			Node __col = (Node)__xpath.evaluate("/WidgetStore", __doc, XPathConstants.NODE);
 			
-			NodeList __requird = __root.getElementsByTagName("requird").item(0).getChildNodes();
-			NodeList _requird = _root.getElementsByTagName("required").item(0).getChildNodes();
-			Node _node = _requird.item(0);
-			Node __node = __requird.item(0);
-			//manifest_version
-			if(!__node.getNodeName().equals(_node.getNodeName())){
-				throw new SAXException("manifest_version이 존재하지 않습니다.");
-			}
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다." ,   enumEvalFailCase.MANIFEST_ERROR);
+
+			NodeList _cols = (NodeList)_xpath.evaluate("*/required", _doc, XPathConstants.NODESET);
+			NodeList __cols = (NodeList)__xpath.evaluate("*/required", __doc, XPathConstants.NODESET);
+			
+			_col = _cols.item(0);
+			__col = __cols.item(0);
+			
+			System.out.println(_col.getNodeName());
+			
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다." ,   enumEvalFailCase.MANIFEST_ERROR);
+		
+
+			_col = (Node)_xpath.evaluate("*/required/manifest_version", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/required/manifest_version", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다." ,   enumEvalFailCase.MANIFEST_ERROR);
 			else{
-				String __manifest_version = __node.getTextContent();
-				String _manifest_version = __node.getTextContent();
+				String __manifest_version = __col.getTextContent();
+				String _manifest_version = _col.getTextContent();
 				if( !isInteger(_manifest_version) )
-					throw new SAXException("매니퍼스트 버전의 값이 올바르지 않습니다.(정수만 입력 가능합니다.)");
+					throw new EvaluationException("매니퍼스트 버전의 값이 올바르지 않습니다.(정수만 입력 가능합니다) 매니패스트 메뉴얼을 참조하세요.", enumEvalFailCase.MANIFEST_ERROR);
 								
 				if(  Integer.valueOf(__manifest_version)!= Integer.valueOf(_manifest_version))
-					throw new SAXException("매니페스트 버전이 현재 위젯스토어의 버전과 일치하지 않습니다.");
+					throw new EvaluationException("매니페스트 버전이 현재 위젯스토어의 버전과 일치하지 않습니다다. 매니패스트 메뉴얼을 참조하세요.", enumEvalFailCase.MANIFEST_ERROR);
 			}
+			_manifestVersion = Integer.valueOf( _col.getTextContent() );
+			
+
+			_col = (Node)_xpath.evaluate("*/required/widget", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/required/widget", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new SAXException(_col.getTextContent()+"이 존재하지 않습니다.");
+			
+			_col = (Node)_xpath.evaluate("*/required/widget/version", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/required/widget/version", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new SAXException(_col.getTextContent()+"이 존재하지 않습니다.");
+			else{
+				String _ver = _col.getTextContent();
+				if(!_ver.contains("."))
+					_ver+=".0";
+				if(!_ver.matches("[0-9]+(\\.[0-9][0-9]?)?")) {
+					throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",   enumEvalFailCase.MANIFEST_ERROR);
+				}
+						
+			}
+			
+
+			_col = (Node)_xpath.evaluate("*/required/widget/root", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/required/widget/root", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",   enumEvalFailCase.MANIFEST_ERROR);
+			_rootUrl = _col.getTextContent();
+			
+			
+			
+			_col = (Node)_xpath.evaluate("*/required/position", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/required/position", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",   enumEvalFailCase.MANIFEST_ERROR);
+			else{
+				String _pos = ((Element)((NodeList)_xpath.evaluate("*/required/position", _doc, XPathConstants.NODESET)).item(0)).getAttribute("kind");
+				for(enumWidgetPosition p : enumWidgetPosition.values()){
+					if(p.getString().equals(_pos)){
+						this._position = p;
+						break;
+					}
+				}
+				if(this._position == null){
+					throw new EvaluationException("position 값이 시스템에 존재하지 않습니다. 매니패스트 메뉴얼을 참조하세요. ",   enumEvalFailCase.MANIFEST_ERROR);
+					
+				}
+
+			}
+
+			switch(_position){
+				
+				
+				case NOTHING:
+					_position = enumWidgetPosition.NOTHING;
+					break;
+					
+				case GIT:
+					
+					_col = (Node)_xpath.evaluate("*/required/position/git", _doc, XPathConstants.NODE);
+					__col = (Node)_xpath.evaluate("*/required/position/git", __doc, XPathConstants.NODE);
+					if(!_col.getNodeName().equals( __col.getNodeName() ))
+						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+					
+					_cols = (NodeList)_xpath.evaluate("*/required/position/git/id", _doc, XPathConstants.NODESET);
+					__cols = (NodeList)_xpath.evaluate("*/required/position/git/id", __doc, XPathConstants.NODESET);
+					_col = _cols.item(0);
+					__col = __cols.item(0);
+					if(!_col.getNodeName().equals( __col.getNodeName() ))
+						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+					else{
+						
+					}
+					_col = _cols.item(1);
+					break;
+					
+				default:
+					break;
+				
+			}
+			
+			
 			
 			enumWidgetEvaluation e = enumWidgetEvaluation.EVALUATING;
 			
 		} catch (ParserConfigurationException e1) {
 			// TODO Auto-generated catch block
-			eval.setErrMsg(e1.getMessage());
-			eval = enumWidgetEvaluation.UNALLOWANCE;
-			eval.setFailCase(enumEvalFailCase.MANIFEST_ERROR);
+	
 			
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
-			eval.setErrMsg(e1.getMessage());
-			eval = enumWidgetEvaluation.UNALLOWANCE;
-			eval.setFailCase(enumEvalFailCase.MANIFEST_ERROR);
+
 			e1.printStackTrace();
 		} catch (SAXException e1) {
 			// TODO Auto-generated catch block
-			eval.setErrMsg(e1.getMessage());
-			eval = enumWidgetEvaluation.UNALLOWANCE;
-			eval.setFailCase(enumEvalFailCase.MANIFEST_ERROR);
+			
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
+
+			e1.printStackTrace();
+		} catch (XPathExpressionException e1) {
+			// TODO Auto-generated catch block
+
+			e1.printStackTrace();
+		}
+		catch (EvaluationException e1){
 			eval.setErrMsg(e1.getMessage());
 			eval = enumWidgetEvaluation.UNALLOWANCE;
-			eval.setFailCase(enumEvalFailCase.UNKWON_ERROR);
-			e1.printStackTrace();
+			eval.setFailCase(e1.getFailCsae());
 		}
 		
 	   

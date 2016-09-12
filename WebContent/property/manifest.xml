@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <WidgetStore>
     <required>
         <manifest_version>1</manifest_version>				<!-- only use integer-->
@@ -7,13 +7,14 @@
             <version>1.0</version>								<!-- dont use charater only use integer or decimal-->
             <root>./entry.html</root>
         </widget>
-        <isGit>yes</isGit>
-        <git>
-            <id>gooddaumi@naver.com</id>
-            <repository>WidgetStore</repository>
-            <tag>1.41</tag>                               <!--default : "" -->
-            <branch>master</branch>                       <!--default : "master"-->
-        </git>
+        <position kind="git">										<!-- default : "nothing", {"nothing", "git"} -->
+			<git>
+			    <id>gooddaumi@naver.com</id>
+			    <repository>WidgetStore</repository>
+			    <tag>1.41</tag>                               <!--default : "" -->
+			    <branch>master</branch>                       <!--default : "master"--> <!-- caution : just use one between tag and branch -->
+			</git>
+		  </position>
      </required>
 
     <recommanded>
