@@ -36,11 +36,36 @@ import java.io.*;
  * 3.  제출된 압축파일을 widget폴더를 생성하여 해제한다.<br>
  * 경로 :  upload/widget/<i><b>username</b></i>/<b><i>widgetname</i></b>/source/)<br>
  * 4. 기본적인 파일이 있는지 조사한다. (매니페스트, 루트파일)<br>
- * 5. 참조하는 js에 문제가 없는지 조사한다. (실행이 잘 될 요건의 최소사항.)<br>
+ * 5. 참조하는 js에 문제가 없는지 조사한다. (실행이 잘 될 요건의 최소사항.)<br> 
  * 6. 매니페스트에 근거하여 위젯정보를 DB에 저장한다.<br>
  * **각 순서에서의 설명은 메서드를 참고.
  */
 public class ManageEvaluation implements Runnable{
+	
+	private class RecommandInfo{
+		
+		private class Ratio{
+			public int ratioNum;
+			public int heightRatio;
+			public int widthRatio;
+			public int heightSize;
+			public int widthSize;
+		}
+		
+		public boolean isExistRecommand;
+		public boolean _isSupportResolution;
+		public String _resolutionMethod;
+		public HashMap<String, Ratio> _ratioMap;
+		public int _minWidthSize;
+		public int _maxWidthSize;
+		public int _minHeightSize;
+		public int _mixHeightSize;
+		public String _iconPath;
+		
+		public RecommandInfo(){
+			_ratioMap = new HashMap<String, Ratio>();
+		}
+	}
 	
 	private class GitInfo{
 		
@@ -51,7 +76,8 @@ public class ManageEvaluation implements Runnable{
 		
 	}
 	
-	private GitInfo _git;
+	private RecommandInfo _recommandInfo = null;
+	private GitInfo _git = null;
 	private int _manifestVersion;
 	private float _version;
 	private final String _defaultPath;
@@ -102,7 +128,8 @@ public class ManageEvaluation implements Runnable{
 		try {
 			
 			zipDecompress(_zipFileName);
-			check_parseXml();
+			checkManifest_Required();
+			checkJavaScript();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -174,7 +201,7 @@ public class ManageEvaluation implements Runnable{
         }
    }
 	      
-   private enumWidgetEvaluation check_parseXml(){
+   private enumWidgetEvaluation checkManifest_Required(){
 	   
 	   enumWidgetEvaluation eval = enumWidgetEvaluation.PASS;
 	   
@@ -208,6 +235,9 @@ public class ManageEvaluation implements Runnable{
 			if(!_col.getNodeName().equals( __col.getNodeName() ))
 				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다." ,   enumEvalFailCase.MANIFEST_ERROR);
 
+			/////////////required 시작/////////////
+			
+			
 			NodeList _cols = (NodeList)_xpath.evaluate("*/required", _doc, XPathConstants.NODESET);
 			NodeList __cols = (NodeList)__xpath.evaluate("*/required", __doc, XPathConstants.NODESET);
 			
@@ -297,31 +327,69 @@ public class ManageEvaluation implements Runnable{
 					if(!_col.getNodeName().equals( __col.getNodeName() ))
 						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
 					
-					_cols = (NodeList)_xpath.evaluate("*/required/position/git/id", _doc, XPathConstants.NODESET);
-					__cols = (NodeList)_xpath.evaluate("*/required/position/git/id", __doc, XPathConstants.NODESET);
-					_col = _cols.item(0);
-					__col = __cols.item(0);
+					_col = (Node)_xpath.evaluate("*/required/position/git/id", _doc, XPathConstants.NODE);
+					__col = (Node)_xpath.evaluate("*/required/position/git/id", __doc, XPathConstants.NODE);
 					if(!_col.getNodeName().equals( __col.getNodeName() ))
 						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
 					else{
-						
+						String _id = _col.getTextContent();
+						_git._gitId = _id;
 					}
-					_col = _cols.item(1);
+					
+					_col = (Node)_xpath.evaluate("*/required/position/git/repository", _doc, XPathConstants.NODE);
+					__col = (Node)_xpath.evaluate("*/required/position/git/repository", __doc, XPathConstants.NODE);
+					if(!_col.getNodeName().equals( __col.getNodeName() ))
+						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+					else{
+						String _rep = _col.getTextContent();
+						_git._repositoryName = _rep;
+					}
+					
+					//branch와 tag는 둘 중 하나만 기입 될 수 있다. 두개 모두 기입 되어 있으면 불허.
+					String _branch="", _tag="";
+					Node _branchNode = (Node)_xpath.evaluate("*/required/position/git/branch", _doc, XPathConstants.NODE);
+					__col = (Node)_xpath.evaluate("*/required/position/git/branch", __doc, XPathConstants.NODE);
+					if(!_branchNode.getNodeName().equals( __col.getNodeName() ))
+						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+					
+					
+					Node _tagNode = (Node)_xpath.evaluate("*/required/position/git/tag", _doc, XPathConstants.NODE);
+					__col = (Node)_xpath.evaluate("*/required/position/git/tag", __doc, XPathConstants.NODE);
+					if(!_tagNode.getNodeName().equals( __col.getNodeName() ))
+						throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+					
+					if( _tagNode!=null && _branchNode!=null)
+						throw new EvaluationException("git의 저장소로 tag 또는 branch 하나만 택해야 합니다.",   enumEvalFailCase.MANIFEST_ERROR);
+															
+					if(_branchNode != null)
+						_git._branch = _branchNode.getTextContent();
+					else if(_tagNode != null)
+						_git._tag = _tag;
+					
+					
 					break;
+					//git 끝
 					
 				default:
 					break;
 				
 			}
+
+			///////////////required 끝/////////////
 			
 			
-			
+			_recommandInfo = new RecommandInfo();
+			_col = (Node)_xpath.evaluate("*/recommand", _doc, XPathConstants.NODE);
+						
+			if(_col == null){
+				_recommandInfo.isExistRecommand = false;
+				_recommandInfo._iconPath="";
+			}else
+				eval = checkManifest_Recommand(_col, __col);
+
 			enumWidgetEvaluation e = enumWidgetEvaluation.EVALUATING;
-			
 		} catch (ParserConfigurationException e1) {
-			// TODO Auto-generated catch block
-	
-			
+			// TODO Auto-generated catch block			
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
@@ -346,13 +414,157 @@ public class ManageEvaluation implements Runnable{
 			eval.setFailCase(e1.getFailCsae());
 		}
 		
-	   
-   	
 		return eval;
   	}  
    
+   /**
+    * manifest에 recommand가 기입되어 있으면 파싱한다. required 함수 맨 끝에서 recommand가 있는지 여부를 검사.
+    * @param _col   required에서 widget manifest를 파싱하기 위한 node변수 
+    * @param __col  origin manifest를 파싱하기 위한 node 변수
+    * @param eval   required의 eval변수를 받는다.
+    * @return 위젯심사 결과를 리턴한다.
+    */
+   private enumWidgetEvaluation checkManifest_Recommand(enumWidgetEvaluation eval){ 
+	   
 
-	public void wholeHtmlPaser(String url){
+		///////////////recommand 시작////////////////
+		
+	   String _manifesetPath = "/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml";
+	   String _xmlPath = _widgetRoot + "source/manifest.xml";
+	   File _mf = new File(_xmlPath );
+	   File _origin = new File(_manifesetPath);
+	   NodeList _cols, __cols;
+	   Node _col, __col;
+
+		try {
+					
+			if(!_mf.exists())
+		   		throw new EvaluationException("매니페스트 파일이 없습니다.", enumEvalFailCase.NO_MANIFEST);
+		   	
+			
+			// __는 위젯스토어에 존재하는 최신버전의 매니페스트 값들을 위한 변수
+			//_는 사용자의 매니페스트 값을 위한 변수		
+			DocumentBuilder _builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document _doc = _builder.parse(new File(_xmlPath));
+			XPath  _xpath = XPathFactory.newInstance().newXPath();			
+			
+			DocumentBuilder __builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document __doc = __builder.parse(new File(_manifesetPath));
+			XPath  __xpath = XPathFactory.newInstance().newXPath();
+			
+			
+			
+			_col = (Node)_xpath.evaluate("*/recommand/support_resolution", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/recommand/support_resolution", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+			
+			if(_col.getTextContent().equals("yes")){
+				
+				_col = (Node)_xpath.evaluate("*/recommand/resolution", _doc, XPathConstants.NODE);
+		
+				__col = (Node)_xpath.evaluate("*/recommand/resolution", __doc, XPathConstants.NODE);
+				if(!_col.getNodeName().equals( __col.getNodeName() ))
+					throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
+				else{
+					String _res = ((Element)((NodeList)_xpath.evaluate("*/recommand/resolution", _doc, XPathConstants.NODESET)).item(0)).getAttribute("method");
+					if(_res==null)
+						throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",   enumEvalFailCase.MANIFEST_ERROR);
+					
+					switch( _res){
+						case "ratio":
+							
+							_cols = (NodeList)_xpath.evaluate("*/recommand/resolution/ratio", _doc, XPathConstants.NODESET);
+							__cols = (NodeList)_xpath.evaluate("*/recommand/resolution/ratio", __doc, XPathConstants.NODESET);
+							
+							///수정필요
+							ㄴㅁ
+							
+							if(_firstRatio == null || _firstResolution==null)
+								throw new EvaluationException("ratio나 resolution 값이 존재 하지 않습니다.",   /enumEvalFailCase.MANIFEST_ERROR);
+							
+							
+							
+							break;
+							
+						case "free":
+							
+							_col = (Node)_xpath.evaluate("*/recommand/resolution/free", _doc, XPathConstants.NODE);
+							__col = (Node)_xpath.evaluate("*/recommand/resolutio/free", __doc, XPathConstants.NODE);
+							if(!_col.getNodeName().equals( __col.getNodeName() ))
+								throw new EvaluationException(__col.getNodeName()+"값이 존재하지 않습니다.", enumEvalFailCase.MANIFEST_ERROR);
+							
+							//추가필요
+							
+							break;
+							
+						default:
+							
+							break;
+					}//switch
+					 
+				}//end support method
+				
+				
+				_col = (Node)_xpath.evaluate("*/recommand/icon-path", _doc, XPathConstants.NODE);
+				__col = (Node)_xpath.evaluate("*/recommand/icon-path", __doc, XPathConstants.NODE);
+				if(!_col.getNodeName().equals( __col.getNodeName() ))
+					throw new EvaluationException(__col.getNodeName()+"값이 존재하지 않습니다.", enumEvalFailCase.MANIFEST_ERROR);
+				
+				_recommandInfo._iconPath = _col.getTextContent();
+			}
+		}catch(EvaluationException e1){
+			eval.setErrMsg(e1.getMessage());
+			eval = enumWidgetEvaluation.UNALLOWANCE;
+			eval.setFailCase(e1.getFailCsae());
+		}
+		
+		return eval;
+	   
+   }
+
+   private enumWidgetEvaluation checkManifestOfOptional(enumWidgetEvaluation eval){ 
+	   
+
+	   String _manifesetPath = "/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml";
+	   String _xmlPath = _widgetRoot + "source/manifest.xml";
+	   File _mf = new File(_xmlPath );
+	   File _origin = new File(_manifesetPath);
+	   NodeList _cols, __cols;
+	   Node _col, __col;
+
+		try {
+					
+			if(!_mf.exists())
+		   		throw new EvaluationException("매니페스트 파일이 없습니다.", enumEvalFailCase.NO_MANIFEST);
+		   	
+			
+			// __는 위젯스토어에 존재하는 최신버전의 매니페스트 값들을 위한 변수
+			//_는 사용자의 매니페스트 값을 위한 변수		
+			DocumentBuilder _builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document _doc = _builder.parse(new File(_xmlPath));
+			XPath  _xpath = XPathFactory.newInstance().newXPath();			
+			
+			DocumentBuilder __builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document __doc = __builder.parse(new File(_manifesetPath));
+			XPath  __xpath = XPathFactory.newInstance().newXPath();
+			
+
+		}catch(EvaluationException e1){
+			eval.setErrMsg(e1.getMessage());
+			eval = enumWidgetEvaluation.UNALLOWANCE;
+			eval.setFailCase(e1.getFailCsae());
+		}
+	   
+		return eval;
+   }
+   
+   private void checkJavaScript(){
+	   
+	   
+   }
+   
+   public void wholeHtmlPaser(String url){
 			
 		org.jsoup.nodes.Document doc = null;
 		try {
@@ -366,7 +578,7 @@ public class ManageEvaluation implements Runnable{
 		
 	}
    
-	public static boolean isInteger(String s) {
+   public static boolean isInteger(String s) {
 		    try { 
 		        Integer.parseInt(s); 
 		    } catch(NumberFormatException e) { 
@@ -379,7 +591,7 @@ public class ManageEvaluation implements Runnable{
 		}
 	
 
-	private void fileMove(String inFileName, String outFileName) {
+   private void fileMove(String inFileName, String outFileName) {
 	try {
 	   FileInputStream fis = new FileInputStream(inFileName);
 	   FileOutputStream fos = new FileOutputStream(outFileName);
@@ -400,7 +612,7 @@ public class ManageEvaluation implements Runnable{
 	  }
 	 }
 	 
-	 private void fileDelete(String deleteFileName) {
+   private void fileDelete(String deleteFileName) {
 		  File I = new File(deleteFileName);
 		  I.delete();
 		 }

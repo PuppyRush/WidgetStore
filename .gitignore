@@ -9,3 +9,6 @@ WebContent/Widget
 WebContent/org/*
 *.bak
 *.*~
+*.prefs
+*.prefs
+.settings/org.eclipse.jdt.core.prefs

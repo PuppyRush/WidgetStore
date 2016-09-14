@@ -57,7 +57,7 @@
  <script>
  
 	function fun(){
-		location.replace("/Develop/Registration/RegistrationWidget.jsp");
+		location.replace("/Develop/Registration/ViewWidgetInfo.html");
 		
 	}
 	

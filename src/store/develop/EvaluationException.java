@@ -1,6 +1,6 @@
 package store.develop;
 
-import property.enums.enumMemberState;
+
 import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
 
 public class EvaluationException extends Exception {
