@@ -1,3 +1,28 @@
+<%@page import="javaBean.*"%>
+<%@page import="java.util.*"%>
+<%@page import="page.VerifyMemberStateFromPage"%>
+
+<%
+
+	HashMap<String,Object> results =  VerifyMemberStateFromPage.Verify(session.getId());
+	if(!(boolean)results.get("isSuccessVerify")){
+		
+		String message = (String)results.get("message");
+		String to = (String)results.get("to");
+		
+		request.setAttribute("cautionKind", (enumCautionKind)results.get("kind"));
+		request.setAttribute("from", "Developer/ManagaDeveloper.jsp");
+		
+		
+	}
+		
+		
+		
+	
+
+
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -15,13 +40,17 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
+    <link href="library/popup/style.css" rel="stylesheet">
     <link href="css/sb-admin.css" rel="stylesheet">
-
+	
+	
     <!-- Morris Charts CSS -->
     <link href="css/plugins/morris.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
     <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -45,11 +74,11 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">My Develop Widget</a>
+                <a class="navbar-brand" href="Developer/ManageDeveloper.jsp">My Develop Widget</a>
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
-				<li class="dropdown"> <a href="uploadform.html"><i class="glyphicon glyphicon-share"></i> WidgetUpload</a>
+				<li class="dropdown"> <a href="uploadform.jsp"><i class="glyphicon glyphicon-share"></i> WidgetUpload</a>
 				</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b class="caret"></b></a>
@@ -139,6 +168,8 @@
     </div>
     <!-- /#wrapper -->
 
+<div id=ohsnap></div>
+
     <!-- jQuery -->
     <script src="js/jquery.js"></script>
 
@@ -150,16 +181,40 @@
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 
+	<script src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js" type="text/javascript" charset="utf-8"></script>
+
 </body>
 
 <script>
+	
+	window.onload=function(){
+			
+	<%
+	try{
+ 		String uId = session.getId();
+		Member m = Member.getMember(uId);
+		String uName = m.getNickname();
+		ArrayList<HashMap<String,String>> widgets = WidgetProcess.getUserWidgets(uId);
 
-			window.onload=function(){
-				
-				
-				
-				
-			}
+		Iterator<HashMap<String,String>> it = widgets.iterator();
+		while(it.hasNext()){
+			
+			HashMap<String,String> widget = it.next();
+			String wName = widget.get("wName");
+			String wContents= widget.get("wContents");
+			String updatedDate= widget.get("updatedDate");
+			String repImagePath = widget.get("repImagePath");
+			
+			//꺼내올때마다 js배열에 저장하여 li에 append한다
+		}
+	}catch(Throwable e){
+		e.printStackTrace();
+	}
+
+	%>
+		
+		
+	}
 </script>
 
 </html>

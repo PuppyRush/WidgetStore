@@ -126,8 +126,10 @@
                 
                    <div class="col-md-9">
 
-                <form id="widget-upload">
-
+                <form id="upload-form" method="post" action="uploadWidget.do" enctype="multipart/form-data" >
+							<input id="sessionId"  name="sessionId" type="hidden">
+						
+							<input id="kind" name="kind" value="sports" type="hidden">
 					<div class="modal-body">
 		    				<div id="div-lost-msg">
                                 <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -135,7 +137,7 @@
 							</div>
 
 		    				<input id="widget-name" class="form-control" type="text" placeholder="Widget name" required></br>
-				</form>
+				
 				<!-- 이미지 파일 선택 -->
 				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
 					<tr>
@@ -176,6 +178,7 @@
 				<li><a href="javascript:;">종류4</a></li>
             </ul>
         </div></br>
+        </form>
 
 						<!-- 주의 사항 -->
 						<div class="modal-footer"></div>
@@ -188,7 +191,8 @@
 							
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                            <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="uploadsubmit()" >Upload</button>
+
 								<i class="glyphicon glyphicon-ok"></i> Upload</button>
                             </div>
 		    		    </div>
@@ -218,6 +222,15 @@
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 	<script>
+	
+	function uploadsubmit(){
+		var id = "<%= session.getId() %>";
+		$("#sessionId").val(id);
+		document.forms["upload-form"].submit();
+			
+	}
+	
+	
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');

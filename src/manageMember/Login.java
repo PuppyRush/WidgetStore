@@ -111,9 +111,6 @@ public class Login implements commandAction {
 						}
 					}
 					
-					
-					
-					
 				}
 				else if((code & Integer.valueOf( enumUserState.SLEEP.getString()) ) == Integer.valueOf( enumUserState.SLEEP.getString())  ){
 						
