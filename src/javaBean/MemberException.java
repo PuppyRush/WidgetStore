@@ -17,7 +17,11 @@ public class MemberException extends Exception {
 		this(errcode.getString(), errcode);// ERR_CODE를 100(기본값)으로 초기화한다.
 	}
 	
-	public String getErrCode(){// 에러 코드를 얻을 수 있는 메서드도 추가한다.
-		return ERR_CODE.getString();// 이 메서드는 주로 getMessage()와 함께 사용될 것이다.
+	public String getMessage(){
+		return super.getMessage();
+	}
+	
+	public enumMemberState getErrCode(){
+		return ERR_CODE;
 	}
 }

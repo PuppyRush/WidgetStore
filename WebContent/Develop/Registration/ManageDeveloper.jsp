@@ -71,7 +71,7 @@
                 </li>
             </ul>
             <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-            <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <div id="widgetList" class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li class="active">
                         <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> widget001</a>
@@ -152,4 +152,16 @@
 
 </body>
 
+<script>
+
+			window.onload=function(){
+				
+				
+				
+				
+			}
+</script>
+
 </html>
+
+

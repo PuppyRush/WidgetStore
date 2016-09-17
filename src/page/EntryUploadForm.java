@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import property.commandAction;
 
-public class uploadFormPage implements commandAction{
+public class EntryUploadForm implements commandAction{
 
 	@Override
 	public HashMap<String, Object> requestPro(HttpServletRequest request,

@@ -20,6 +20,7 @@ public class Member {
 	private boolean isLogin;
 	private boolean isLogout;
 	private boolean isJoin;
+	private boolean isDeveloper;
 	
 	public Member(){
 		id = DEFAULT_VALUE;
@@ -102,6 +103,14 @@ public class Member {
 
 	public boolean isLogout() {
 		return isLogout;
+	}
+
+	public boolean isDeveloper() {
+		return isDeveloper;
+	}
+
+	public void setDeveloper(boolean isDeveloper) {
+		this.isDeveloper = isDeveloper;
 	}
 
 	public void setLogout(boolean isLogout) {

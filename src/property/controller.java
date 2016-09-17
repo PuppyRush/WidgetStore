@@ -145,7 +145,7 @@ public class controller extends HttpServlet {
 			}catch(Throwable e) {
 				e.printStackTrace();
 			}
-
+			request.setCharacterEncoding("utf-8");
 		    RequestDispatcher dispatcher = 
 		       request.getRequestDispatcher(view);
 		    dispatcher.forward(request, response);

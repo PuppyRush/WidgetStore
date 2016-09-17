@@ -1,4 +1,4 @@
-
+<%@page import="property.enums.enumCautionKind"%>
 <%@page import="property.enums.enumAttributeKey"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map.Entry"%>
@@ -8,6 +8,11 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Enumeration"%>
 
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
 
 <!DOCTYPE html>
 <html>
@@ -22,7 +27,7 @@
 
     <title>Widget Store - OSS</title>
     
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js" type="text/javascript" charset="utf-8"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
@@ -30,6 +35,8 @@
     <link href="WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
+     <link href="library/popup/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <link href="WidgetClientPage/css/stylish-portfolio.css" rel="stylesheet">
 	<!-- bootsnipp down -->
 	<link href="WidgetClientPage/css/login.css" rel="stylesheet">
@@ -81,13 +88,16 @@
                 <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" >Sign out</a>
             </li>
             <li>
-                <a href="Store.jsp" onclick ="fun_Store()"; >Store</a>
+                <a href="Store" onclick ="verifyMember('store')" data-toggle="modal" >Store</a>
             </li>
             <li>
-                <a href="#Custom" onclick = $("#menu-close").click(); data-toggle="modal" data-target="#Register-edit-modal">Custom</a>
+                <a href="#Custom" onclick ="verifyMember('custom')" data-toggle="modal">Custom</a>
             </li>
             <li>
-                <a href="#Setting" onclick = $("#menu-close").click(); >Setting</a>
+                <a href="#Developer" onclick ="verifyMember('developer')" data-toggle="modal">Developer</a>
+            </li>
+            <li>
+                <a href="#Settings" onclick ="verifyMember('settings')">Setting</a>
             </li>
             <li>
                 <a href="#About" onclick = $("#menu-close").click(); >About</a>
@@ -226,14 +236,24 @@
 		</div>
 	</div>
 
+<div id="ohsnap" ></div>
+
+<!-- 이하는 폼태그만 존재  -->
+
 	<form method="GET" ACTION="logout.do" id="logout-form">
-		<input id="sessionId_logout" name="sessionId" type="hidden" />
+		<input id="sessionId_logout" type="hidden" />
 	</form>
 	
 
-	<form method="GET" ACTION="verify.do" id="chkRegister_chk_form">
+	<form method="GET" ACTION="verifyRegistration.do" id="chkRegister_chk_form">
 				<input type = "hidden" name = "nickname" value = "" >
 				<input type = "hidden" name = "email" value = "" >
+	</form>
+	
+	<form method="GET" ACTION="entryFromMain.do" id="entryForm">
+				<input type="hidden" id = "to"/>
+				<input type = "hidden" id="sessionId_entryForm" value=""/>
+				<input type = "hidden" id ="from"/>
 	</form>
     <!-- jQuery -->
     <script src="WidgetClientPage/js/jquery.js"></script>
@@ -243,24 +263,34 @@
 
     <!-- Custom Theme JavaScript -->
     <script>
+	var id = "<%=session.getId()%>";
+    
 	window.onload=function(){
-				
+		var message;
+		var popup_color;
+		<% if(request.getAttribute("message")!=null && request.getAttribute("messageKind") !=null){
+			enumCautionKind kind = (enumCautionKind)request.getAttribute("messageKind");	
+		%>
+		  message = "<%=(String)request.getAttribute("message")%>";
+		  popup_color = "<%=(String)kind.getString()%>";
+		  ohSnap(message,{color:popup_color});
+		<%
+		}
+		%>
+
 			<%
 
-			
 			try{ 
+
 				//자동로그인 처리하기    
 				if(request.getAttribute("doLogout")!= null && 	((String)request.getAttribute("doLogout")).equals("true")){
 					session.removeAttribute("alreayLogin");
 					%>
-						alert("Bye...");
+					ohsnap("Bye...",{color:'red'});
+						
 					<%
 				}
-				else if(request.getAttribute("isSuccessJoin")!= null && 	((String)request.getAttribute("isSuccessJoin")).equals("true")){
-					%>
-					alert(" <%= request.getAttribute("message") %>");
-					<%
-				}
+
 				else if(request.getAttribute("alreadyLogin") != null &&	((String) request.getAttribute("alreadyLogin")).equals("true")){
 								//response.sendRedirect("main.jsp");
 							%>
@@ -289,27 +319,30 @@
 			
 	};
 
-	function fun_Store(){
+	function verifyMember(type){
+	
 		 $("#menu-close").click();
-		response.forward("./store.jsp");
-		
+		 $("#to").val(type);
+		 $("#sessionId_entryForm").val(id);
+	 	$("#from").val("Main");
+	 	document.forms["entryForm"].submit();
 	}
 	
 	function fun_signOut(){
-		var id = "<%= (String)session.getId() %>";
-//		document.getElementsByName("sessionId_logout")[0].value = id;
+		 $("#menu-close").click();
+	
 		$("#sessionId_logout").val(id);
 		document.forms["logout-form"].submit();
 		return;	
 	}
 	
 	function innerLogin(){
-		var id = "<%= (String)session.getId() %>";
+		
 		$(".sessionId").val(id);
 		document.forms["login-form"].submit();
 	}
 	function innerJoin(){
-		var id = "<%= (String)session.getId() %>";
+	
 		$(".sessionId").val(id);
 		document.forms["register-form"].submit();
 	}

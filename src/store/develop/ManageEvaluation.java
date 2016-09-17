@@ -385,7 +385,7 @@ public class ManageEvaluation implements Runnable{
 				_recommandInfo.isExistRecommand = false;
 				_recommandInfo._iconPath="";
 			}else
-				eval = checkManifest_Recommand(_col, __col);
+				eval = checkManifest_Recommand( eval);
 
 			enumWidgetEvaluation e = enumWidgetEvaluation.EVALUATING;
 		} catch (ParserConfigurationException e1) {
@@ -478,11 +478,7 @@ public class ManageEvaluation implements Runnable{
 							__cols = (NodeList)_xpath.evaluate("*/recommand/resolution/ratio", __doc, XPathConstants.NODESET);
 							
 							///수정필요
-							ㄴㅁ
-							
-							if(_firstRatio == null || _firstResolution==null)
-								throw new EvaluationException("ratio나 resolution 값이 존재 하지 않습니다.",   /enumEvalFailCase.MANIFEST_ERROR);
-							
+					
 							
 							
 							break;
@@ -517,6 +513,18 @@ public class ManageEvaluation implements Runnable{
 			eval.setErrMsg(e1.getMessage());
 			eval = enumWidgetEvaluation.UNALLOWANCE;
 			eval.setFailCase(e1.getFailCsae());
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		
 		return eval;
@@ -554,6 +562,15 @@ public class ManageEvaluation implements Runnable{
 			eval.setErrMsg(e1.getMessage());
 			eval = enumWidgetEvaluation.UNALLOWANCE;
 			eval.setFailCase(e1.getFailCsae());
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	   
 		return eval;

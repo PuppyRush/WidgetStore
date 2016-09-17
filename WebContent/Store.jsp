@@ -50,9 +50,7 @@
             <!-- ìì ë©ë´ -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a href="Develop/Develop.jsp">Develop</a>
-                    </li>
+               
                     <li>
                         <a href="#">Services</a>
                     </li>
@@ -355,6 +353,14 @@
     <script src="WidgetClientPage/js/jquery.js"></script>
     <!-- Bootstrap Core JavaScript -->
     <script src="WidgetClientPage/js/bootstrap.min.js"></script>
-</body>
+    
 
+</body>
+ 
+ <script>
+
+	
+ 
+ </script>
+ 
 </html>
