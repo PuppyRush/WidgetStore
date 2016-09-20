@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import javaBean.Member;
 import property.commandAction;
 
@@ -44,7 +44,7 @@ public class VerifyAuthNum implements commandAction {
 		}
 		
 			
-		if(MemberProcess.isConcordTempValue(mdb, authNum)){
+		if(ManageMember.isConcordTempValue(mdb, authNum)){
 			
 			returns.put("view", "password_Reset");
 			returns.put("corret_AuthNum", "true");

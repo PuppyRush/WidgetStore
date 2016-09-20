@@ -1,3 +1,26 @@
+<%@page import="javaBean.*"%>
+<%@page import="java.util.*"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.*" %>
+
+<%
+
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	if(!(boolean)results.get("isSuccessVerify")){
+				
+		enumPage to = (enumPage)results.get("to");
+		
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+		request.setAttribute("from", enumPage.DEVELOPER.getString());
+		
+		response.sendRedirect(to.getString());
+		return;
+		
+	}
+		
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -77,7 +100,7 @@
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
-				<li class="dropdown"> <a href="ViewWidgetInfo.html"><i class="glyphicon glyphicon-list-alt"></i> View My Widget </a>
+				<li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-list-alt"></i> View My Widget </a>
 				</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b class="caret"></b></a>
@@ -124,20 +147,14 @@
 
                 <!-- Page Heading -->
                 
-                   <div class="col-md-9">
-
-                <form id="upload-form" method="post" action="uploadWidget.do" enctype="multipart/form-data" >
+          <form id="upload-form" method="post" action="updateWidget.do" enctype="multipart/form-data" >
 							<input id="sessionId"  name="sessionId" type="hidden">
 						
 							<input id="kind" name="kind" value="sports" type="hidden">
-					<div class="modal-body">
-		    				<div id="div-lost-msg">
-                                <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
-                                <span id="text-lost-msg">UPLOAD WIDGET</span>
-							</div>
-
-		    				<input id="widget-name" class="form-control" type="text" placeholder="Widget name" required></br>
-				
+                <div class="col-md-9">
+		    		<h1 class="page-header">
+                            [WidgetName] <small>[widget category]</small> <small>[update day]</small> 
+                    </h1>
 				<!-- 이미지 파일 선택 -->
 				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
 					<tr>
@@ -148,7 +165,7 @@
 					<tr>
 						<td align="center">
 						<label class="btn btn-block btn-primary">
-						Drag & drop or choose images from your local file system<input style="display: none;" type="file" id="input" multiple="true" onchange="imagesSelected(this.files)" />
+						Drag & drop or choose images from your local file system<input accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z" type="file" name="upload[]" multiple/>
 					</label>
 						</td>
 					</tr>
@@ -164,22 +181,10 @@
             </div>
 
 				<!-- 텍스트 입력 -->
-				<p class="help-block">Input text about this widget</p>
-				<textarea class="form-control" rows="5" placeholder="이 위젯에 대한 설명을 해주세요."></textarea>
-
-
-
-					<!-- 카테고리 -->
-					<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">Category <span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a href="javascript:;">종류1</a></li>
-                <li><a href="javascript:;">종류2</a></li>
-                <li><a href="javascript:;">종류3</a></li>
-				<li><a href="javascript:;">종류4</a></li>
-            </ul>
-        </div></br>
-        </form>
-
+				<p class="help-block">Input text about update</p>
+				<textarea class="form-control" rows="5" placeholder="업데이트에 대한 내용을 입력해주세요."></textarea>
+				
+				</form>
 						<!-- 주의 사항 -->
 						<div class="modal-footer"></div>
 								<div class="alert alert-warning" role="alert">
@@ -191,12 +196,12 @@
 							
 		    		    <div class="modal-footer">
                             <div>
-                            <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="uploadsubmit()" >Upload</button>
-
-								<i class="glyphicon glyphicon-ok"></i> Upload</button>
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">
+								<i class="glyphicon glyphicon-ok"></i> Update</button>
                             </div>
 		    		    </div>
 						</div>
+						
 					</div>
 
                 </div>
@@ -222,15 +227,6 @@
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 	<script>
-	
-	function uploadsubmit(){
-		var id = "<%= session.getId() %>";
-		$("#sessionId").val(id);
-		document.forms["upload-form"].submit();
-			
-	}
-	
-	
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');

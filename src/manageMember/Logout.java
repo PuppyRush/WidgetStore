@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import java.util.HashMap;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import javaBean.Member;
 import property.commandAction;
 import property.enums.enumUserState;
@@ -38,7 +38,7 @@ public class Logout implements commandAction {
 		
 		
 		
-		MemberProcess.logoutMember(member);
+		ManageMember.logoutMember(member);
 		returns.put("view", "/");	
 		returns.put("doLogout", "true");
 		

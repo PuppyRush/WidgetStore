@@ -117,19 +117,20 @@ public class controller extends HttpServlet {
 			HashMap<String, Object>preSplit = null;
 			String view = null;
 			commandAction com=null;
-	
-			
+		
 			try {
+				
 				String command = request.getRequestURI();
 				if(command.indexOf(request.getContextPath()) == 0) 
 				   command = command.substring(request.getContextPath().length());
 				
 				
-					System.out.println(command);	
-									       
-						com = (commandAction)commandMap.get(command);  
-						preSplit = com.requestPro(request, response);
-						view = (String)preSplit.get("view");
+				System.out.println(command);	
+								       
+				com = (commandAction)commandMap.get(command);  
+				preSplit = com.requestPro(request, response);
+				view = (String)preSplit.get("view");
+				
 				if(preSplit.size() > 1){
 					preSplit.remove("view");
 				
@@ -142,6 +143,7 @@ public class controller extends HttpServlet {
 					}
 				
 				}
+				
 			}catch(Throwable e) {
 				e.printStackTrace();
 			}

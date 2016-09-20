@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import javaBean.Member;
 import property.commandAction;
 
@@ -35,7 +35,7 @@ public class Join implements commandAction {
 		member.setEmail((String) request.getParameter("register_email"));
 		member.setIdType((String) request.getParameter("idType"));
 		member.setNickname((String) request.getParameter("register_username"));
-		member.setReg_date(new Timestamp(System.currentTimeMillis()));
+		member.setRegDate(new Timestamp(System.currentTimeMillis()));
 		
 		switch (idType) {
 				
@@ -59,7 +59,7 @@ public class Join implements commandAction {
 				
 		}
 		
-		if (MemberProcess.joinMember(member)){
+		if (ManageMember.joinMember(member)){
 			returns.put("isSuccessJoin", "true");
 			returns.put("message", "가입에 성공하였습니다. 로그인 하세요");
 		}

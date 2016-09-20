@@ -3,6 +3,13 @@ package store.develop;
 
 import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
 
+/**
+ * 	위젯 자동 평가중 실패하는 경우 실패사유를 enumEvalFailCase enumeration을 매개변수로  예외처리를 한다.
+ *     이 예외를 통해 평가실패를 DB에 기록한다. 
+ * 
+ * @author cmk
+ *
+ */
 public class EvaluationException extends Exception {
 
 	private final enumEvalFailCase failcase;

@@ -7,111 +7,94 @@ import javax.servlet.http.HttpServletResponse;
 
 import javaBean.Member;
 import javaBean.MemberException;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import property.commandAction;
 import property.enums.enumCautionKind;
 import property.enums.enumMemberState;
 import property.enums.enumPage;
 
-public class VerifyMemberStateFromPage {
+public class VerifyPage {
 
 	/**
 	 * 페이지 마다 요청되는 유저의 권한(가입, 로그인, 개발자등록 여부등의 상태)을 점검한다.
 	 * 
 	 * @param uId  브라우져의 sessionId
 	 * @param from 어느 페이지에서 왔는지를 명시하는 변수
-	 * @param to   어느 페이지로 갈 것인지 명시하는 변수
 	 * @return	   인증 성공여부 실패 할 경우 가야할 페이지, 오류메시지를 반환한다.
 	 * 	(HashMap 형태로 isSuccessVerify, to, messageKind, message를 반환한다)
 	 */
-	public HashMap<String,Object> Verify(String uId,String from, String to){
+	public static HashMap<String,Object> Verify(String uId, enumPage fromPage){
 			
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		Member member = null;
 	
 		
 		try{				
-			
+			enumPage page = fromPage;
 			member = Member.getMember(uId);
 			
 			member.setLogin(true);
 			member.setJoin(true);
 			member.setDeveloper(true);
 			
+			switch(page){
 			
-			switch(from){
-				
-				case "main":
+				case MAIN:
+					if(!member.isJoin()){
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						
+					}
+					else if(!member.isLogin()){
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.LOGIN);
+					}
 					
-					switch(to){
+					break;
 					
-					case "custom":
-						
-
-						if(!member.isJoin()){
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.JOIN);
-							
-						}
-						else if(!member.isLogin()){
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.LOGIN);
-						}
-						
-						returns.put("to", to);
-						
-						break;
-						
-					case "developer":
+				case DEVELOPER:
 					
-						if(!member.isJoin())
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.JOIN);
-													
-						else if(!member.isLogin())
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.LOGIN);
+					if(!member.isJoin()){
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
 						
-						else if(!member.isDeveloper())
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.REGSTRY_DEVELOPER);
-						else{
-							
-							//개발자의 개발위젯 정보들(위젯번호, 위젯 이름, 업데이트 날짜, 위젯 설명 정보, 대표사진 이름)
-												
-							
-							
-						}
-						break;
-						
-					case "settings":
-
-						if(!member.isJoin())
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.JOIN);
-													
-						else if(!member.isLogin())
-							throw new MemberException(enumMeberState.NOT_JOIN, enumPage.LOGIN);
-						
-						returns.put("to", enumPage.SETTINGS.getString());
-						
-						break;
-					default:
-						
-						returns.put("to", enumPage.MAIN.getString());
-						returns.put("message", "내부오류. ");
-						
-						break;
-
-
-					}//switch to
+					}
+					else if(!member.isLogin()){
+						throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.LOGIN);
+					}
+					else if(!member.isDeveloper())
+						throw new MemberException(enumMemberState.NOT_DEVELOPER, enumPage.REGSTRY_DEVELOPER);
 					
-					break;//case main
+					break;
 					
-				case "custom":
+				case SETTINGS:
 					
-					break;					
+					if(!member.isJoin()){
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						
+					}
+					else if(!member.isLogin()){
+						throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.LOGIN);
+					}
+					
+					break;
+				case CUSTOM:
+					
+					if(!member.isJoin()){
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						
+					}
+					else if(!member.isLogin()){
+						throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.LOGIN);
+					}
+					
+					break;
 					
 				default:
 					
-					break;;
+					break;
+
 			
-				
-			}
+			}//switch
+			
+		
 		
 			returns.put("isSuccessVerify", true);
 	
@@ -121,7 +104,6 @@ public class VerifyMemberStateFromPage {
 			returns.put("message", e.getMessage());
 			returns.put("messageKind", enumCautionKind.ERROR);
 			
-			e.printStackTrace();
 		}catch(Exception e){
 			returns.put("isSuccessVerify", false);
 			returns.put("to", "/");		
@@ -137,7 +119,7 @@ public class VerifyMemberStateFromPage {
 			e.printStackTrace();
 		}
 		
-		returns.put("from", from);
+
 		return returns;
 	}
 }

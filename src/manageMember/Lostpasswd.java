@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import javaBean.Member;
 import property.commandAction;
 import property.enums.enumUserState;
@@ -29,12 +29,12 @@ public class Lostpasswd implements commandAction {
 			String email = (String)request.getParameter("email");
 			mdb.setEmail(email);
 			
-			if(MemberProcess.isExist("user", "email", email) == false){
+			if(ManageMember.isExist("user", "email", email) == false){
 				returns.put("NotFindEmail", "false");
 				returns.put("message", "가입된 메일이 아닙니다");
 			}
 			else{				
-				if(MemberProcess.isSendmail(mdb, Integer.valueOf(enumUserState.LOSTPW.getString())))
+				if(ManageMember.isSendmail(mdb, Integer.valueOf(enumUserState.LOSTPW.getString())))
 					returns.put("view", "WHERE?");
 				else
 					returns.put("view", "WHEER?");				

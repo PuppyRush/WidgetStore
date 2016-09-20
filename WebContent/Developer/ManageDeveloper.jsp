@@ -1,26 +1,26 @@
 <%@page import="javaBean.*"%>
 <%@page import="java.util.*"%>
-<%@page import="page.VerifyMemberStateFromPage"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.*" %>
+
 
 <%
 
-	HashMap<String,Object> results =  VerifyMemberStateFromPage.Verify(session.getId());
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
 	if(!(boolean)results.get("isSuccessVerify")){
+				
+		enumPage to = (enumPage)results.get("to");
 		
-		String message = (String)results.get("message");
-		String to = (String)results.get("to");
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+		request.setAttribute("from", enumPage.DEVELOPER.getString());
 		
-		request.setAttribute("cautionKind", (enumCautionKind)results.get("kind"));
-		request.setAttribute("from", "Developer/ManagaDeveloper.jsp");
-		
+		response.sendRedirect(to.getString());
+		return;
 		
 	}
 		
 		
-		
-	
-
-
 %>
 
 <!DOCTYPE html>
@@ -40,7 +40,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="library/popup/style.css" rel="stylesheet">
+    <link href="../library/popup/style.css" rel="stylesheet">
     <link href="css/sb-admin.css" rel="stylesheet">
 	
 	
@@ -78,7 +78,7 @@
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
-				<li class="dropdown"> <a href="uploadform.jsp"><i class="glyphicon glyphicon-share"></i> WidgetUpload</a>
+				<li class="dropdown"> <a href="./Uploadform.jsp"><i class="glyphicon glyphicon-share"></i> WidgetUpload</a>
 				</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b class="caret"></b></a>
@@ -132,9 +132,7 @@
 
 						<img class="img-responsive" src="http://placehold.it/500x300" alt="">
 						<hr>
-						<div class="alert alert-info" role="alert">This widget github URL is
-							<a href="#" class="alert-link"> adminWidget@naver.com</a>
-						</div>
+				
 						<ol class="breadcrumb">
 							<li class="active">
                                 Repository : [Repository Name]
@@ -151,7 +149,7 @@
 						</div>
 						<div class="modal-footer">
                             <div>
-								<a href="updateform.html" class="btn btn-success">
+								<a href="updateform.jsp class="btn btn-success">
 								<i class="glyphicon glyphicon-ok"></i> Do Update</a>
 								<button class="btn btn-danger" onclick="alert('Delete Success!');">
 								<i class="glyphicon glyphicon-trash"></i> Delete</button>
@@ -187,6 +185,8 @@
 
 <script>
 	
+	var widgetsArray;
+	
 	window.onload=function(){
 			
 	<%
@@ -194,8 +194,19 @@
  		String uId = session.getId();
 		Member m = Member.getMember(uId);
 		String uName = m.getNickname();
-		ArrayList<HashMap<String,String>> widgets = WidgetProcess.getUserWidgets(uId);
+		ArrayList<HashMap<String,String>> widgets = ManageWidget.getUserWidgets(uId);
 
+		if(widgets.size()>0){
+			%>
+			
+			widgetsArray = new Array("<%=widgets.size()%>") ;
+			for(int i=0 ; widgetsArray.length ; i++){
+					widgetArray[i] = new Array(4);
+					widgetArray
+			}			
+			<%
+			}
+		
 		Iterator<HashMap<String,String>> it = widgets.iterator();
 		while(it.hasNext()){
 			
@@ -206,6 +217,8 @@
 			String repImagePath = widget.get("repImagePath");
 			
 			//꺼내올때마다 js배열에 저장하여 li에 append한다
+		
+		
 		}
 	}catch(Throwable e){
 		e.printStackTrace();

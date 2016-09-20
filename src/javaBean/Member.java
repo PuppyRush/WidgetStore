@@ -1,13 +1,41 @@
 package javaBean;
 
+import java.awt.Point;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//User Table 참조
+/**
+ * member에 대한 객체 정보는 static 변수를 통해 참조하며 유저와 관련된 위젯들은 widget관련 변수를 통해 관리한다.
+ * 	멤버 상태나 정보는 manageMember패캐지의 클래스들이나 MemberProess에서만 유일하게 조작되며 
+ *     개개의 유저가 가진 위젯들의 상태는 WidgetProcess를 통해서만 조작된다.
+ * @author cmk
+ *
+ */
 public class Member {
 
+	
+	public static class MyAddedWidgets{
+		
+		private final int wId;
+		private final String wName;
+		private final String originPath;
+		private final Point point;
+				
+		public MyAddedWidgets(int id, String name, String originPath, Timestamp updatedDate, Point point){
+			
+			wId = id;
+			wName = name;
+			this.originPath = originPath;
+			this.point = point;
+		}
+		
+	}
+	
 	private static Map<String, Member> MemberMap = new HashMap<String, Member>();
+	private DevelopedWidget developedWidget;
+	private DownloadedWidget downloadedWidget;
 	
 	public static final int DEFAULT_VALUE = -1;
 	private int id;
@@ -22,6 +50,8 @@ public class Member {
 	private boolean isJoin;
 	private boolean isDeveloper;
 	
+	
+	
 	public Member(){
 		id = DEFAULT_VALUE;
 		nickname="";
@@ -30,6 +60,8 @@ public class Member {
 		email="";
 		regDate =  new Timestamp(System.currentTimeMillis());
 		sessionId= "";
+		downloadedWidget = null;
+		developedWidget = null;
 	}
 	
 	public Member(Member mdb){
@@ -38,6 +70,9 @@ public class Member {
 		password = new String(mdb.password.toString());
 		idType = new String(mdb.idType);
 		regDate = (Timestamp)mdb.regDate.clone();
+		developedWidget = mdb.developedWidget;
+		downloadedWidget = mdb.downloadedWidget;
+		developedWidget = mdb.developedWidget;
 	}
 	
 	public Member(int id, String email, String name, String pw, String idType, Timestamp reg_date){
@@ -47,7 +82,11 @@ public class Member {
 		this.password = pw;
 		this.idType = idType;
 		this.regDate = reg_date;
+		this.developedWidget = null;
+		this.downloadedWidget = null;
 	}
+	
+	////getter setter////
 	
 	public int getId() {
 		return id;
@@ -81,12 +120,6 @@ public class Member {
 		this.email = email;
 	}
 
-	public Timestamp getReg_date() {
-		return regDate;
-	}
-	public void setReg_date(Timestamp regDate) {
-		this.regDate = regDate;
-	}
 	public String getSessionId(){
 		return sessionId;
 	}
@@ -124,6 +157,38 @@ public class Member {
 	public void setJoin(boolean isJoin) {
 		this.isJoin = isJoin;
 	}
+		
+
+	public Timestamp getRegDate() {
+		return regDate;
+	}
+
+	public void setRegDate(Timestamp regDate) {
+		this.regDate = regDate;
+	}
+	
+	public static Map<String,Member> getMemberMap(){
+		return MemberMap;
+	}
+
+	public DevelopedWidget getDevelopedWidget() {
+		return developedWidget;
+	}
+
+	public void setDevelopedWidget(DevelopedWidget developedWidget) {
+		this.developedWidget = developedWidget;
+	}
+
+	public DownloadedWidget getDownloadedWidget() {
+		return downloadedWidget;
+	}
+
+	public void setDownloadedWidget(DownloadedWidget downloadedWidget) {
+		this.downloadedWidget = downloadedWidget;
+	}
+
+	/////method/////
+	
 	
 	public static boolean isContainsMember(String sId){
 		
@@ -131,9 +196,7 @@ public class Member {
 						
 	}
 	
-	public static Map<String,Member> getMemberMap(){
-		return MemberMap;
-	}
+
 	
 	/**
 	 * 	로그인한 유저를 대상으로 HashMap으로 객체를 보유하고 없으면 새로 생성한다. 
@@ -148,7 +211,7 @@ public class Member {
 		
 		Member member = null;
 		
-
+		
 		if(Member.MemberMap.containsKey(sId)){
 			return Member.MemberMap.get(sId);
 		}
@@ -194,7 +257,7 @@ public class Member {
 	
 	public static Member makePerfectMember(String id){
 		Member m = new Member();
-		m.setEmail("gooddaumi@naver.co");
+		m.setEmail("gooddaumi@naver.com");
 		
 		m.setId(32);
 		m.setSessionId(id);
@@ -206,4 +269,8 @@ public class Member {
 		
 		return m;
 	}
+
+
+
+	
 }

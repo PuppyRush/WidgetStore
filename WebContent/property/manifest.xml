@@ -19,30 +19,24 @@
 
     <recommanded>
         <support_resolution>yes</support_resolution>      <!--default:"no", {"yes","no"}-->
-        <resolution method="ratio"/>                      <!--default:"unsupported" ,{"unsupported","ratio","free"}-->
+        <resolution method="ratio"/>                      <!--default:"unsupported" ,{"unsupported","ratio","free","auto"}-->
             <ratio>
-                <ratio first="1:1" res="300,300"/>
-                <ratio second="3:4" res="300,400"/>
-                <ratio third="16:9" res="400,300"/>
+                <ratio value="1:1" size="300,300"/>
+                <ratio value="3:4" size="300,400"/>
+                <ratio value="16:9" size="400,300"/>
             </ratio>
             <free>
-                <minWidthRatio>300</minWidthRatio>
-                <minHeightRatio>300</minHeightRatio>
-                <maxWidthRatio>900</maxWidthRatio>
-                <maxHeightRatio>900</maxHeightRatio>
+                <minWidthSize>300</minWidthSize>
+                <minHeightSize>300</minHeightSize>
+                <maxWidthSize>900</maxWidthSize>
+                <maxHeightSize>900</maxHeightSize>
             </free>           
 
         <icon-path>./image/icon/title.jpg</icon-path>
     </recommanded>
 
-    <optional>
-        
-
-
-    </optional>
-
-
-   
+	    <optional>
+    </optional>   
 </WidgetStore>
 
 <!--

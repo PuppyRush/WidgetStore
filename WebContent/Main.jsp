@@ -8,9 +8,28 @@
 <%@page import="java.util.HashMap"%>
 <%@page import="java.util.Enumeration"%>
 
+<%@page import="javaBean.*"%>
+<%@page import="java.util.*"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.enumPage"%>
+
+
 <%
 
 	request.setCharacterEncoding("UTF-8");
+	boolean isFailVerify;
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	if(!(boolean)results.get("isSuccessVerify")){
+		isFailVerify =false;
+		enumPage to = (enumPage)results.get("to");
+		
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+
+		return;
+		
+	}else
+		isFailVerify = true;
 
 %>
 
@@ -88,16 +107,16 @@
                 <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" >Sign out</a>
             </li>
             <li>
-                <a href="Store" onclick ="verifyMember('store')" data-toggle="modal" >Store</a>
+                <a href="Store.jsp" data-toggle="modal" >Store</a>
             </li>
             <li>
-                <a href="#Custom" onclick ="verifyMember('custom')" data-toggle="modal">Custom</a>
+                <a href="Cutsom.jsp"  data-toggle="modal">Custom</a>
             </li>
             <li>
-                <a href="#Developer" onclick ="verifyMember('developer')" data-toggle="modal">Developer</a>
+                <a href="Developer/ManageDeveloper.jsp" data-toggle="modal">Developer</a>
             </li>
             <li>
-                <a href="#Settings" onclick ="verifyMember('settings')">Setting</a>
+                <a href="Settings.jsp">Setting</a>
             </li>
             <li>
                 <a href="#About" onclick = $("#menu-close").click(); >About</a>
@@ -263,7 +282,10 @@
 
     <!-- Custom Theme JavaScript -->
     <script>
-	var id = "<%=session.getId()%>";
+    
+    //페이지 인증 성공 여부를 담는 변수 
+ var isSuccessVerify = (Boolean)<%=isFailVerify%>;
+ 	var id = "<%=session.getId()%>";
     
 	window.onload=function(){
 		var message;
@@ -319,15 +341,6 @@
 			
 	};
 
-	function verifyMember(type){
-	
-		 $("#menu-close").click();
-		 $("#to").val(type);
-		 $("#sessionId_entryForm").val(id);
-	 	$("#from").val("Main");
-	 	document.forms["entryForm"].submit();
-	}
-	
 	function fun_signOut(){
 		 $("#menu-close").click();
 	

@@ -1,3 +1,27 @@
+<%@page import="javaBean.*"%>
+<%@page import="java.util.*"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.*" %>
+
+<%
+
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	if(!(boolean)results.get("isSuccessVerify")){
+				
+		enumPage to = (enumPage)results.get("to");
+		
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+		request.setAttribute("from", enumPage.DEVELOPER.getString());
+		
+		response.sendRedirect(to.getString());
+		return;
+		
+	}
+		
+		%>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -77,7 +101,7 @@
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
-				<li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-list-alt"></i> View My Widget </a>
+				<li class="dropdown"> <a href="ViewWidgetInfo.html"><i class="glyphicon glyphicon-list-alt"></i> View My Widget </a>
 				</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b class="caret"></b></a>
@@ -124,11 +148,21 @@
 
                 <!-- Page Heading -->
                 
-                <div class="col-md-9">
-		    		<h1 class="page-header">
-                            [WidgetName] <small>[widget category]</small> <small>[update day]</small> 
-                    </h1>
-				<!-- 이미지 파일 선택 -->
+                   <div class="col-md-9">
+
+                <form id="upload-form" method="post" action="uploadWidget.do" enctype="multipart/form-data" >
+							<input id="sessionId"  name="sessionId" value=<%=session.getId() %> type="hidden">
+						
+							<input id="kind" name="kind" value="sports" type="hidden">
+					<div class="modal-body">
+		    				<div id="div-lost-msg">
+                                <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
+                                <span id="text-lost-msg">WidgetName</span>
+							</div>
+
+		    				<input id="widget-name" name="widget-name"  class="form-control" type="text" placeholder="Widget name" required></br>
+				
+				<!-- ì´ë¯¸ì§ íì¼ ì í -->
 				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
 					<tr>
 						<td align="left" height="105" ondragenter="return false" ondragover="return false" ondrop="dropIt(event)">    
@@ -138,38 +172,52 @@
 					<tr>
 						<td align="center">
 						<label class="btn btn-block btn-primary">
-						Drag & drop or choose images from your local file system<input style="display: none;" type="file" id="input" multiple="true" onchange="imagesSelected(this.files)" />
+						Drag & drop or choose images from your local file system<input accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z" type="file" name="upload-image[]" multiple/>
 					</label>
 						</td>
 					</tr>
 				</table>
-				<!-- 위젯 파일 선택 -->
+				<!-- ìì ¯ íì¼ ì í -->
 				<div class="input-group">
                 <label class="input-group-btn">
                     <span class="btn btn-primary">
-                        Widget File&hellip; <input type="file" style="display: none;" multiple>
+                        Widget File&hellip; <input accept=" file/zip, file/7z" type="file" name="upload-zip" />
                     </span>
                 </label>
                 <input type="text" class="form-control" readonly>
             </div>
 
-				<!-- 텍스트 입력 -->
-				<p class="help-block">Input text about update</p>
-				<textarea class="form-control" rows="5" placeholder="업데이트에 대한 내용을 입력해주세요."></textarea>
+				<!-- íì¤í¸ ìë ¥ -->
+				<p class="help-block">Input text about this widget</p>
+				<textarea class="form-control" name="contents"  rows="5" placeholder="위젯의 설명을 입력해주세요"></textarea>
 
-						<!-- 주의 사항 -->
+
+
+					<!-- ì¹´íê³ ë¦¬ -->
+					<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">Category <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="javascript:;">ì¢ë¥1</a></li>
+                <li><a href="javascript:;">ì¢ë¥2</a></li>
+                <li><a href="javascript:;">ì¢ë¥3</a></li>
+				<li><a href="javascript:;">ì¢ë¥4</a></li>
+            </ul>
+        </div></br>
+        </form>
+
+						<!-- ì£¼ì ì¬í­ -->
 						<div class="modal-footer"></div>
 								<div class="alert alert-warning" role="alert">
-								1.주의사항1</br>
-								2.주의사항2</br>
-								3.주의사항3
+								1.ì£¼ìì¬í­1</br>
+								2.ì£¼ìì¬í­2</br>
+								3.ì£¼ìì¬í­3
 								</div>
 							
 							
 		    		    <div class="modal-footer">
                             <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">
-								<i class="glyphicon glyphicon-ok"></i> Update</button>
+                            <button type="submit" class="btn btn-primary btn-lg btn-block" onclick="uploadsubmit()" >Upload</button>
+
+								<i class="glyphicon glyphicon-ok"></i> Upload</button>
                             </div>
 		    		    </div>
 						</div>
@@ -198,6 +246,9 @@
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 	<script>
+
+
+	
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');

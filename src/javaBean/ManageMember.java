@@ -5,25 +5,16 @@ package javaBean;
 import java.sql.*;
 import java.util.*;
 import java.util.Date;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
 import org.mindrot.jbcrypt.BCrypt;
-import property.*;
 import property.enums.enumStandard;
 import property.enums.enumUserState;
 
 
-public class MemberProcess {
+public class ManageMember {
 	
 	private static Connection conn = ConnectMysql.getConnector();
-	private static Member instance = new Member();
 
-	public static Member getInstance() {
-		return instance;
-	}
-
-	public MemberProcess() {
+	private ManageMember() {
 	}
 
 	public static int isLockingMember(Member member) throws Throwable{
@@ -305,7 +296,7 @@ public class MemberProcess {
 			pstmt.setString(1, member.getEmail());
 			pstmt.setString(2, member.getNickname());
 		
-			pstmt.setTimestamp(4, member.getReg_date());
+			pstmt.setTimestamp(4, member.getRegDate());
 
 			if(member.getIdType().equals("inner")){
 
@@ -339,10 +330,10 @@ public class MemberProcess {
 			pstmt.setInt(5,0);	
 			pstmt.setInt(6,0);
 			pstmt.setInt(7,0);	
-			pstmt.setTimestamp(8, member.getReg_date());
-			pstmt.setTimestamp(9, member.getReg_date());
-			pstmt.setTimestamp(10, member.getReg_date());
-			pstmt.setTimestamp(11, member.getReg_date());
+			pstmt.setTimestamp(8, member.getRegDate());
+			pstmt.setTimestamp(9, member.getRegDate());
+			pstmt.setTimestamp(10, member.getRegDate());
+			pstmt.setTimestamp(11, member.getRegDate());
 			
 			pstmt.executeUpdate();
 				
@@ -523,7 +514,7 @@ public class MemberProcess {
 	 */
 	public static boolean isPassingDate(Member member){
 		
-		Timestamp time = (Timestamp)MemberProcess.getSthJustOne("losingPasswd", "u_num", member.getId(), "sendedMailDate");
+		Timestamp time = (Timestamp)ManageMember.getSthJustOne("losingPasswd", "u_num", member.getId(), "sendedMailDate");
 		//int dateGap = Calendar.getInstance().get
 																 
 		Date today = new Date ( );
@@ -563,8 +554,8 @@ public class MemberProcess {
 	public static boolean isSendmail(Member member, int userState){
 		
 		//이미 전송하였는가?
-		if( (boolean)MemberProcess.getSthJustOne("losingPassword", "u_num", member.getId(), "isSendedMail")){
-			Timestamp time = (Timestamp)MemberProcess.getSthJustOne("losingPasswd", "u_num", member.getId(), "sendedMailDate");
+		if( (boolean)ManageMember.getSthJustOne("losingPassword", "u_num", member.getId(), "isSendedMail")){
+			Timestamp time = (Timestamp)ManageMember.getSthJustOne("losingPasswd", "u_num", member.getId(), "sendedMailDate");
 			//int dateGap = Calendar.getInstance().get
 																	 
 			Date today = new Date ( );

@@ -24,9 +24,15 @@ import javaBean.Member;
 import javaBean.MemberException;
 import property.commandAction;
 import property.enums.enumMemberState;
-import property.enums.enumPage;
 
-public class UploadWidget implements commandAction {
+/**
+ * 
+ *    개발자가 기존의 위젯을 업데이트하는 행위를 위한 클래 
+ *    압축파일에 manifest와 소스파일을 기본이며 선택적으로 이미지 파일이 업로드 되면 기존의 대표사진을 새로 교체한다. 
+ * @author cmk  
+ *
+ */
+public class UpdateWidget implements commandAction {
 	
 	private String _userPath;
 	private String _sourcePath;
@@ -69,18 +75,9 @@ public class UploadWidget implements commandAction {
 			MultipartRequest multi = new MultipartRequest(request,_defaultTempPath, sizeLimit, "euc-kr", new DefaultFileRenamePolicy());
 			
 		
-			if(multi.getParameter("contents")==null){
+			if(multi.getParameter("contents")==null || multi.getParameter("widget-name")== null ||multi.getParameter("sessionId")== null 
+					||	multi.getParameter("kind")==null )
 				throw new NullPointerException("widget-upload 폼으로부터 값이 모두 전송되지 않았습니다.");
-			}
-			else if(multi.getParameter("widget-name")== null ){
-				throw new NullPointerException("widget-upload 폼으로부터 값이 모두 전송되지 않았습니다.");
-			}else if(multi.getParameter("sessionId")== null){
-				throw new NullPointerException("widget-upload 폼으로부터 값이 모두 전송되지 않았습니다.");
-			}else if(multi.getParameter("kind")==null ){
-				throw new NullPointerException("widget-upload 폼으로부터 값이 모두 전송되지 않았습니다.");
-			}
-							
-		
 
 			_contents = (String)multi.getParameter("contents");
 			_widgetName = (String)multi.getParameter("widget-name");
@@ -96,15 +93,7 @@ public class UploadWidget implements commandAction {
 			
 			_imagePath = (new StringBuilder(_defaultPath)).append("/").append(m.getId()).append("/").append(_widgetName).append("/").append("representiveImages/").toString();
 			_sourcePath =  (new StringBuilder(_defaultPath)).append("/").append(m.getId()).append("/").append(_widgetName).append("/").append("source/").toString();
-			
-			
-			File folder = new File(_imagePath);
-			if(!folder.exists())
-				folder.mkdirs();
-			
-			folder = new File(_sourcePath);
-			if(!folder.exists())
-				folder.mkdirs();
+		
 			
 			if(!m.isJoin())
 				throw new MemberException("이상 접근, 가입하지 않은 유저가 접근하였습니다", enumMemberState.NOT_JOIN);
@@ -149,7 +138,7 @@ public class UploadWidget implements commandAction {
 		}
 		
 		catch(IOException e){
-			returns.put("view", enumPage.UPDATE_WIDGET.getString());
+			returns.put("view", "/Develop/Registration/RegistrationGit");
 			returns.put("message", "업로드파일 저장중 문제가 발생하였습니다.");
 			returns.put("isSuccessUpload", "false");
 			System.out.println(e.getMessage());
@@ -157,7 +146,7 @@ public class UploadWidget implements commandAction {
 			return returns;
 		}
 		catch(Exception e){
-			returns.put("view", enumPage.UPDATE_WIDGET.getString());
+			returns.put("view", "/Develop/Registration/RegistrationGit");
 			returns.put("message", "알수 없는 오류 발생.");
 			returns.put("isSuccessUpload", "false");
 			System.out.println(e.getMessage());
@@ -167,12 +156,12 @@ public class UploadWidget implements commandAction {
 		
 	
 		
-		Runnable me = new ManageEvaluation(m, _widgetName, _zipFileName, (HashMap<String,String>)_ImagesName,_kind,false );
+		Runnable me = new ManageEvaluation(m, _widgetName, _zipFileName, (HashMap<String,String>)_ImagesName,_kind,true);
 		Thread t = new Thread(me);
 		t.run();
 				
 		
-		returns.put("view", enumPage.DEVELOPER.getString());
+		returns.put("view", "/Develop/Registration/RegistrationGit");
 		returns.put("isSuccessUpload", "true");
 
 		
@@ -183,7 +172,6 @@ public class UploadWidget implements commandAction {
 	
 	private void fileMove(String inFileName, String outFileName) {
 	try {
-		
 	   FileInputStream fis = new FileInputStream(inFileName);
 	   FileOutputStream fos = new FileOutputStream(outFileName);
 	   

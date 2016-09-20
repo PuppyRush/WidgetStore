@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import java.util.HashMap;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import javaBean.Member;
 import property.commandAction;
 import property.enums.enumAttributeKey;
@@ -47,20 +47,20 @@ public class Login implements commandAction {
 					//주석	
 			if( nick_or_mail.contains("@") ){			
 				member.setEmail(nick_or_mail);	
-				member.setId( MemberProcess.sthToId(member));
-				member.setNickname( (String)MemberProcess.getSthJustOne("user", "userNum", member.getId(), "nickname"));
+				member.setId( ManageMember.sthToId(member));
+				member.setNickname( (String)ManageMember.getSthJustOne("user", "userNum", member.getId(), "nickname"));
 			}
 			else{
 				member.setNickname(nick_or_mail);
-				member.setId( MemberProcess.sthToId(member));
-				member.setNickname( (String)MemberProcess.getSthJustOne("user", "userNum", member.getId(), "email"));
+				member.setId( ManageMember.sthToId(member));
+				member.setNickname( (String)ManageMember.getSthJustOne("user", "userNum", member.getId(), "email"));
 			}
 			
 			member.setPassword((String)request.getParameter("login_password"));			
 				
 			int code;
 			//잠김상태인가?
-			if( (code = MemberProcess.isLockingMember(member)) !=0){
+			if( (code = ManageMember.isLockingMember(member)) !=0){
 				
 				//비밀번호 분실상태인가?
 				//아래의 두 상태는 비밀번호 일치여부를 검사할 필요 없음.
@@ -68,7 +68,7 @@ public class Login implements commandAction {
 									
 					returns.put("userState","lostpw");		
 					
-					if(MemberProcess.isSendmail(member, Integer.valueOf(enumUserState.LOSTPW.getString())))
+					if(ManageMember.isSendmail(member, Integer.valueOf(enumUserState.LOSTPW.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -83,7 +83,7 @@ public class Login implements commandAction {
 					returns.put("userState","faild_login");
 					returns.put("excessFaildcount","true");
 					
-					if(MemberProcess.isSendmail(member, Integer.valueOf(enumUserState.LOSTPW.getString())))
+					if(ManageMember.isSendmail(member, Integer.valueOf(enumUserState.LOSTPW.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -96,12 +96,12 @@ public class Login implements commandAction {
 				if((code & Integer.valueOf( enumUserState.OLD_PASSWD.getString()) ) == Integer.valueOf( enumUserState.OLD_PASSWD.getString())  ){
 				
 					//로그인 실패하면 3개월 이상 변경여부 검사 안함
-					if(MemberProcess.loginMember(member)==false){
+					if(ManageMember.loginMember(member)==false){
 						returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
 					}
 					else{
 						
-						if(MemberProcess.isPassingDate(member)){
+						if(ManageMember.isPassingDate(member)){
 							returns.put("excessDateOfChange", "ture");
 							returns.put("view", "password_Reset.html");
 						}
@@ -114,7 +114,7 @@ public class Login implements commandAction {
 				}
 				else if((code & Integer.valueOf( enumUserState.SLEEP.getString()) ) == Integer.valueOf( enumUserState.SLEEP.getString())  ){
 						
-					if(MemberProcess.isSendmail(member, Integer.valueOf(enumUserState.SLEEP.getString())))
+					if(ManageMember.isSendmail(member, Integer.valueOf(enumUserState.SLEEP.getString())))
 						returns.put("view", "WHERE?");
 					else
 						returns.put("view", "WHEER?");
@@ -125,7 +125,7 @@ public class Login implements commandAction {
 			}//isn't Locking member and Succes login process.
 			else{
 			
-				if(MemberProcess.loginMember(member)==false){
+				if(ManageMember.loginMember(member)==false){
 					returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
 					returns.put("isSuccessLogin", "false");
 					

@@ -4,10 +4,26 @@
 	pageEncoding="UTF-8"%>
 
 <%@page import="java.util.*"%>
+<%@page import="javaBean.*"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.enumPage"%>
+
 
 <%
-
 	request.setCharacterEncoding("UTF-8");
+	boolean isFailVerify;
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	if(!(boolean)results.get("isSuccessVerify")){
+		isFailVerify =false;
+		enumPage to = (enumPage)results.get("to");
+		
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+	
+		return;
+		
+	}else
+		isFailVerify = true;
 
 %>
 
@@ -192,6 +208,10 @@
         </table>
     </div>
     <script type="text/javascript">
+    
+    //페이지 인증 성공 여부를 담는 변수 
+    var isSuccessVerify = (Boolean)<%=isFailVerify%>;
+    
     /*************************************************************************************/
 
     // ���콺 Ŭ����

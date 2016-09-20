@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import javaBean.MemberProcess;
+import javaBean.ManageMember;
 import javaBean.Member;
 import property.commandAction;
 
@@ -24,8 +24,8 @@ public class VerifyMail implements commandAction {
 		
 		String mail = (String) request.getParameter("mail");
 		
-		int u_num = MemberProcess.sthToId(member);
-		String email_of_unum = (String)MemberProcess.getSthJustOne("user", "user_num", u_num, "email");
+		int u_num = ManageMember.sthToId(member);
+		String email_of_unum = (String)ManageMember.getSthJustOne("user", "user_num", u_num, "email");
 				
 		if(email_of_unum.equals(mail)){
 			
