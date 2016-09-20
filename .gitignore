@@ -11,3 +11,5 @@ WebContent/org/*
 *.prefs
 *.prefs
 .settings/org.eclipse.jdt.core.prefs
+enumMysql.java
+enumMail.java
