@@ -103,16 +103,16 @@
             <div id="widgetList" class="collapse navbar-collapse navbar-ex1-collapse">
                 <ul class="nav navbar-nav side-nav">
                     <li class="active">
-                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> widget001</a>
+                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> [WidgetName01]</a>
                     </li>
                     <li>
-                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> widget002</a>
+                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> [WidgetName02]</a>
                     </li>
                     <li>
-                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> widget003</a>
+                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> [WidgetName03]</a>
                     </li>
                     <li>
-                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> widget004</a>
+                        <a href="javascript:;"><i class="glyphicon glyphicon-console"></i> [WidgetName04]</a>
                     </li>
                 </ul>
             </div>
@@ -149,7 +149,7 @@
 						</div>
 						<div class="modal-footer">
                             <div>
-								<a href="updateform.jsp class="btn btn-success">
+								<a href="updateform.jsp?WidgetName=<%=WidgetName%>" class="btn btn-success">
 								<i class="glyphicon glyphicon-ok"></i> Do Update</a>
 								<button class="btn btn-danger" onclick="alert('Delete Success!');">
 								<i class="glyphicon glyphicon-trash"></i> Delete</button>

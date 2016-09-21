@@ -227,6 +227,18 @@
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 	<script>
+window.onload=function(){
+	var _tempUrl = location.href.split("?"); //url에서 처음부터 '?'까지 삭제
+		
+	var _keyValuePair = _tempUrl[1].split('='); // '=' 을 기준으로 분리하기
+
+	if(_keyValuePair[0] == 'WidgetName'){ // _keyValuePair[0] : 파라미터 명
+		// _keyValuePair[1] : 파라미터 값
+		alert(_keyValuePair[1]);
+		
+	}
+}
+
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
