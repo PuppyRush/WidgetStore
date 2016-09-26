@@ -165,7 +165,7 @@
 										class="glyphicon glyphicon-calendar"></span></span>
 								</div>
 							</th>
-						<th>위젯 종류</th>
+							<th>위젯 종류</th>
 							<th>위젯 등록 방식</th>
 						</tr>
 					</thead>
@@ -254,6 +254,9 @@
 
 
 <script>
+$("button").click( function() {
+   alert($(this).closest('tr').index());
+});
 
 $( document ).ready(function() {
 	$(".acceptWidget").on( 'click', function() {
@@ -333,7 +336,7 @@ window.onload=function(){
 			 	 
 				 $("#widgetTable > tbody:last").append('<tr><td>'+ (i+1) +'</td><td>' + '<div class="checkbox"><label><input type="checkbox"> </label> </div></td><td>' +
 						 m.get("developer") + '</td><td>' + m.get("widgetName")	+ '</td><td>' + m.get("uploadedDate") + '</td><td>' + m.get("kind") + '</td><td>' + m.get("position") +
-						'</td><td> <button type="button" class="acceptWidget" value="" class="btn btn-primary btn-sm">승인</button> </td></tr> ');
+						'</td><td> <button type="button" class="acceptWidget" value="" class="btn btn-primary btn-sm">승인</button> <button type="button" class="acceptWidget" value="" class="btn btn-primary btn-sm">소스 보기</button> </td></tr> ');
 				 $("widgetTable = tbody:last").val(m.get("developer")); 
 		}
 			 
