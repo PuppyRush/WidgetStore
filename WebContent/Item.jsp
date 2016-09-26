@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -80,7 +83,7 @@
                     <img class="img-responsive" src="naver_ba.jpg" alt="">
                     <div class="caption-full">
                         <h4 class="pull-right">NickName</h4>
-                        <h4><a href="#">NAVER검색어</a>
+                        <h4><a href="#">NAVERê²ìì´</a>
                         </h4>
                         <p>See more snippets like these online store reviews at</p>
                         <p>Want to make these reviews work? Check out

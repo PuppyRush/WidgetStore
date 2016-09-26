@@ -1,41 +1,75 @@
 package javaBean;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 public class ManageWidget {
 
-
 	private static Connection conn = ConnectMysql.getConnector();
-
-
 	
-	public static void AddEvaluatingWidget(int uId, int wId){
+	public static void addWidgetToStore(int uId, int wId){
+		
+	
+	}
+	
+	public static void removeWidget(int uId, int wId){
+		
+		
 		
 	}
 	
-	public static void uploadToStore(int uId, int wId){
+	public static boolean updateWidget(int uId, int wId,float version, String root ,String wName){
 		
+		PreparedStatement st  = null;
+		ResultSet rs = null;
+		
+	  	try {
+	  		conn.setAutoCommit(false);
+	  		
+	  		st = conn.prepareStatement("select widget_num from widget where developer = ? and title = ? ", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+	  		st.setInt(1,uId);
+	  		st.setString(2, wName);
+	  		rs = st.executeQuery();
+	  		
+	  		rs.last();
+	  		if(rs.getRow()!=1)
+	  			throw new SQLException();
+	  			
+	  	
+	  		
+			st = conn.prepareStatement("update widget set currentVersion = ? , HTML = ? where title = ? and developer = ?  ");
+		  	st.setFloat(1,  version);
+		  	st.setString(2, root);
+		  	st.setString(3, wName);
+		  	st.setInt(4, uId);
+			 
+			st.executeUpdate();		
+			
+			
+			
+			//manifest에 업로드.
+		  	
+		  	conn.commit();
+		  
+		  	
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 	
-	public static void removeFaildEvaluationWidget(){
-		
-	}
-	
-	/**
-	 * 메인에서 개발자 페이지에 접근할 때 불러올 개발자의 위젯 정보들을 반환한다.
-	 * @param uId 개발자의 uId
-	 * @return (위젯 기본키, 이름, 업데이트 날짜, 위젯 설명 정보, 대표사진 경로)를 반환한다.
-	 *		 이때 순서대로 배열 각 요소에 Hashmap의 키 값은(wId, wName, updatedDate, wContent, repImagePath) 		
-	 */
 	public static ArrayList<HashMap<String,String>> getUserWidgets(String uId){
-	
-		ArrayList<HashMap<String, String>> widgets = new ArrayList<>();
+		ArrayList<HashMap<String,String>> _list = new ArrayList<HashMap<String,String>>(); 
 		
 		
 		
-		return widgets;
 		
+		return _list;
 	}
+	
 }

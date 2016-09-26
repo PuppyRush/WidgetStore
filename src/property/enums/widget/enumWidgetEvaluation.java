@@ -43,10 +43,14 @@ public enum enumWidgetEvaluation {
 	public static enum enumEvalFailCase {
 		
 		NOTHING("1"),
+		NO_ZIPFILE("2"),
+		NO_IMAGE("2"),
 		NO_ROOTFILE("2"),
-		NO_MANIFEST("3"),
-		MANIFEST_ERROR("4"),
-		UNKWON_ERROR("5");
+		NO_MANIFEST("2"),
+		MANIFEST_ERROR("3"),
+		IMAGE_ERROR("3"),
+		UNKWON_ERROR("4");
+		
 		
 		
 		private String UnallowanceReason;

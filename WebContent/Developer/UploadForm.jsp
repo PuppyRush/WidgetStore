@@ -3,7 +3,11 @@
 <%@page import="page.VerifyPage"%>
 <%@page import="property.enums.*" %>
 
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <%
+
+	request.setCharacterEncoding("UTF-8");
 
 	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
 	if(!(boolean)results.get("isSuccessVerify")){
@@ -19,7 +23,8 @@
 		
 	}
 		
-%>
+		%>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -100,7 +105,7 @@
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
-				<li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-list-alt"></i> View My Widget </a>
+				<li class="dropdown"> <a href="ViewWidgetInfo.html"><i class="glyphicon glyphicon-list-alt"></i> View My Widget </a>
 				</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b class="caret"></b></a>
@@ -147,62 +152,62 @@
 
                 <!-- Page Heading -->
                 
-          <form id="upload-form" method="post" action="updateWidget.do" enctype="multipart/form-data" >
-							<input id="sessionId"  name="sessionId" type="hidden">
+                   <div class="col-md-9">
+
+           <form id="upload-form" method="post" action="uploadWidget.do" enctype="multipart/form-data" >
+							<input id="sessionId"  name="sessionId" value=<%=session.getId() %> type="hidden">
 						
 							<input id="kind" name="kind" value="sports" type="hidden">
-                <div class="col-md-9">
-		    		<h1 class="page-header">
-                            [WidgetName] <small>[widget category]</small> <small>[update day]</small> 
-                    </h1>
-				<!-- 이미지 파일 선택 -->
-				<table class="table table-bordered" width="485" border="1" cellspacing=0 cellpadding=5>
-					<tr>
-						<td align="left" height="105" ondragenter="return false" ondragover="return false" ondrop="dropIt(event)">    
-						<output id="thumbs"></output> 
-						</td>
-					</tr>
-					<tr>
-						<td align="center">
-						<label class="btn btn-block btn-primary">
-						Drag & drop or choose images from your local file system<input accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z" type="file" name="upload[]" multiple/>
-					</label>
-						</td>
-					</tr>
-				</table>
-				<!-- 위젯 파일 선택 -->
-				<div class="input-group">
-                <label class="input-group-btn">
-                    <span class="btn btn-primary">
-                        Widget File&hellip; <input type="file" style="display: none;" multiple>
-                    </span>
-                </label>
-                <input type="text" class="form-control" readonly>
-            </div>
-
-				<!-- 텍스트 입력 -->
-				<p class="help-block">Input text about update</p>
-				<textarea class="form-control" rows="5" placeholder="업데이트에 대한 내용을 입력해주세요."></textarea>
+					<div class="modal-body">
+		    				<div id="div-lost-msg">
+                                <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
+                                <span id="text-lost-msg">위젯이름</span>
+							</div>
+							
+		    				<input id="widget-name" name="widget-name"  class="form-control" type="text" placeholder="Widget name" required></br>
 				
-				</form>
-						<!-- 주의 사항 -->
+							
+					<div class="btn-group"> <a class="btn btn-default dropdown-toggle btn-select" href="#" data-toggle="dropdown">Category <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a href="javascript:;">ì¢ë¥1</a></li>
+                <li><a href="javascript:;">ì¢ë¥2</a></li>
+                <li><a href="javascript:;">ì¢ë¥3</a></li>
+							<li><a href="javascript:;">ì¢ë¥4</a></li>
+           </ul>
+        </div><br>
+				
+				
+          <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
+              <span id="text-lost-msg">압축파일</span> <br>
+               <input accept=" file/zip, file/7z" type="file" name="upload-zip" />
+							</div>
+		    				
+				
+				
+          <div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
+              <span id="text-lost-msg">이미지파일</span> <br>
+              <input accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z" type="file" name="upload-image[]" multiple/>
+							</div>
+		    			
+				<br>
+				<textarea class="form-control" name="contents"  rows="5" placeholder="위젯의 설명을 입력해주세요"></textarea>
+
+
+       
+						<!-- ì£¼ì ì¬í­ -->
 						<div class="modal-footer"></div>
 								<div class="alert alert-warning" role="alert">
-								1.주의사항1</br>
-								2.주의사항2</br>
-								3.주의사항3
+								1. 업로드 된 위젯에 대한  책임은 개발자 약관을 확인하세요.</br>
+								2.소스파일은 zip파일로, 이미지는 대표사진 이름을 1 나머지 상세설명 이미지는 2번부터 명명하여 첨부해주세요.</br>
+								3. 업로드 후 스토어에 업로드 되기까지 수일이 소요될 수 있습니다. 심사가 성공하거나 실패할 경우 사유와 함께 메일로 발송됩니다.<br>
 								</div>
 							
 							
 		    		    <div class="modal-footer">
-                            <div>
-                                <button type="submit" class="btn btn-primary btn-lg btn-block">
-								<i class="glyphicon glyphicon-ok"></i> Update</button>
-                            </div>
-		    		    </div>
-						</div>
-						
-					</div>
+                 <div>
+                 <button type="submit" class="btn btn-primary btn-lg btn-block" >Upload</button>
+             </div>
+ 							</form>
 
                 </div>
 
@@ -227,18 +232,9 @@
     <script src="js/plugins/morris/morris.min.js"></script>
     <script src="js/plugins/morris/morris-data.js"></script>
 	<script>
-window.onload=function(){
-	var _tempUrl = location.href.split("?"); //url에서 처음부터 '?'까지 삭제
-		
-	var _keyValuePair = _tempUrl[1].split('='); // '=' 을 기준으로 분리하기
 
-	if(_keyValuePair[0] == 'WidgetName'){ // _keyValuePair[0] : 파라미터 명
-		// _keyValuePair[1] : 파라미터 값
-		alert(_keyValuePair[1]);
-		
-	}
-}
 
+	
  $(function () {
     $(document).on('change', ':file', function () {
         var input = $(this), numFiles = input.get(0).files ? input.get(0).files.length : 1, label = input.val().replace(/\\/g, '/').replace(/.*\//, '');

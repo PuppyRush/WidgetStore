@@ -1,8 +1,10 @@
 <%@page import="javaBean.*"%>
 <%@page import="java.util.*"%>
 <%@page import="page.VerifyPage"%>
+<%@page import="property.enums.member.*" %>
 <%@page import="property.enums.*" %>
 
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%
 
@@ -149,7 +151,7 @@
 						</div>
 						<div class="modal-footer">
                             <div>
-								<a href="updateform.jsp?WidgetName=<%=WidgetName%>" class="btn btn-success">
+								<a href="updateform.jsp?WidgetName="as" class="btn btn-success">
 								<i class="glyphicon glyphicon-ok"></i> Do Update</a>
 								<button class="btn btn-danger" onclick="alert('Delete Success!');">
 								<i class="glyphicon glyphicon-trash"></i> Delete</button>

@@ -23,8 +23,9 @@ import com.oreilly.servlet.multipart.DefaultFileRenamePolicy;
 import javaBean.Member;
 import javaBean.MemberException;
 import property.commandAction;
-import property.enums.enumMemberState;
+import property.enums.member.enumMemberState;
 import property.enums.enumPage;
+import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
 
 public class UploadWidget implements commandAction {
 	
@@ -39,7 +40,7 @@ public class UploadWidget implements commandAction {
 	private String _contents, _sessionId, _kind;
 	private String _position;
 	private String _zipFileName;
-	private Map<String, String> _ImagesName;
+	private HashMap<Integer, String> _ImagesName;
 	private boolean _isSuccessZipFile; 
 	private String _widgetName;
 	private Member m;
@@ -51,7 +52,7 @@ public class UploadWidget implements commandAction {
 		Member mdb = new Member();
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		_isSuccessZipFile = false;
-		_ImagesName = new HashMap<String, String>();
+		_ImagesName = new HashMap<Integer, String>();
 		
 		String realFolder = "/upload/"; //properties파일이 저장된 폴더
 		ServletContext context = request.getServletContext();
@@ -107,70 +108,86 @@ public class UploadWidget implements commandAction {
 				folder.mkdirs();
 			
 			if(!m.isJoin())
-				throw new MemberException("이상 접근, 가입하지 않은 유저가 접근하였습니다", enumMemberState.NOT_JOIN);
+				throw new MemberException("이상 접근, 가입하지 않은 유저가 접근하였습니다", enumMemberState.NOT_JOIN, enumPage.MAIN);
 			
 			else if(!m.isLogin())
-				throw new MemberException("이상 접근, 로그인하지 않은 유저가 접근하였습니다", enumMemberState.NOT_LOGIN);
+				throw new MemberException("이상 접근, 로그인하지 않은 유저가 접근하였습니다", enumMemberState.NOT_LOGIN, enumPage.MAIN);
 			
 			@SuppressWarnings("unchecked")
+			int imageNumber=1;
 			String[] e = new File(_defaultTempPath).list();
 			for(String name : e){ 
 				String fullPath = _defaultTempPath + name;
 				int duplicatedNum=1;
 				File file = new File(fullPath);
 				//File file = multi.getFile(name);
-				if(!_isSuccessZipFile && file.getName().contains(".zip") || file.getName().contains(".7z")){
+				if(!_isSuccessZipFile && name.contains(".zip") || name.contains(".7z")){
 					_zipFileName = name;
 					_isSuccessZipFile = true;
 					fileMove(fullPath, _sourcePath+name);
 				}
-				else if(file.getName().contains("jpg") || file.getName().contains("jpeg") ||
-					file.getName().contains("tif") || file.getName().contains("bmp") || file.getName().contains("png") ){
-					if(!_ImagesName.containsKey(name))
-						_ImagesName.put(name,name);
-					else{
-						duplicatedNum++;
-						name = name+String.valueOf(duplicatedNum);
-						_ImagesName.put(name,name);
+				else if(name.contains(".jpg") || name.contains(".jpeg") ||
+						name.contains(".tif") || name.contains(".bmp") ||  name.contains(".png") ){
+				
+					String _tempString = 	name.substring(0, name.indexOf("."));
+					if(isInteger(_tempString)){
+						int _tempInt = Integer.valueOf(_tempString);
+						if(_ImagesName.containsKey(_tempInt))
+							throw new EvaluationException(enumEvalFailCase.IMAGE_ERROR);
+							
+						_ImagesName.put(_tempInt, name);
 					}
-						
+									
 					fileMove(fullPath, _imagePath+name);
 				}
 				
 			}
-			if(_ImagesName.size()==0)
-				throw new IOException("대표사진이 없습니다");
-			else if(!_isSuccessZipFile){
-				throw new IOException("압축파일이 전송되지 않았습니다.");
+			if(!_isSuccessZipFile){
+				throw new EvaluationException("압축파일이 업로드 되지 않았습니다.",enumEvalFailCase.NO_ZIPFILE);
+			}		
+			else if( _ImagesName.size()>0 &&  !_ImagesName.containsKey(new Integer(1))){
+				throw new EvaluationException("대표사진이 없습니다. 대표사진의 이름은 1로 설정하세요.",enumEvalFailCase.NO_IMAGE);
+			}		
+			else if(_ImagesName.containsKey(new Integer(2))){
+				throw new EvaluationException("예제사진이 없습니다.",enumEvalFailCase.NO_IMAGE);
 			}
-						
 			fileDelete(_defaultTempPath);
 		
 		}
-		
+		catch(EvaluationException e){
+			
+			//실패결과 통보하기 
+			returns.put("view", enumPage.UPDATE_WIDGET.getString());
+			returns.put("message", e.getMessage());
+			returns.put("isSuccessUpload", "false");
+			return returns;
+		}
 		catch(IOException e){
 			returns.put("view", enumPage.UPDATE_WIDGET.getString());
 			returns.put("message", "업로드파일 저장중 문제가 발생하였습니다.");
 			returns.put("isSuccessUpload", "false");
 			System.out.println(e.getMessage());
-			e.printStackTrace();
+	
 			return returns;
 		}
 		catch(Exception e){
-			returns.put("view", enumPage.UPDATE_WIDGET.getString());
+			returns.put("view", enumPage.UPLOAD_WIDGET.getString());
 			returns.put("message", "알수 없는 오류 발생.");
 			returns.put("isSuccessUpload", "false");
 			System.out.println(e.getMessage());
-			e.printStackTrace();
+
 			return returns;
 		}
 		
 	
 		
-		Runnable me = new ManageEvaluation(m, _widgetName, _zipFileName, (HashMap<String,String>)_ImagesName,_kind,false );
+		Runnable me = new ManageEvaluation(m, _widgetName,_contents, _zipFileName, _ImagesName,_kind,false );
 		Thread t = new Thread(me);
 		t.run();
 				
+		
+		
+		
 		
 		returns.put("view", enumPage.DEVELOPER.getString());
 		returns.put("isSuccessUpload", "true");
@@ -207,4 +224,17 @@ public class UploadWidget implements commandAction {
 		  File I = new File(deleteFileName);
 		  I.delete();
 		 }
+	 
+	 public static boolean isInteger(String s) {
+		    try { 
+		        Integer.parseInt(s); 
+		    } catch(NumberFormatException e) { 
+		        return false; 
+		    } catch(NullPointerException e) {
+		        return false;
+		    }
+		    // only got here if we didn't return false
+		    return true;
+		}
+	
 }

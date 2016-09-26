@@ -1,3 +1,6 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+
 <!doctype html>
 <html lang="en">
  <head>
@@ -6,7 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-  <title>Widget Store - 패스워드 변경</title>
+  <title>Widget Store - í¨ì¤ìë ë³ê²½</title>
   <link href="WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
@@ -29,7 +32,7 @@
 			<div class="modal-body">
 		    	<div id="div-edit-register-msg">
                     <div id="icon-edit-register-msg" class="glyphicon glyphicon-chevron-right"></div>
-                         <span id="text-register-msg">Change Password [아이디 들어갈 곳]</span>
+                         <span id="text-register-msg">Change Password [ìì´ë ë¤ì´ê° ê³³]</span>
                     </div>
 					<input id="register_edit_password1" name="register_edit_password1" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="password" placeholder="Password" required>
 					<input id="register_edit_password2" name="register_edit_password2" class="form-control" type="password" placeholder="Rewrite password" required>
@@ -51,7 +54,7 @@
 			return true;
 		}
 		else{
-			alert("패스워드가 일치하지 않습니다.");
+			alert("í¨ì¤ìëê° ì¼ì¹íì§ ììµëë¤.");
 			return false;
 		}
 	}

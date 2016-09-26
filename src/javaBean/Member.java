@@ -1,10 +1,22 @@
 package javaBean;
 
 import java.awt.Point;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.EnumMap;
+
+import org.apache.catalina.connector.Connector;
+
+import property.enums.enumPage;
+import property.enums.member.enumMemberAbnormalState;
+import property.enums.member.enumMemberState;
+import property.enums.member.enumMemberType;
 
 /**
  * member에 대한 객체 정보는 static 변수를 통해 참조하며 유저와 관련된 위젯들은 widget관련 변수를 통해 관리한다.
@@ -33,15 +45,18 @@ public class Member {
 		
 	}
 	
+	private static Connection conn = ConnectMysql.getConnector();
+	private EnumMap<enumMemberAbnormalState, Boolean> abnormalState;
 	private static Map<String, Member> MemberMap = new HashMap<String, Member>();
 	private DevelopedWidget developedWidget;
 	private DownloadedWidget downloadedWidget;
 	
 	public static final int DEFAULT_VALUE = -1;
 	private int id;
+	private int dev_id;
 	private String nickname;
-	private String password;
-	private String idType;
+	private String planPassword;
+	private enumMemberType userType;
 	private String email;
 	private Timestamp regDate;
 	private String sessionId;
@@ -49,14 +64,16 @@ public class Member {
 	private boolean isLogout;
 	private boolean isJoin;
 	private boolean isDeveloper;
-	
+		
 	
 	
 	public Member(){
 		id = DEFAULT_VALUE;
+		dev_id = DEFAULT_VALUE;
 		nickname="";
-		password="";
-		idType="";
+		planPassword="";
+		abnormalState = new EnumMap<>(enumMemberAbnormalState.class);
+		userType=enumMemberType.NOTHING;
 		email="";
 		regDate =  new Timestamp(System.currentTimeMillis());
 		sessionId= "";
@@ -65,22 +82,25 @@ public class Member {
 	}
 	
 	public Member(Member mdb){
+		abnormalState = mdb.abnormalState; 
+		dev_id = mdb.dev_id;
 		id = mdb.id;
 		nickname = new String(mdb.nickname);
-		password = new String(mdb.password.toString());
-		idType = new String(mdb.idType);
+		planPassword = new String(mdb.planPassword.toString());
+		userType = mdb.userType;
 		regDate = (Timestamp)mdb.regDate.clone();
 		developedWidget = mdb.developedWidget;
 		downloadedWidget = mdb.downloadedWidget;
 		developedWidget = mdb.developedWidget;
 	}
 	
-	public Member(int id, String email, String name, String pw, String idType, Timestamp reg_date){
+	public Member(int id, String email, String name, String pw, enumMemberType idType, Timestamp reg_date){
 		this.id = id;
+		this.dev_id = dev_id;
 		this.email = email;
 		this.nickname = name;
-		this.password = pw;
-		this.idType = idType;
+		this.planPassword = pw;
+		this.userType = idType;
 		this.regDate = reg_date;
 		this.developedWidget = null;
 		this.downloadedWidget = null;
@@ -100,22 +120,21 @@ public class Member {
 	public void setNickname(String name) {
 		this.nickname = name;
 	}
-	public String getPassword() {
-		return password;
+	public String getPlanePassword() {
+		return planPassword;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPlanePassword(String password) {
+		this.planPassword = password;
 	}
-	public String getIdType() {
-		return idType;
+	public enumMemberType getIdType() {
+		return userType;
 	}
-	public void setIdType(String idType) {
-		this.idType = idType;
+	public void setIdType(enumMemberType idType) {
+		this.userType = idType;
 	}
 	public String getEmail() {
 		return email;
 	}
-
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -125,6 +144,12 @@ public class Member {
 	}
 	public void setSessionId(String arg){
 		sessionId = arg;
+	}
+	public int getDeveloperId(){
+		return dev_id;
+	}
+	public void setDeveloperId(int id){
+		dev_id = id;
 	}
 	public boolean isLogin() {
 		return isLogin;
@@ -150,7 +175,8 @@ public class Member {
 		this.isLogout = isLogout;
 	}
 
-	public boolean isJoin() {
+	public boolean isJoin() {	
+			
 		return isJoin;
 	}
 
@@ -187,8 +213,113 @@ public class Member {
 		this.downloadedWidget = downloadedWidget;
 	}
 
+	public EnumMap<enumMemberAbnormalState, Boolean> getAbnormalState() {
+		return abnormalState;
+	}
+
+	public void setAbnormalState(EnumMap<enumMemberAbnormalState, Boolean> abnormalState) {
+		this.abnormalState = abnormalState;
+	}
+	
 	/////method/////
 	
+	/**
+	 * 	로그인 후 member객체의 정보를 모두 DB로 부터 읽어온다. 
+	 * @param sId		sessionId
+	 * @param nickname	페이지로부터 넘어온 nickname string
+	 * @throws Throwable member, sql exception을 던진다
+	 */
+	public static Member setMemberFromDB_Nickname(Member member, String sId, String nickname) throws Throwable{
+		
+	
+		PreparedStatement _ps = conn.prepareStatement("select * from user where nickname = ?");
+		_ps.setString(1, nickname);
+		ResultSet _rs = _ps.executeQuery();
+
+		if(_rs.next()){
+			
+			member.setNickname(nickname);
+			member.setId(_rs.getInt("u_id"));
+			member.setEmail(_rs.getString("email"));
+			member.setRegDate(_rs.getTimestamp("registrationDate"));
+			member.setSessionId(sId);
+			member.setJoin(true);
+			
+			boolean _isExist = false;
+			for(enumMemberType e : enumMemberType.values()){
+				if(e.getString().equals(_rs.getString("registrationKind"))){
+					_isExist = true;
+					member.setIdType(e);
+				}
+			}
+			if(!_isExist)
+				throw new MemberException(enumMemberState.NOT_EXIST_IN_DB, enumPage.MAIN);
+			
+			_ps = conn.prepareStatement("select d_id from developer where u_id = ?");
+			_ps.setInt(1, member.getId());
+			_rs = _ps.executeQuery();
+			
+			if(_rs.next()){
+				member.setDeveloperId(_rs.getInt("d_id"));
+				member.setDeveloper(true);
+			}
+			else
+				member.setDeveloper(false);
+			
+		}
+		
+		return member;
+	}
+	
+	
+	/**
+	 * 	로그인 후 member객체의 정보를 모두 DB로 부터 읽어온다. 
+	 * @param sId		sessionId
+	 * @param email	페이지로부터 넘어온 email string
+	 * @throws Throwable member, sql exception을 던진다
+	 */
+	public static Member setMemberFromDB_Email(Member member, String sId, String email) throws Throwable{
+		
+		
+		
+		PreparedStatement _ps = conn.prepareStatement("select * from user where email = ?");
+		_ps.setString(1, email);
+		ResultSet _rs = _ps.executeQuery();
+
+		if(_rs.next()){
+			
+			member.setEmail(email);
+			member.setId(_rs.getInt("u_id"));
+			member.setNickname(_rs.getString("nickname"));
+			member.setRegDate(_rs.getTimestamp("registrationDate"));
+			member.setSessionId(sId);
+			member.setJoin(true);
+			
+			boolean _isExist = false;
+			for(enumMemberType e : enumMemberType.values()){
+				if(e.getString().equals(_rs.getString("registrationKind"))){
+					_isExist = true;
+					member.setIdType(e);
+				}
+			}
+			if(!_isExist)
+				throw new MemberException(enumMemberState.NOT_EXIST_IN_DB, enumPage.MAIN);
+			
+			_ps = conn.prepareStatement("select d_id from developer where u_id = ?");
+			_ps.setInt(1, member.getId());
+			_rs = _ps.executeQuery();
+			
+			if(_rs.next()){
+				member.setDeveloperId(_rs.getInt("d_id"));
+				member.setDeveloper(true);
+			}
+			else
+				member.setDeveloper(false);
+			
+		}
+		return member;
+		
+	}
 	
 	public static boolean isContainsMember(String sId){
 		
@@ -217,13 +348,16 @@ public class Member {
 		}
 		else{
 			
-			member = new Member();
+			member = new Member();			 
+			
 			member.setSessionId(sId);
 			MemberMap.put(sId, member);
 		}
 		
 		return member;
 	}
+	
+
 	
 	public static void addMember(Member m){
 		Member.getMemberMap().put(m.getSessionId(), m);
@@ -252,7 +386,7 @@ public class Member {
 		
 		Member m = (Member )mdb;
 		
-		return ( id==m.getId() && password.equals(m.getPassword()) ) ? true : false;
+		return ( id==m.getId() && planPassword.equals(m.getPlanePassword()) ) ? true : false;
 	}
 	
 	public static Member makePerfectMember(String id){
@@ -265,10 +399,11 @@ public class Member {
 		m.setLogin(true);
 		m.setLogout(false);
 		m.setNickname("cks1023");
-		m.setPassword("1234");
+		m.setPlanePassword("1234");
 		
 		return m;
 	}
+
 
 
 

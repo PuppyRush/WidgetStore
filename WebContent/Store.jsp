@@ -1,7 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-
-	pageEncoding="UTF-8"%>
 
 <%@page import="java.util.*"%>
 <%@page import="javaBean.*"%>
@@ -19,7 +17,7 @@
 		
 		request.setAttribute("message",  (String)results.get("message"));
 		request.setAttribute("messageKind", results.get("messageKind"));
-	
+		response.sendRedirect(to.getString());
 		return;
 		
 	}else
@@ -375,7 +373,7 @@
  
  <script>
  //페이지 인증 성공 여부를 담는 변수 
- var isSuccessVerify = (Boolean)<%=isFailVerify%>;
+ var isSuccessVerify = (Boolean)<%=(boolean)isFailVerify%>;
 	
  
  </script>

@@ -1,5 +1,4 @@
 <%@page import="property.enums.enumCautionKind"%>
-<%@page import="property.enums.enumAttributeKey"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.Map.Entry"%>
 <%@page import="java.util.Properties"%>
@@ -13,11 +12,12 @@
 <%@page import="page.VerifyPage"%>
 <%@page import="property.enums.enumPage"%>
 
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
 <%
 
 	request.setCharacterEncoding("UTF-8");
-	boolean isFailVerify;
+ 	boolean isFailVerify;
 	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
 	if(!(boolean)results.get("isSuccessVerify")){
 		isFailVerify =false;
@@ -29,8 +29,9 @@
 		return;
 		
 	}else
-		isFailVerify = true;
-
+		isFailVerify = true; 
+		
+	
 %>
 
 <!DOCTYPE html>
@@ -107,16 +108,16 @@
                 <a href="#Sign Out" id="signOut" style="display:none;" onclick ="fun_signOut()" >Sign out</a>
             </li>
             <li>
-                <a href="Store.jsp" data-toggle="modal" >Store</a>
+                <a href="./Store.jsp" data-toggle="modal" >Store</a>
             </li>
             <li>
-                <a href="Cutsom.jsp"  data-toggle="modal">Custom</a>
+                <a href="./Cutsom.jsp"  data-toggle="modal">Custom</a>
             </li>
             <li>
                 <a href="Developer/ManageDeveloper.jsp" data-toggle="modal">Developer</a>
             </li>
             <li>
-                <a href="Settings.jsp">Setting</a>
+                <a href="./Settings.jsp">Setting</a>
             </li>
             <li>
                 <a href="#About" onclick = $("#menu-close").click(); >About</a>
@@ -163,7 +164,7 @@
                                 <button id="login_register_btn" type="button" class="btn btn-link">Register</button>
                             </div>
 				        </div>
-				        <input type="hidden" name="idType" value="inner">
+				        <input type="hidden" name="idType" value="nothing">
                     </form>
                     <!-- End # Login Form -->
                     
@@ -189,7 +190,7 @@
                     <!-- End | Lost Password Form -->
                     
                     <!-- Begin | Register Form -->
-                    <form id="register-form" style="display:none;" method="GET" ACTION="join.do">
+                    <form id="register-form" style="display:none;" method="POST" ACTION="join.do">
             		    <div class="modal-body">
 		    				<div id="div-register-msg">
                                 <div id="icon-register-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -210,7 +211,7 @@
                             </div>
 		    		    </div>
 		    		   			 <input class="sessionId" name="sessionId" type="hidden" />
-		    		  			  <input type="hidden" name="idType" value="inner">
+		    		  			  <input type="hidden" name="idType" value="nothing">
                     </form>
                     <!-- End | Register Form -->
                 </div>
@@ -260,7 +261,7 @@
 <!-- 이하는 폼태그만 존재  -->
 
 	<form method="GET" ACTION="logout.do" id="logout-form">
-		<input id="sessionId_logout" type="hidden" />
+		<input id="sessionId" name="sessionId"  type="hidden" value=<%=session.getId() %> />
 	</form>
 	
 
@@ -284,7 +285,7 @@
     <script>
     
     //페이지 인증 성공 여부를 담는 변수 
- var isSuccessVerify = (Boolean)<%=isFailVerify%>;
+ <%-- var isSuccessVerify = (Boolean)<%=isFailVerify%>; --%>
  	var id = "<%=session.getId()%>";
     
 	window.onload=function(){

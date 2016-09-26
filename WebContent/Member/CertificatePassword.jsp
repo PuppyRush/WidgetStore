@@ -1,3 +1,33 @@
+
+<%@page import="javaBean.*"%>
+<%@page import="java.util.*"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.enumPage"%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%
+
+/* 	request.setCharacterEncoding("UTF-8");
+	boolean isFailVerify;
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	if(!(boolean)results.get("isSuccessVerify")){
+		isFailVerify =false;
+		enumPage to = (enumPage)results.get("to");
+		
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+
+		return;
+		
+	}else
+		isFailVerify = true; */
+
+%>
+
+
+
+
 <!doctype html>
 <html lang="en">
  <head>
@@ -6,7 +36,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-  <title>Widget Store - 인증번호 입력</title>
+  <title>Widget Store - ì¸ì¦ë²í¸ ìë ¥</title>
   <link href="WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
@@ -25,17 +55,17 @@
 					
 				</div>
     <div id="div-forms">
-		<form id="register-edit-form"  method="GET" ACTION="CheckAuthNum.do">
+		<form id="register-edit-form"  method="GET" ACTION="checkCertificationLostPw.do">
 			<div class="modal-body">
 		    	<div id="div-edit-register-msg">
                     <div id="icon-edit-register-msg" class="glyphicon glyphicon-chevron-right"></div>
-                         <span id="text-register-msg">check Num</span>
+                         <span id="text-register-msg">인증번호 입력</span>
                     </div>
-					<input id="chkNum" class="form-control" title="minimum is 8 characters. and contain special character, numeric" type="text" placeholder="Input Num" required>
+					<input id="chkNum" class="form-control" title="" type="text" placeholder="이메일로 전송된 비밀번호를 입력하세요." required>
 					</div>
 				<div class="modal-footer">
                     <div>
-                         <button type="submit" class="btn btn-primary btn-lg btn-block">submit</button>
+                         <button type="submit" class="btn btn-primary btn-lg btn-block">확인하기</button>
 					</div>
                 </div>
 			</div>

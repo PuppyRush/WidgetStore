@@ -1,5 +1,6 @@
 package store.develop;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -8,6 +9,8 @@ import org.jsoup.Jsoup;
 
 import javaBean.ConnectMysql;
 import javaBean.Member;
+import mail.PostMan;
+import property.enums.enumSystem;
 import property.enums.widget.enumWidgetEvaluation;
 import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
 import property.enums.widget.enumWidgetKind;
@@ -17,7 +20,7 @@ import property.enums.widget.enumWidgetPosition;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-
+import javax.portlet.WindowStateException;
 import javax.xml.parsers.*;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -27,6 +30,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
@@ -78,12 +82,17 @@ public class ManageEvaluation implements Runnable{
 		public boolean isExistRecommand;
 		public boolean _isSupportResolution;
 		public String _resolutionMethod;
-		public HashMap<Integer, Ratio> _ratioMap;
+		public ArrayList<Ratio> _ratioArray;
 	
 		public String _iconPath;
 		
 		public RecommandInfo(){
-			_ratioMap = new HashMap<Integer, Ratio>();
+			_ratioArray = new ArrayList<Ratio>();
+			minWidthSize=0;
+			maxWidthSize=0;
+			maxHeightSize=0;
+			minHeightSize=0;
+			_resolutionMethod="unsupported";
 		}
 	}
 	
@@ -103,6 +112,7 @@ public class ManageEvaluation implements Runnable{
 	
 	private int manifestVersion;
 	private float version;
+	private final String contents;
 	private final String defaultPath;
 	private final String zipFileName;
 	private final String widgetRoot;
@@ -114,22 +124,19 @@ public class ManageEvaluation implements Runnable{
 	private enumWidgetKind kind;
 	private enumWidgetPosition position;
 
-	
-
-
 	private String rootUrl;
-	private final HashMap<String, String> imagesNames;
+	private final HashMap<Integer, String> imagesNames;
 	private enumWidgetEvaluation evaluationResult;
 
+	Connection conn = ConnectMysql.getConnector();
 	
-	public ManageEvaluation(Member member, String widgetName, String zipFileName, HashMap<String, String> images, String kind, boolean isUpdate) throws Exception{
+	public ManageEvaluation(Member member, String widgetName,String contents, String zipFileName, HashMap<Integer, String> images, String kind, boolean isUpdate) throws Exception{
 	
-		if(member==null || widgetName == null || zipFileName == null || images ==null || kind==null)
+		if(member==null || widgetName == null || zipFileName == null || images ==null || kind==null || contents==null)
 			throw new NullPointerException("ManageEvaluation 생성자의 파라메타에 null 존재합니다.");
 		
-		this.isUpdate = isUpdate;
-		this.kind = null;
-		
+	
+		this.kind = null;		
 		for(enumWidgetKind k : enumWidgetKind.values()){
 			if(k.getString().equals(kind)){
 				this.kind = k;
@@ -139,8 +146,9 @@ public class ManageEvaluation implements Runnable{
 		if(this.kind == null){
 			throw new Exception("파라미터로 넘어온 position 값이 시스템에 존재하지 않습니다. ");
 		}
-
-
+		
+		this.isUpdate = isUpdate;
+		this.contents = contents;
 		this.imagesNames = images;
 		this.zipFileName = zipFileName;	
 		this.defaultPath = "/home/cmk/workspace/WidgetStore/WebContent/upload/"; 
@@ -149,6 +157,7 @@ public class ManageEvaluation implements Runnable{
 		this.widgetRoot = (new StringBuilder(defaultPath).append(member.getId()).append("/").append(widgetName).append("/")).toString();
 		this.git = new GitInfo();
 		
+		conn = ConnectMysql.getConnector();
 	}
 
 
@@ -156,20 +165,27 @@ public class ManageEvaluation implements Runnable{
 		
 		enumWidgetEvaluation eval = enumWidgetEvaluation.EVALUATING;
 		
-		try {
-			
-			
+		try {			
 			
 			zipDecompress(zipFileName);
+			
+			if(isUpdate){
+				eval = VerifyUpdateWidget(eval);
+			}
+			
 			checkJavaScript(eval);
 			checkManifestOfRequired(eval);
 			
-			if(isUpdate)
-				;
+			if(isUpdate){
+				addUpdatingWidget(eval);		
+			}
 			else
 				addEvaluatingWidget(eval);
 			
-		} catch (IOException e) {
+		}catch(EvaluationException e){
+			PostMan.sendFailEvaluation(widgetName, member.getNickname(), e.getMessage(), member.getEmail());
+		}
+		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
@@ -241,9 +257,7 @@ public class ManageEvaluation implements Runnable{
    }
 	      
   
-  
-
-   private enumWidgetEvaluation checkManifestOfRequired(enumWidgetEvaluation eval){
+   private enumWidgetEvaluation checkManifestOfRequired(enumWidgetEvaluation eval) throws EvaluationException{
 	   
 	  
 	   
@@ -454,11 +468,12 @@ public class ManageEvaluation implements Runnable{
 
 			e1.printStackTrace();
 		}
-		catch (EvaluationException e1){
+	/*	catch (EvaluationException e1){
 			eval.setErrMsg(e1.getMessage());
 			eval = enumWidgetEvaluation.UNALLOWANCE;
 			eval.setFailCase(e1.getFailCsae());
-		}
+
+		}*/
 		
 		return eval;
   	}  
@@ -469,8 +484,9 @@ public class ManageEvaluation implements Runnable{
     * @param __col  origin manifest를 파싱하기 위한 node 변수
     * @param eval   required의 eval변수를 받는다.
     * @return 위젯심사 결과를 리턴한다.
+ * @throws EvaluationException 
     */
-   private enumWidgetEvaluation checkManifestOfRecommand(enumWidgetEvaluation eval){ 
+   private enumWidgetEvaluation checkManifestOfRecommand(enumWidgetEvaluation eval) throws EvaluationException{ 
 	   
 
 		///////////////recommand 시작////////////////
@@ -500,8 +516,8 @@ public class ManageEvaluation implements Runnable{
 			
 			
 			
-			_col = (Node)_xpath.evaluate("*/recommanded/support_resolution", _doc, XPathConstants.NODE);
-			__col = (Node)_xpath.evaluate("*/recommanded/support_resolution", __doc, XPathConstants.NODE);
+			_col = (Node)_xpath.evaluate("*/recommanded/isSupportResolution", _doc, XPathConstants.NODE);
+			__col = (Node)_xpath.evaluate("*/recommanded/isSupportResolution", __doc, XPathConstants.NODE);
 			if(!_col.getNodeName().equals( __col.getNodeName() ))
 				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다.",   enumEvalFailCase.MANIFEST_ERROR);
 			
@@ -536,8 +552,7 @@ public class ManageEvaluation implements Runnable{
 								wSize = Integer.valueOf(preSplitSize[0]);
 								hSize = Integer.valueOf(preSplitSize[1]);
 								
-								recommandInfo._ratioMap.put(Integer.valueOf(i), 
-										new store.develop.ManageEvaluation.RecommandInfo.Ratio(wRatio, hRatio, wSize, hSize));
+								recommandInfo._ratioArray.add(new store.develop.ManageEvaluation.RecommandInfo.Ratio(wRatio, hRatio, wSize, hSize));
 							}
 
 							break;
@@ -635,11 +650,7 @@ public class ManageEvaluation implements Runnable{
 				
 				
 			}
-		}catch(EvaluationException e1){
-			eval.setErrMsg(e1.getMessage());
-			eval = enumWidgetEvaluation.UNALLOWANCE;
-			eval.setFailCase(e1.getFailCsae());
-		} catch (ParserConfigurationException e) {
+		}catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -656,10 +667,9 @@ public class ManageEvaluation implements Runnable{
 		return eval;
 	   
    }
+ 
 
-  
-
-   private enumWidgetEvaluation checkManifestOfOptional(enumWidgetEvaluation eval){ 
+   private enumWidgetEvaluation checkManifestOfOptional(enumWidgetEvaluation eval) throws EvaluationException{ 
 	   
 
 	   String _manifesetPath = "/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml";
@@ -686,10 +696,6 @@ public class ManageEvaluation implements Runnable{
 			XPath  __xpath = XPathFactory.newInstance().newXPath();
 			
 
-		}catch(EvaluationException e1){
-			eval.setErrMsg(e1.getMessage());
-			eval = enumWidgetEvaluation.UNALLOWANCE;
-			eval.setFailCase(e1.getFailCsae());
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -712,7 +718,6 @@ public class ManageEvaluation implements Runnable{
 	   return eval;
    }
    
-
    public void wholeHtmlPaser(String url){
 			
 		org.jsoup.nodes.Document doc = null;
@@ -726,7 +731,6 @@ public class ManageEvaluation implements Runnable{
 		
 		
 	}
-   
 
 
    public static boolean isInteger(String s) {
@@ -742,27 +746,6 @@ public class ManageEvaluation implements Runnable{
 		}
 	
 
-   private void fileMove(String inFileName, String outFileName) {
-	try {
-	   FileInputStream fis = new FileInputStream(inFileName);
-	   FileOutputStream fos = new FileOutputStream(outFileName);
-	   
-	   int data = 0;
-	   while((data=fis.read())!=-1) {
-	    fos.write(data);
-	   }
-	   fis.close();
-	   fos.close();
-	   
-	   //복사한뒤 원본파일을 삭제함
-	   fileDelete(inFileName);
-	   
-	  } catch (IOException e) {
-	   // TODO Auto-generated catch block
-	   e.printStackTrace();
-	  }
-	 }
-	 
 
    private void fileDelete(String deleteFileName) {
 
@@ -772,46 +755,343 @@ public class ManageEvaluation implements Runnable{
 		 }
 
 
-   private void updateWidget(enumWidgetEvaluation eval){
+   private enumWidgetEvaluation VerifyUpdateWidget(enumWidgetEvaluation eval) throws EvaluationException, SQLException{
 	
 	   
-	   
+	   String _manifesetPath = "/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml";
+	   String _xmlPath = widgetRoot + "temp/source/manifest.xml";
+	   File _mf = new File(_xmlPath );
+	   File _origin = new File(_manifesetPath);
+   	
+	   PreparedStatement _ps = null;
+	   ResultSet _rs = null;
+   		
+
+		try {
+					
+			if(!_mf.exists())
+		   		throw new EvaluationException("매니페스트 파일이 없습니다.", enumEvalFailCase.NO_MANIFEST);
+		   	
+			
+			// __는 위젯스토어에 존재하는 최신버전의 매니페스트 값들을 위한 변수
+			//_는 사용자의 매니페스트 값을 위한 변수		
+			DocumentBuilder _builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document _doc = _builder.parse(new File(_xmlPath));
+			XPath  _xpath = XPathFactory.newInstance().newXPath();
+			Node _col = (Node)_xpath.evaluate("/WidgetStore/required/widget/name", _doc, XPathConstants.NODE);
+			
+			DocumentBuilder __builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+			Document __doc = __builder.parse(new File(_manifesetPath));
+			XPath  __xpath = XPathFactory.newInstance().newXPath();
+			Node __col = (Node)__xpath.evaluate("/WidgetStore/required/widget/name", __doc, XPathConstants.NODE);
+			
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다." ,   enumEvalFailCase.MANIFEST_ERROR);
+			
+			String _wName = _col.getTextContent();
+			
+			
+			_col = (Node)_xpath.evaluate("/WidgetStore/required/widget/version", _doc, XPathConstants.NODE);
+			__col = (Node)__xpath.evaluate("/WidgetStore/required/widget/version", __doc, XPathConstants.NODE);
+			if(!_col.getNodeName().equals( __col.getNodeName() ))
+				throw new EvaluationException(__col.getNodeName()+"이 존재하지 않습니다." ,   enumEvalFailCase.MANIFEST_ERROR);
+			String _ver = _col.getTextContent();
+			if(!_ver.contains("."))
+				_ver+=".0";
+			if(!_ver.matches("[0-9]+(\\.[0-9][0-9]?)?")) {
+				throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력하세요.",   enumEvalFailCase.MANIFEST_ERROR);
+			}
+			float _newVersion = Float.parseFloat(_ver);	
+			
+			//DB와 비교뒤 결정.
+									
+			_ps = conn.prepareStatement("select title, currentVersion from widget where developer = ? ");
+			_ps.setInt(1, member.getDeveloperId());
+			_rs = _ps.executeQuery();
+			
+			if(_rs.next()){
+				if(!_rs.getString("title").equals(_wName))					
+					throw new EvaluationException("위젯의 이름은 최초의 매니페스트 등록파일에 등록한 이름과 같아야 합니다." ,   enumEvalFailCase.MANIFEST_ERROR);
+				
+				float _maniVer = _rs.getFloat("currentVersion");
+				if(_maniVer >= _newVersion)
+					throw new EvaluationException("새로운 업데이트 버전은 이전보다 버전보다 상위여야(커야)합니다.." ,   enumEvalFailCase.MANIFEST_ERROR);
+			}else
+				throw new SQLException("DB오류. 관리자에게 문의하세요.");
+								
+			
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		 finally {
+				if (_ps != null)
+					try {
+						_ps.close();
+					} catch (SQLException ex) {
+					}
+				if (_rs != null)
+					try {
+						_rs.close();
+					} catch (SQLException ex) {
+					}
+			
+			}
+			  
+	   return eval;
    	
    	}
    
+   private enumWidgetEvaluation addUpdatingWidget(enumWidgetEvaluation  eval) throws SQLException{
+   		
+	   ResultSet _rs = null;
+	   PreparedStatement _ps = null;
+		try{
+		  if(conn.isClosed()){
+				eval = enumWidgetEvaluation.UNALLOWANCE;
+			  throw new SQLException("DB오류. 개발자에게 문의하세요. ");
+		  	}
+		  	conn.setAutoCommit(false);
+		  	
+		  	
+		  	////////////to get oldManifest key
+		  	int _oldManifestId;
+		  	
+		  	_ps = conn.prepareStatement("select manifest_id from widget where developer = ? ");
+		  	_ps.setInt(1, member.getDeveloperId());
+		  	
+		  	_rs = _ps.executeQuery();
+		  	if(_rs.next())
+		  		_oldManifestId = _rs.getInt("manifest_id");
+		  	else
+		  		throw new SQLException();
+		  		
+		  	
+		  	
+		  	//////////// evaluationManifest table
+		  	
+			_ps = conn.prepareStatement("insert into evaluationManifest (manifest_version,   widget_version,    widget_kind,   git_tag,   git_branch, "
+					+ "is_support_resolution, resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? ,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			
+			_ps.setInt(1, manifestVersion); 
+			_ps.setFloat(2, widgetVersion);
+			_ps.setString(3, kind.getString());
+			_ps.setString(4, git._tag);
+			_ps.setString(5, git._branch);
+			if(recommandInfo._isSupportResolution){
+				_ps.setInt(6, 1);
+			}
+			else
+				_ps.setInt(6, 0);
+			
+			_ps.setString(7, recommandInfo._resolutionMethod);
+			_ps.setInt(8, recommandInfo.maxHeightSize);
+			_ps.setInt(9, recommandInfo.maxWidthSize);
+			_ps.setInt(10, recommandInfo.minWidthSize);
+			_ps.setInt(11, recommandInfo.minHeightSize);
+			
+			_ps.executeUpdate();
+		
+			_rs = _ps.getGeneratedKeys();
+			_rs.next();
+			int _newManifestId = _rs.getInt(1);
+		  	
+			if(recommandInfo._isSupportResolution){
+				for(store.develop.ManageEvaluation.RecommandInfo.Ratio ary : recommandInfo._ratioArray){
+					_ps = conn.prepareStatement("insert into widgetRatio (manifest_id, widthRatio, heightRatio, widthSize, heightSize) values (?,?,?,?,?) ");
+					_ps.setInt(1,_newManifestId);
+					_ps.setInt(2,ary.widthRatio);
+					_ps.setInt(3,ary.heightRatio);
+					_ps.setInt(4,ary.widthSize);
+					_ps.setInt(5,ary.heightSize);
+					
+					_ps.executeUpdate();
+				}
+			}
+			
+			///////////////widgetEvaluation Table
+			
+		  	_ps = conn.prepareStatement("insert into widgetEvaluation ( evalState, developer, manifest_id) values (?,?,?)");
+		  	 	  	
+		  	int evalState = Integer.valueOf(eval.getString());
+		  	_ps.setInt(1, evalState);
+		  	_ps.setInt(2, member.getDeveloperId());
+		  	_ps.setInt(3, _newManifestId);
+		  	_ps.executeUpdate();
+
+		  	//////////// widget table
+		  	
+			_ps = conn.prepareStatement("insert into widget (developer,title, kind, currentVersion, registrationPosition, HTML, manifest_id)"
+					+ " values(?,?,?,  ?,?,?,?) ", PreparedStatement.RETURN_GENERATED_KEYS);
+			
+			_ps.setInt(1, member.getDeveloperId());
+			_ps.setString(2, widgetName);
+			_ps.setString(3, kind.getString());
+			_ps.setFloat(4, widgetVersion);
+			_ps.setString(5,position.getString());
+			
+			_ps.setString(6, new StringBuilder(widgetRoot).append(enumSystem.SOURCE_FOLDER_NAME).append("/").append(rootUrl).toString());
+			_ps.setInt(7, _newManifestId);
+			
+			_ps.executeUpdate();
+			_rs = _ps.getGeneratedKeys();
+			_rs.next();
+			int _wId= _rs.getInt(1);
+			
+			/////////////////widgetDetail Table
+			
+			_ps = conn.prepareStatement("insert into widgetDetail (widget_num, main_image, sub_image, explane,widgetRoot) values(?,?,?)");
+			_ps.setInt(1, _wId);
+			_ps.setString(2, new StringBuilder(widgetRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+			_ps.setString(3, new StringBuilder(widgetRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+			_ps.setString(4, contents);
+			_ps.setString(5, widgetRoot);
+			_ps.executeUpdate();
+			
+			///////////////////tempUpdatingWidget Table
+			
+			_ps = conn.prepareStatement("insert into tempUpdatingWidget (old_id,new_id,contents) values(?,?,?)");
+			_ps.setInt(1, _oldManifestId);
+			_ps.setInt(2, _newManifestId);
+			_ps.setString(3, contents);
+			
+			
+		  	conn.commit();
+		
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+		
+		}
+		  
+		
+	   return eval;
+   	}
+   
    private void addEvaluatingWidget(enumWidgetEvaluation eval) throws SQLException{
-	   Connection conn = ConnectMysql.getConnector();
- 
+	    
+   ResultSet _rs = null;
+   PreparedStatement _ps = null;
 	try{
 	  if(conn.isClosed()){
 			eval = enumWidgetEvaluation.UNALLOWANCE;
-		  throw new SQLException();
+		  throw new SQLException("DB오류. 개발자에게 문의하세요. ");
 	  	}
 	  	conn.setAutoCommit(false);
 	  	
-	  	PreparedStatement st = conn.prepareStatement("insert into widgetEvaluation ( evalState, failNum, evaluationBeginDate, evaluationEndDate) values (?,?,?,?,?)");
+	  	//////////// evaluationManifest table
 	  	
-	  	int evalState = Integer.valueOf(eval.getString());
-	  	int failNum = Integer.valueOf(eval.getFailCase().getString());
-	  	Timestamp date = new Timestamp(System.currentTimeMillis());
-	  	st.setInt(1, evalState);
-	  	st.setInt(2, failNum);
-	  	st.setTimestamp(3, date);
-	  	st.setTimestamp(4, date);
-	  	st.executeUpdate();
-	  	
-	  	st = conn.prepareStatement("insert into widgetStore ( evalState, failNum, evaluationBeginDate, evaluationEndDate) values (?,?,?,?,?)");
-	  	//등록..
-	  	
-	  	st.executeUpdate();
-	  	
-	  	conn.commit();
-	}
-  catch(SQLException e){
-		eval.setFailCase(enumEvalFailCase.UNKWON_ERROR);
-		e.printStackTrace();
+		_ps = conn.prepareStatement("insert into evaluationManifest (manifest_version,   widget_version,    widget_kind,   git_tag,   git_branch, "
+				+ "is_support_resolution, resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? ,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 		
+		_ps.setInt(1, manifestVersion); 
+		_ps.setFloat(2, widgetVersion);
+		_ps.setString(3, kind.getString());
+		_ps.setString(4, git._tag);
+		_ps.setString(5, git._branch);
+		if(recommandInfo._isSupportResolution){
+			_ps.setInt(6, 1);
+		}
+		else
+			_ps.setInt(6, 0);
+		
+		_ps.setString(7, recommandInfo._resolutionMethod);
+		_ps.setInt(8, recommandInfo.maxHeightSize);
+		_ps.setInt(9, recommandInfo.maxWidthSize);
+		_ps.setInt(10, recommandInfo.minWidthSize);
+		_ps.setInt(11, recommandInfo.minHeightSize);
+		
+		_ps.executeUpdate();
+	
+		_rs = _ps.getGeneratedKeys();
+		_rs.next();
+		int _maniId = _rs.getInt(1);
+	  	
+		if(recommandInfo._isSupportResolution){
+			for(store.develop.ManageEvaluation.RecommandInfo.Ratio ary : recommandInfo._ratioArray){
+				_ps = conn.prepareStatement("insert into widgetRatio (manifest_id, widthRatio, heightRatio, widthSize, heightSize) values (?,?,?,?,?) ");
+				_ps.setInt(1,_maniId);
+				_ps.setInt(2,ary.widthRatio);
+				_ps.setInt(3,ary.heightRatio);
+				_ps.setInt(4,ary.widthSize);
+				_ps.setInt(5,ary.heightSize);
+				
+				_ps.executeUpdate();
+			}
+		}
+		
+		///////////////widgetEvaluation Table
+		
+	  	_ps = conn.prepareStatement("insert into widgetEvaluation ( evalState, developer, manifest_id) values (?,?,?)");
+	  	 	  	
+	  	int evalState = Integer.valueOf(eval.getString());
+	  	_ps.setInt(1, evalState);
+	  	_ps.setInt(2, member.getDeveloperId());
+	  	_ps.setInt(3, _maniId);
+	  	_ps.executeUpdate();
+
+	  	//////////// widget table
+	  	
+		_ps = conn.prepareStatement("insert into widget (developer,title, kind, currentVersion, registrationPosition, registrationDate, HTML, manifest_id)"
+				+ " values(?,?,?,?,  ?,?,?,?) ", PreparedStatement.RETURN_GENERATED_KEYS);
+		
+		_ps.setInt(1, member.getDeveloperId());
+		_ps.setString(2, widgetName);
+		_ps.setString(3, kind.getString());
+		_ps.setFloat(4, widgetVersion);
+		_ps.setString(5,position.getString());
+		_ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()) );
+		_ps.setString(7, new StringBuilder(widgetRoot).append(enumSystem.SOURCE_FOLDER_NAME).append("/").append(rootUrl).toString());
+		_ps.setInt(8, _maniId);
+		
+		_ps.executeUpdate();
+		_rs = _ps.getGeneratedKeys();
+		_rs.next();
+		int _wId= _rs.getInt(1);
+		
+		/////////////////widgetDetail Table
+		
+		_ps = conn.prepareStatement("insert into widgetDetail (widget_num, main_image, sub_image, explane, widgetRoot) values(?,?,?)");
+		_ps.setInt(1, _wId);
+		_ps.setString(2, new StringBuilder(widgetRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+		_ps.setString(3, new StringBuilder(widgetRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+		_ps.setString(4, contents);
+		_ps.setString(5, widgetRoot);
+		_ps.executeUpdate();
+		
+	  	conn.commit();
+	  	
 	}
+	 finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+		
+		}
 		  
 		
 	   

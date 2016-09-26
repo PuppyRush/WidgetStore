@@ -1,4 +1,18 @@
-<%@page import="property.enums.enumCautionKind" %>
+
+<%@page import="javaBean.*"%>
+<%@page import="java.util.*"%>
+<%@page import="page.VerifyPage"%>
+<%@page import="property.enums.member.*" %>
+<%@page import="property.enums.*" %>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
+
 
 <!doctype html>
 <html lang="en">
@@ -8,7 +22,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-  <title>Widget Store - 패스워드 변경</title>
+  <title>Administrator Page</title>
   <link href="../WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
 
@@ -33,7 +47,7 @@
 					
 				</div>
     <div id="div-forms">
-                 <form id="login-form" method="POST" ACTION="login.do" >
+                 <form id="login-form" method="POST" ACTION="LoginManager.do" >
 		                <div class="modal-body">
 				    		<div id="div-login-msg">
                                 <div id="icon-login-msg" class="glyphicon glyphicon-chevron-right"></div>
@@ -41,16 +55,15 @@
                             </div>
 				    		<input id="login_username" name="login_username" class="form-control" type="text" placeholder="Username" required>
 				    		<input id="login_password" name="login_password" class="form-control" type="password" placeholder="Password" required>
-				    			<input class="sessionId" name="sessionId" type="hidden" />
-				    			<input type="hidden" name="idType" value="inner">
+				    			<input class="sessionId" name="sessionId" type="hidden" value="<%=session.getId() %>" />
                             <div class="checkbox">
                                 <label>
                                     <input type="checkbox"> Remember me
                                 </label>
                             </div>
         		    	</div>
-				   
-				        		<button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+				   <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+				      
               </form>
 		</div>
 	</div>    
@@ -66,7 +79,7 @@
 	<script>
 	
 	var error_color;
-	var id = "<%=session.getId() %>";
+
 	<% if(session.getAttribute("messageKind")!=null){
 	 %>
 	  error_color ="<%=((enumCautionKind)session.getAttribute("messageKind")).getString() %>";
@@ -78,11 +91,9 @@
 	<%
 	  }
 	%>
-	
-	var id = "<%=session.getId() %>";
-	
 	var from = "<%=(String)session.getAttribute("from") %>";
 	var message = "<%=(String)session.getAttribute("message") %>";
+	
 	window.onload=function(){
 			
 	<%
@@ -104,7 +115,7 @@
 			return true;
 		}
 		else{
-			alert("패스워드가 일치하지 않습니다.");
+			alert("í¨ì¤ìëê° ì¼ì¹íì§ ììµëë¤.");
 			return false;
 		}
 	}

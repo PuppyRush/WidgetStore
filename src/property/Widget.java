@@ -169,5 +169,13 @@ public class Widget {
 		
 	}
 
+	public enumWidgetKind getKind() {
+		return kind;
+	}
+
+	public void setKind(enumWidgetKind kind) {
+		this.kind = kind;
+	}
+
 		
 }

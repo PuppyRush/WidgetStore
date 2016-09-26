@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <WidgetStore>
     <required>
-        <manifest_version>1</manifest_version>				<!-- only use integer-->
+        <manifest_version>2</manifest_version>				<!-- only use integer-->
         <widget>
             <name>MyWidget</name>
             <version>1.0</version>								<!-- dont use charater only use integer or decimal-->
@@ -18,8 +18,8 @@
      </required>
 
     <recommanded>
-        <support_resolution>yes</support_resolution>      <!--default:"no", {"yes","no"}-->
-        <resolution method="ratio"/>                      <!--default:"unsupported" ,{"unsupported","ratio","free","auto"}-->
+        <isSupportResolution>yes</isSupportResolution>      <!--default:"no", {"yes","no"}-->
+        <resolution method="ratio"/>                      <!--default:"unsupported" {"unsupported", "ratio","free","auto"}-->
             <ratio>
                 <ratio value="1:1" size="300,300"/>
                 <ratio value="3:4" size="300,400"/>

@@ -10,14 +10,17 @@
  */
 
 // t: current time, b: begInnIng value, c: change In value, d: duration
-jQuery.easing['jswing'] = jQuery.easing['swing'];
 
-jQuery.extend( jQuery.easing,
+	JQurey.easing['jswing'] = JQurey.easing['swing'];
+
+
+
+	JQurey.extend( JQurey.easing,
 {
 	def: 'easeOutQuad',
 	swing: function (x, t, b, c, d) {
 		//alert(jQuery.easing.default);
-		return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
+		return JQurey.easing[JQurey.easing.def](x, t, b, c, d);
 	},
 	easeInQuad: function (x, t, b, c, d) {
 		return c*(t/=d)*t + b;
@@ -144,3 +147,4 @@ jQuery.extend( jQuery.easing,
 		return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
 	}
 });
+
