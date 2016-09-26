@@ -19,8 +19,8 @@ public enum enumPage {
 		REGSTRY_DEVELOPER("Member/RegistryDeveloper.jsp"),
 	
 	DEVELOPER("Developer/ManageDeveloper.jsp"),
-		UPLOAD_WIDGET("UploadForm.jsp"),		//  /Developer 폴더에서 시작.
-		UPDATE_WIDGET("UpdateForm.jsp"),
+		UPLOAD_WIDGET("Developer/UploadForm.jsp"),		//  /Developer 폴더에서 시작.
+		UPDATE_WIDGET("Developer/UpdateForm.jsp"),
 	
 	SETTINGS("Settings.jsp"),
 	CUSTOM("Custom.jsp"),

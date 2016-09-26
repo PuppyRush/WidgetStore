@@ -6,6 +6,9 @@
 
 /* Global Styles */
 
+
+.highlight { background-color: red; }
+
 body {
     margin-top: 100px;
     background-color: #222;

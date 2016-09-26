@@ -153,14 +153,14 @@
 					<thead>
 						<tr>
 							<th>NO.</th>
+							<th></th>
 							<th>개발자</th>
 							<th>위젯 이름</th>
-
-								<div class="input-group date allowDate " data-date=""
+							<th>
+								<div class="input-group date allowDate " id='datetimepicker10' data-date=""
 									data-date-format="dd MM yyyy" data-link-field="dtp_input2"
 									data-link-format="yyyy-mm-dd">
-									<input class="form-control" size="16" type="text"
-										value="등록 날짜 " readonly>
+									<input class="form-control" size="16" type="text"		readonly>
 									<span class="input-group-addon"><span
 										class="glyphicon glyphicon-calendar"></span></span>
 								</div>
@@ -181,6 +181,7 @@
 						</tr>
 					</tbody>
 				</table>
+				
 				<div class="container">
 
 					<div class="row">
@@ -191,7 +192,7 @@
 							</div>
 						</div>
 						<div class="col-md-9">
-							<iframe width="600" height="400" src="http://www.daum.net/"
+							<iframe  width="600" height="400" src="http://www.daum.net/"
 								scrolling="yes"> </iframe>
 						</div>
 					</div>
@@ -213,6 +214,10 @@
 		charset="UTF-8"></script>
 	<script type="text/javascript"
 		src="/AdminPage/js/locales/bootstrap-datetimepicker.ko.js" charset="UTF-8"></script>
+<script src="/AdminPage/js/commanJs.js"></script>
+
+</body>
+
 	<script>
 	$(document).ready( function() {
 				
@@ -247,11 +252,52 @@
  
 	</script>
 
-</body>
 
 <script>
 
+$( document ).ready(function() {
+	$(".acceptWidget").on( 'click', function() {
+	 var data = "";
+	 var id = $(this).val();
+				alert(id);
+	 //jQuery의 Post함수로 입력받은 id값 전달 
+	 $.post("IdCheckProc.asp?id=" + id, data, function (data) {
+	     if (data.code) {
+	         $("#idchk").val("N");
+	         alert("이미 사용중인 아이디입니다.");
+	     } else {
+	         $("#idchk").val("Y");
+	         alert("사용가능한 아이디입니다.");
+	     }
+	 }, "json");
+	
+	 return false;
+	});
+});
 
+$( document ).ready(function() {
+	$('#widetTable').on( 'over', 'tr', function() {
+
+         var selected = $(this).hasClass("highlight");
+            $("#widetTable tr").removeClass("highlight");
+            if(!selected)
+                    $(this).addClass("highlight");
+
+          alert('You clicked row '+ ($(this).index()+1) );
+        });
+});
+
+
+
+$(function () {
+ $('#datetimepicker10').datetimepicker({
+     viewMode: 'years',
+     format: 'MM/YYYY'
+ });
+});
+
+
+	
 
 window.onload=function(){
 	
@@ -267,7 +313,7 @@ window.onload=function(){
 			
 			%>
 				var map = new Map();
-				map.put("developer", <%= widgets.get(i).getNickname()%> );
+				map.put("developer", "<%= widgets.get(i).getNickname()%> ");
 				map.put("widgetName","<%=widgets.get(i).getWidgetName()%>");
 				map.put("uploadedDate","<%=widgets.get(i).getUploadedDate() %>");
 				map.put("kind","<%=widgets.get(i).getKind() %>");
@@ -281,94 +327,20 @@ window.onload=function(){
 	
 	///member가져오기
 	if(_widgets!=null)
-		while(_widgets.length > 0){
-	   var i=1;
+		for(var i=0; i< _widgets.length ; i++){
 			var m = new Map();
-	   m = _widgets.pop();
+			m = _widgets[i];
 			 	 
-				 $("#widgetTable > tbody:last").append('<tr><td>'+ i++ +'</td><td>' + m.get("developer") + '</td><td>' + m.get("widgetName")
-						+ '</td><td>' + m.get("uploadedDate") + '</td><td>' + m.get("kind") + '</td><td>' + m.get("position") +
-						'</td><td> <button type="button" class="acceptWidget" value="" class="btn btn-primary btn-sm">승인</button> </td><r> '
-				  	+ '</td><td><div class="checkbox"><label><input type="checkbox"> </label> </div></td></tr> ' );
-				 $("widgetTable = tbody:last").val(m.get("developer"));
+				 $("#widgetTable > tbody:last").append('<tr><td>'+ (i+1) +'</td><td>' + '<div class="checkbox"><label><input type="checkbox"> </label> </div></td><td>' +
+						 m.get("developer") + '</td><td>' + m.get("widgetName")	+ '</td><td>' + m.get("uploadedDate") + '</td><td>' + m.get("kind") + '</td><td>' + m.get("position") +
+						'</td><td> <button type="button" class="acceptWidget" value="" class="btn btn-primary btn-sm">승인</button> </td></tr> ');
+				 $("widgetTable = tbody:last").val(m.get("developer")); 
 		}
 			 
 	}
 
 
-
-
-Map = function(){
-	 this.map = new Object();
-	};   
-	Map.prototype = {   
-	    put : function(key, value){   
-	        this.map[key] = value;
-	    },   
-	    get : function(key){   
-	        return this.map[key];
-	    },
-	    containsKey : function(key){    
-	     return key in this.map;
-	    },
-	    containsValue : function(value){    
-	     for(var prop in this.map){
-	      if(this.map[prop] == value) return true;
-	     }
-	     return false;
-	    },
-	    isEmpty : function(key){    
-	     return (this.size() == 0);
-	    },
-	    clear : function(){   
-	     for(var prop in this.map){
-	      delete this.map[prop];
-	     }
-	    },
-	    remove : function(key){    
-	     delete this.map[key];
-	    },
-	    keys : function(){   
-	        var keys = new Array();   
-	        for(var prop in this.map){   
-	            keys.push(prop);
-	        }   
-	        return keys;
-	    },
-	    values : function(){   
-	     var values = new Array();   
-	        for(var prop in this.map){   
-	         values.push(this.map[prop]);
-	        }   
-	        return values;
-	    },
-	    size : function(){
-	      var count = 0;
-	      for (var prop in this.map) {
-	        count++;
-	      }
-	      return count;
-	    }
-	};
-	
-	$(".acceptWidget").click(function () {
-        var data = "";
-        var id = $("").val();
-   
-        //jQuery의 Post함수로 입력받은 id값 전달 
-        $.post("IdCheckProc.asp?id=" + id, data, function (data) {
-            if (data.code) {
-                $("#idchk").val("N");
-                alert("이미 사용중인 아이디입니다.");
-            } else {
-                $("#idchk").val("Y");
-                alert("사용가능한 아이디입니다.");
-            }
-        }, "json");
-
-        return false;
-    });
-   
+ 
 
 </script>
 

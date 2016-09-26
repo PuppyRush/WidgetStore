@@ -177,7 +177,7 @@
 	<script type="text/javascript"
 		src="/AdminPage/js/locales/bootstrap-datetimepicker.fr.js"
 		charset="UTF-8"></script>
-
+	<script src="/AdminPage/js/commanJs.js"></script>
 </body>
 
 
@@ -238,6 +238,18 @@ Map = function(){
 	};
 	
 
+$( document ).ready(function() {
+	$('#userTable').on( 'over', 'tr', function() {
+
+         var selected = $(this).hasClass("highlight");
+            $("#userTable tr").removeClass("highlight");
+            if(!selected)
+                    $(this).addClass("highlight");
+
+          alert('You clicked row '+ ($(this).index()+1) );
+        });
+});
+
 
 window.onload=function(){
 
@@ -294,25 +306,12 @@ window.onload=function(){
 				m = _members[i];
 				
 				
-			 $("#userTable > tbody:last").append('<tr><td>'+ i+1 +'</td><td>' + m.get("nickname") + '</td><td>' + m.get("email")
-						+ '</td><td>' + m.get("date") + '</td><td>' + m.get("isDeveloper")
-						+ '</td><td>' + m.get("state") + '</td><td> <button type="button" id="withdrawal" name="withdrawal" class="btn btn-primary btn-sm">탈퇴</button>' 
-						+ '</td><td><div class="checkbox"><label><input type="checkbox"> </label> </div></td></tr> ' ); 
-		
-		}
-		
-		
-		/* 
-		while(_members.length > 0){
-	   var i=1;
-			var m = new Map();
-	   m = _members.pop();
-			 	 
-				 $("#userTable > tbody:last").append('<tr><td>'+ i++ +'</td><td>' + m.get("nickname") + '</td><td>' + m.get("email")
-						+ '</td><td>' + m.get("date") + '</td><td>' + m.get("isDeveloper")
+			 $("#userTable > tbody:last").append('<tr><td>'+ (i+1) +'</td><td><div class="checkbox"><label><input type="checkbox"> </label> </div></td><td>'+
+					 m.get("nickname") + '</td><td>' + m.get("email")	+ '</td><td>' + m.get("date") + '</td><td>' + m.get("isDeveloper")
 						+ '</td><td>' + m.get("state") + '</td><td> <button type="button" id="withdrawal" name="withdrawal" class="btn btn-primary btn-sm">탈퇴</button> </td></tr> ' ); 
+		
 		}
-	 */		 
+	
 	}
 
 </script>

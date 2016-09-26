@@ -80,7 +80,7 @@
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
-				<li class="dropdown"> <a href="./Uploadform.jsp"><i class="glyphicon glyphicon-share"></i> WidgetUpload</a>
+				<li class="dropdown"> <a href="./UploadForm.jsp"><i class="glyphicon glyphicon-share"></i> WidgetUpload</a>
 				</li>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b class="caret"></b></a>

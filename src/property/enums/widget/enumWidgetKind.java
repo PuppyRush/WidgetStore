@@ -5,7 +5,10 @@ public enum enumWidgetKind {
 	SPORTS("sports"),
 	WEATHER("weather"),
 	GAMES("games"),
-	SECURITY("security");
+	SECURITY("security"),
+	HEALTH("health"),
+	VIDEO("video"),
+	FINANCE("finance");
 	
 	private String kind;
 	

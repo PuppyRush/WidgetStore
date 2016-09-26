@@ -184,12 +184,8 @@ public class UploadWidget implements commandAction {
 		Runnable me = new ManageEvaluation(m, _widgetName,_contents, _zipFileName, _ImagesName,_kind,false );
 		Thread t = new Thread(me);
 		t.run();
-				
-		
-		
-		
-		
-		returns.put("view", enumPage.DEVELOPER.getString());
+
+		returns.put("view", "/");
 		returns.put("isSuccessUpload", "true");
 
 		

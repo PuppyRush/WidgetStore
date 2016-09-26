@@ -729,7 +729,7 @@ public class ManageMember {
 				////////userDetail table
 				
 				Timestamp date = new Timestamp(System.currentTimeMillis());
-				_ps = conn.prepareStatement("update userDetail set lastModifiedPasswordDate =? , lastLogoutDate = ? where u_id = ?)" );				
+				_ps = conn.prepareStatement("update userDetail set lastModifiedPasswordDate =? , lastLogoutDate = ? where u_id = ?");				
 				_ps.setInt(3,_id);
 				_ps.setTimestamp(1, date);
 				_ps.setTimestamp(2, date);

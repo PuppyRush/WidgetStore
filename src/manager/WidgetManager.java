@@ -24,7 +24,6 @@ public class WidgetManager {
 		
 		try{
 			
-			
 		//_ps = conn.prepareStatement("select developer, widget_num, evalNum, evalState, evaluationBeginDate,developer,isUpdate, title, kind, registartionPosition from widgetEvaluation join widget");
 			 _ps = conn.prepareStatement("select * from widgetEvaluation join widget");
 			 _rs = _ps.executeQuery();
@@ -40,7 +39,7 @@ public class WidgetManager {
 				int developerId = _rs.getInt("developer");
 				boolean isUpdate = _rs.getInt("isUpdate")==1 ? true : false; 
 				
-				 __ps = conn.prepareStatement("widget_root from WidgetDetail where widget_num = ?");
+				 __ps = conn.prepareStatement("select widget_root from WidgetDetail where widget_num = ?");
 				__ps.setInt(1, wNum);
 				__rs = __ps.executeQuery();
 				__rs.next();
@@ -48,13 +47,12 @@ public class WidgetManager {
 				__ps.close();
 				__rs.close();
 
-				__ps = conn.prepareStatement("nickname, d_id from user join developer where d_id = ?");
+				__ps = conn.prepareStatement("select nickname, d_id from user join developer where d_id = ?");
 				__ps.setInt(1, developerId);
 				__rs = __ps.executeQuery();
 				__rs.next();
 				String nickname = __rs.getString("nickname");
 				int devId = __rs.getInt("d_id");		
-
 				
 				EvaluatingWidget w = new EvaluatingWidget(wNum, name, kind, date, widgetRoot, pos, evalNum, isUpdate,devId, nickname);				
 				_widgets.add(w);
