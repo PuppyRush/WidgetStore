@@ -77,7 +77,7 @@ public class ManageEvaluation implements Runnable{
 	
 		this.kind = null;		
 		for(enumWidgetKind k : enumWidgetKind.values()){
-			if(k.getString().equals(kind)){
+			if(k.getString().equalsIgnoreCase(kind)){
 				this.kind = k;
 				break;
 			}
@@ -165,7 +165,7 @@ public class ManageEvaluation implements Runnable{
 				if(eval.equals(enumWidgetEvaluation.UNALLOWANCE))
 					throw new EvaluationException(eval.getFailCase());
 				
-				eval = ManageWidget.addUpdatingWidget(this, eval);
+				eval = ManageWidget.addUpdatingWidget(this, eval,  );
 			}
 			else	
 				eval = ManageWidget.addEvaluatingWidget(this, eval);

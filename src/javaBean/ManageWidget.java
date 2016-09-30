@@ -143,7 +143,7 @@ public class ManageWidget {
 			_rs.close();
 
 			////////////////updatingWidget   필요
-			ㅇㄴㅁ
+			
 			_ps = conn.prepareStatement(
 					"insert into updatingWidget(eval_id, old_widget_key) values (?,?)");
 			
@@ -463,9 +463,9 @@ public class ManageWidget {
 	 *   업데이트 신청한 위젯의 평가가 모두 끝나면 DB를 갱신하고 해당 멤버가 로그인 중이면 이를 추가한다.
 	 * 
 	 * @param widget
-	 * @throws SQLException
+	 * @throws Exception 
 	 */
-	public static void addEvaludatedUpdatedWidget(ManageManifest mani, String sId, int evalId) throws SQLException{
+	public static void addEvaludatedUpdatedWidget(ManageManifest mani, String sId, int evalId) throws Exception{
 		
 	
 		ResultSet _rs = null;
@@ -511,6 +511,8 @@ public class ManageWidget {
 					_rs = _ps.executeQuery();
 					_rs.next();
 					
+					String _kind = _rs.getString("kind");
+					String _widgetName = _rs.getString("title");
 					String _contents = _rs.getString("contents");
 					float _version = _rs.getFloat("version");
 					String _mainImageFullPath = _rs.getString("main_image");
@@ -652,12 +654,16 @@ public class ManageWidget {
 							boolean isEmppy = true;
 							for(DevelopedWidget w : member.getDevelopedWidget()){
 								if(w.getWidgetId() == _oldWidgetKey){
+									w.setVersion(_version);
+									w.setContents(_contents);
+									w.setPosition(_position);
+									w.setUpdatedDate(_updatedDate);
 									
 								}
 
 							}
 							
-							DevelopedWidget widget = new DevelopedWidget.Builder(_oldWidgetKey, _, _kind)
+							DevelopedWidget widget = new DevelopedWidget.Builder(_oldWidgetKey, _widgetName, _kind)
 									.contents(_contents)
 									.developerId(_dId)
 									.developer(nickname)

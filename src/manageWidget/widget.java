@@ -10,11 +10,13 @@ public class widget {
 	private int height = 0;
 	private boolean remote = false;
 	public widget(int num, String name, String tag, int pX, int pY, int width, int height, boolean remote){
+
 		this.num = num;
 		this.name = name;
 		this.tag = tag;
 		this.pX = pX;
 		this.pY = pY;
+
 		this.width = width;
 		this.height = height;
 		this.remote = remote;

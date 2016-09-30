@@ -29,20 +29,24 @@
 			int pY = 0;
 			int width = 0;
 			int height = 0;
+
 			Enumeration<String> eNum = request.getAttributeNames();
 			while (eNum.hasMoreElements()) {
 				obj = request.getAttribute(eNum.nextElement());
 				/* 불러오기일 경우 */
 				if (null != obj && obj instanceof widget) {
 										
+
 					w = (widget) obj;
 					%>
+
 					
 					num = <%=w.getNum()%>;
 					name = "<%=w.getName()%>";
 					tag = "<%=w.getTag()%> ";
 					pX = <%=w.getPointX()%>;
 					pY = <%=w.getPointY()%>;
+
 					width = <%=w.getWidth()%> + "px";
 					height = <%=w.getHeight()%> + "px";
 					<%/* 이미 배치된 위젯을 불러오는 부분 */
@@ -130,20 +134,25 @@
 							/**
 							 * select control에 정보 집어넣는 부분
 							 */
+
 							function addWidget(num, name, tag, width, height) {
+
 								var op = document.createElement("option");
 
 								op.value = tag;
 								op.text = name;
 								op.id = num;
+
 								op.width = width;
 								op.height = height;
+
 								
 								document.form.widgetSel.options.add(op);
 							}
 
 							// select box 에서 위젯 선택시
 							function getWidget() {
+
 								var f = document.form.widgetSel;
 								var idx = f.selectedIndex; //인덱스
 								
@@ -257,6 +266,7 @@
 		var name;
 		var id;
 
+
 		// size
 		var width, height;
 		
@@ -290,6 +300,7 @@
 			
 			div.id = this.id;
 			div.innerText = this.name;
+
 			div.style.width = this.width;
 			div.style.height = this.height;
 			div.style.backgroundColor = "red";

@@ -43,7 +43,7 @@ public class widgetLoad implements commandAction {
 				y = rs.getInt("y");
 				w = rs.getInt("width");
 				h = rs.getInt("height");
-				
+			
 				System.out.println(title + "widget call");
 				
 				if(x>-1 && y>-1) remote = true;
@@ -51,6 +51,7 @@ public class widgetLoad implements commandAction {
 
 				// System.out.println(code);
 				
+
 				// class widget
 				// int num, String name, String tag, int pX, int pY, int width, int height, boolean remote
 				returns.put(Integer.toString(num),

@@ -9,186 +9,18 @@ import property.enums.widget.enumWidgetPosition;
 
 public class DevelopedWidget extends Widget{
 
-	private final float totalReview;
-	private final int reviewCount;
+	private float totalReview;
+	private int reviewCount;
 	private final String subImagePath;
 	private final String mainImagePath;
 	private final String widgetRoot;
 	
 	private final String sourceRoot;
 	private final int developerId;
-	private fi
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	33
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	-nal String developer;
-	private final enumWidgetPosition position;
-	private final String contents;
-	private final  Timestamp updatedDate;
+	private final String developer;
+	private enumWidgetPosition position;
+	private String contents;
+	private Timestamp updatedDate;
 	private float version;
 	
 	public static class Builder{
@@ -228,7 +60,7 @@ public class DevelopedWidget extends Widget{
 			
 			boolean isEmpty = true;
 			for(enumWidgetPosition p : enumWidgetPosition.values()){
-				if(p.getString().equals(pos)){
+				if(p.getString().equalsIgnoreCase(pos)){
 					isEmpty = false;
 					position = p;
 				}
@@ -373,6 +205,45 @@ public class DevelopedWidget extends Widget{
 
 	public String getSourceRoot() {
 		return sourceRoot;
+	}
+
+
+
+	public void setTotalReview(float totalReview) {
+		this.totalReview = totalReview;
+	}
+
+
+
+	public void setReviewCount(int reviewCount) {
+		this.reviewCount = reviewCount;
+	}
+
+
+
+	public void setPosition(String position) {
+		
+		boolean isEmpty=true;
+		for(enumWidgetPosition k : enumWidgetPosition.values()){
+			if(k.getString().equals(position)){
+				this.position = k;
+				isEmpty = false;
+			}
+		}
+		if(isEmpty)
+			throw new IllegalArgumentException("해당하는 position이 없습니다.");
+	}
+
+
+
+	public void setContents(String contents) {
+		this.contents = contents;
+	}
+
+
+
+	public void setUpdatedDate(Timestamp updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 
 
