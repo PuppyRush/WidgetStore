@@ -20,22 +20,22 @@ import property.enums.enumPageError;
 
 /**
  *  JSP페이지에서 폼을 통하여 값을 전달받아 회원가입을 처리받는다.
- *  	  외부로그인 경우(내부로그인이면 가입한 경우) 이전에 로그인한 적이 있다면 가입절차를 밟지 않는다.
- *  
- *       해당 클래스의 기능순서도는  114.129.211.123/boards/2/topics/64 참고
+ *  	  외부로그인 경우(내부로그인이면 가입한 경우) 이전에 로그인한 적이 있다면 가입절차를 밟지 않는다.    
+ *       해당 클래스의 기능순서도는  http://114.129.211.123/boards/2/topics/64 참고
+ *  Login class에서 호출하는 함수들은 모두 예외를 밖으로 던져 마지막으로 Login class의 catch에서 처리한다.
 */
 public class Login implements commandAction {
 
 	@Override
 	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
-			throws Throwable {
+			{
 		
 	
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		Member member = null;
 		String nick_or_mail = null;
 		String userType="";
-		String _sId;
+		String sId="";
 		try{
 			//필요조건
 			if(request.getParameter("sessionId")==null || request.getParameter("idType")==null || request.getParameter("login_username")==null ||
@@ -45,23 +45,20 @@ public class Login implements commandAction {
 			nick_or_mail = (String)request.getParameter("login_username");
 					
 			//가입여부 확인
-			_sId = (String)request.getParameter("sessionId");
-			member = Member.getMember(_sId);
+			sId = (String)request.getParameter("sessionId");
+			member = Member.getMember(sId);
 			if( nick_or_mail.contains("@") )
 				member.setEmail(nick_or_mail);
 			else
 				member.setNickname(nick_or_mail);
 			
 			if(!ManageMember.isMember(member))
-				throw new MemberException("가입되지 않은 유저입니다. 가입후 사용허세요. ", enumMemberState.NOT_JOIN, enumPage.MAIN);
+				throw new MemberException("가입되지 않은 유저입니다. 가입후 사용하세요. ", enumMemberState.NOT_JOIN, enumPage.MAIN);
 			
-			//멤버객체 설정
+			//멤버객체 설정			
+			Member.setMemberFromDB(member);			
+			member.setPlanePassword((String)request.getParameter("login_password"));	
 			
-			if( nick_or_mail.contains("@") )				
-				Member.setMemberFromDB_Email(member, _sId, nick_or_mail);			
-			else
-				Member.setMemberFromDB_Nickname(member, _sId, nick_or_mail);
-			member.setPlanePassword((String)request.getParameter("login_password"));		
 			
 			//가입 방식에 따라 달리 처리한다.
 			userType = (String)request.getParameter("idType");
@@ -69,61 +66,43 @@ public class Login implements commandAction {
 	
 				EnumMap<enumMemberAbnormalState, Boolean> state = ManageMember.getMemberStates(member);
 				//잠김상태인가?
-				if( state.containsKey(enumMemberAbnormalState.ABNORMAL) &&  state.get(enumMemberAbnormalState.ABNORMAL)){
+				if( state.containsValue(true)){
 					
-					//아직 인증 메일을 하지 않은 경우
-					if(state.get(enumMemberAbnormalState.JOIN_CERTIFICATION)){
-						returns.put("view", enumPage.MAIN.getString());
-						returns.put("message", "메일 인증 후 로그인 해주세요.");
-					}
+					//아직 가입 인증을 안한경우.
+					if(state.containsKey(enumMemberAbnormalState.JOIN_CERTIFICATION) && state.get( enumMemberAbnormalState.JOIN_CERTIFICATION))
+						throw new MemberException(enumMemberState.NOT_JOIN_CERTIFICATION, enumPage.MAIN);
+						
 					//비밀번호 분실상태인가?
 					//아래의 두 상태는 비밀번호 일치여부를 검사할 필요 없음.
 					if( state.get(enumMemberAbnormalState.LOST_PASSWORD) ){
-						returns.put("userState","lostpw");		
+							
 						
 						if(ManageMember.isSendmail(member))
-							returns.put("view", enumPage.CHECK_PWD_AUTH_NUM.getString());
+							throw new MemberException(enumMemberState.LOST_PASSWORD, enumPage.CHECK_PWD_AUTH_NUM);
 						else
-							returns.put("view", enumPage.INPUT_MAIL_FOR_CERIFICATION.getString());
+							throw new MemberException(enumMemberState.LOST_PASSWORD, enumPage.INPUT_MAIL_FOR_CERIFICATION);
 						
-						
-						return returns;
 	
 					}
 					//비밀번호 초과상태인가
 					else if(state.get(enumMemberAbnormalState.FAILD_LOGIN) ){
-						
-						returns.put("userState","faild_login");
-						returns.put("excessFaildcount","true");
-						
+					
 						if(ManageMember.isSendmail(member))
-							returns.put("view", enumPage.CHECK_PWD_AUTH_NUM.getString());
+							throw new MemberException(enumMemberState.EXCEED_FAILD_LOGIN, enumPage.CHECK_PWD_AUTH_NUM);
 						else
-							returns.put("view", enumPage.INPUT_MAIL_FOR_CERIFICATION.getString());
-						
-						
-						return returns;
+							throw new MemberException(enumMemberState.EXCEED_FAILD_LOGIN, enumPage.INPUT_MAIL_FOR_CERIFICATION);
+	
+					
 					}
 							
 					//잠김 상태중에서도 아래 두가지는 확인이 필요함.
 					if(state.get(enumMemberAbnormalState.LOST_PASSWORD )){
-					
-						//로그인 실패하면 3개월 이상 변경여부 검사 안함
-						if(ManageMember.loginMember(member)==false){
-							returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
-						}
-						else{
-							
-							if(ManageMember.isPassingDate(member)){
-								returns.put("excessDateOfChange", "ture");
-								returns.put("view", enumPage.RESET_PASSWORD.getString());
-							}
-							else{
-								returns.put("innerLogin", "false");
-								returns.put("view", enumPage.MAIN.getString());
-							}
-						}
-						
+						if(ManageMember.loginMember(member)==false)
+							throw new MemberException(enumMemberState.NOT_EQUAL_PASSWORD, enumPage.LOGIN);				
+						else
+							//로그인 실패하면 3개월 이상 변경여부 검사 안함
+							if(ManageMember.isPassingDate(member))
+								throw new MemberException(enumMemberState.PASSING_CHANGE_PWD, enumPage.CHANGE_OLD_PWD);						
 					}
 					else if(state.get(enumMemberAbnormalState.SLEEP) ){
 					
@@ -132,15 +111,12 @@ public class Login implements commandAction {
 					}
 					
 					
-				}//isn't Locking member and Success login process.
-				else if(state.containsKey(enumMemberAbnormalState.ABNORMAL) && state.get(enumMemberAbnormalState.ABNORMAL) == false){
+				}//ABNORMAL=0. 잠김상태가 아니면 로그인을 시도한다.
+				else{
 				
-					if(ManageMember.loginMember(member)==false){
-						returns.put("message", "패스워드가 일치하지 않거나 아이디혹은 메일이 존재하지 않습니다.");
-						returns.put("isSuccessLogin", "false");
-						returns.put("messageKind", enumCautionKind.ERROR);
-					}
-					else{
+					if(ManageMember.loginMember(member)==false)
+						throw new MemberException(enumMemberState.NOT_EQUAL_PASSWORD, enumPage.LOGIN);	
+					else{//로그인성공
 						member.setSessionId((String)request.getParameter("sessionId"));
 						returns.put("message", "로그인에 성공하셨습니다.");
 						returns.put("messageKind", enumCautionKind.NORMAL);
@@ -161,25 +137,32 @@ public class Login implements commandAction {
 				
 			}
 			else
-				returns.put("view", enumPage.ERROR404);
+				throw new PageException( "시스템에 존재하지 않는" + userType + "값이 전달되었습니다.",enumPageError.UNKNOWN_PARA_VALUE); 
 			
 		}catch(PageException e){
+			e.printStackTrace();
+			System.out.println(e.getErrorMessage());
 			returns.put("is_successLogin", "false");
-			returns.put("view", enumPage.MAIN.getString());		
-			returns.put("message", "로그인에 실패하였습니다");
+			returns.put("view",enumPage.ERROR404.toString());		
+			returns.put("message", e.getErrorMessage());
 			returns.put("messageKind", enumCautionKind.ERROR);
 		
 		}catch(MemberException e){
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 			returns.put("view", e.getToPage().getString());	
 			returns.put("message", e.getMessage());
 			returns.put("messageKind", enumCautionKind.ERROR);
 			
 		}catch(SQLException e){
-			returns.put("view", enumPage.MAIN.getString());
-			returns.put("message", "로그인에 실패하였습니다");
+			e.printStackTrace();
+			returns.put("view", enumPage.ERROR403.toString());
+			returns.put("message", "데이버베이스 조작 오류입니다.");
 			returns.put("messageKind", enumCautionKind.ERROR);
 		}catch(Exception e){
-			returns.put("view", enumPage.MAIN.getString());
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+			returns.put("view", enumPage.ERROR403.toString());
 			returns.put("message", "알수없는 오류 발생. 관리자에게 문의하세요");
 			returns.put("messageKind", enumCautionKind.ERROR);
 		}

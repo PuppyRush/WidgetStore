@@ -33,27 +33,16 @@ public class VerifyPage {
 		try{				
 			enumPage page = fromPage;
 			member = Member.getMember(uId);
-			
-			member.setEmail("gooddaumi@naver.com");
-			member.setLogin(true);
-			member.setJoin(true);
-			member.setDeveloper(true);
-			
+
 			switch(page){
 			
 				case MAIN:
-					if(!member.isJoin()){
-						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
-						
-					}
-					else if(!member.isLogin()){
-						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.LOGIN);
-					}
+					
 					
 					break;
 					
 				case DEVELOPER:
-					
+					System.out.println(member.isDeveloper());
 					if(!member.isJoin()){
 						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
 						

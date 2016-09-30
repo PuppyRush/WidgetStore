@@ -1,3 +1,5 @@
+<%@page import="property.enums.enumCautionKind"%>
+
 <!doctype html>
 <html lang="en">
  <head>
@@ -10,6 +12,7 @@
   <link href="../WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
+      <link href="/library/popup/style.css" rel="stylesheet">
     <link href="../WidgetClientPage/css/stylish-portfolio.css" rel="stylesheet">
 	<!-- bootsnipp down -->
 	<link href="../WidgetClientPage/css/login.css" rel="stylesheet">
@@ -50,7 +53,17 @@
 		</div>
 	</div>    
 </div>
+
+    	<div id="ohsnap" ></div>
     	
+    	
+ </body>
+ 
+     
+			<script src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../WidgetClientPage/js/jquery.js"></script>
+    <script src="../WidgetClientPage/js/bootstrap.min.js"></script>
+ 
 	<script>
 	function match_Password(){
 		var pw1 = $('register_edit_password1').val();
@@ -64,9 +77,21 @@
 			return false;
 		}
 	}
-	</script>
+	
 
-    <script src="../WidgetClientPage/js/jquery.js"></script>
-    <script src="../WidgetClientPage/js/bootstrap.min.js"></script>
- </body>
+ window.onload=function(){
+		var message;
+		var popup_color;
+		<% if(request.getAttribute("message")!=null && request.getAttribute("messageKind") !=null){
+			enumCautionKind kind = (enumCautionKind)request.getAttribute("messageKind");	
+		%>
+		  message = "<%=(String)request.getAttribute("message")%>";
+		  popup_color = "<%=(String)kind.getString()%>";
+		  ohSnap(message,{color:popup_color});
+		<%
+		}
+		%>
+ }
+ </script>
+ 
 </html>

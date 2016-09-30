@@ -2,6 +2,10 @@ package property.enums;
 
 public enum enumSystem {
 
+	MANIFEST_FULLPATH("/home/cmk/workspace/WidgetStore/WebContent/property/manifest.xml"),
+	URL_ROOT("http://114.129.211.123:8282"),
+	PROJECT_PATH("/home/cmk/workspace/WidgetStore/WebContent/"),
+	UPLOAD_PATH("/home/cmk/workspace/WidgetStore/WebContent/upload/"),
 	IMAGE_FOLDER_NAME("representiveImages"),
 	SOURCE_FOLDER_NAME("source"),
 	ADMIN("gooddaumi@naver.com");

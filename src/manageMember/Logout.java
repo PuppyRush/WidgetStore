@@ -27,7 +27,7 @@ public class Logout implements commandAction {
 
 	@Override
 	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
-			throws Throwable {
+			{
 		
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		Member member = null;
@@ -38,23 +38,55 @@ public class Logout implements commandAction {
 			if(request.getParameter("sessionId")==null)				
 				throw new PageException(enumPageError.UNKNOWN_PARAMATER);
 			
-			member = Member.getMember( (String)request.getParameter("sessionId"));	
+			String sId = (String)request.getParameter("sessionId");
+			member = Member.getMember(sId);
+			
+			if(!Member.isContainsMember(sId))
+				throw new MemberException(enumMemberState.NOT_EXIST_MEMBER_FROM_MAP, enumPage.MAIN);
+			
 			if(!member.isLogin())
-				throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.MAIN);
+				throw new MemberException("로그인 한 유저가 아닙니다.", enumMemberState.NOT_LOGIN, enumPage.MAIN);
 			
 			ManageMember.logoutMember(member);
 			
 			returns.put("view", enumPage.MAIN.getString());	
-			returns.put("doLogout", "true");
+			returns.put("doLogout", true);
 			returns.put("message", "로그아웃에 성공하셨습니다.");
 			returns.put("messageKind", enumCautionKind.NORMAL);
 			
 		}catch( PageException e){
-			returns.put("doLogout", "false");
+			returns.put("doLogout", false);
 			returns.put("view", enumPage.MAIN.getString());		
 			returns.put("message", "로그아웃에 실패하셨습니다. 관리자에게 문의하세요.");
 			returns.put("messageKind", enumCautionKind.ERROR);
+			e.printStackTrace();
+		}
+		catch( MemberException e){
+			switch(e.getErrCode()){
+				case NOT_EXIST_MEMBER_FROM_MAP:
+				case NOT_LOGIN:
+				case NOT_JOIN:
+					returns.put("initSession", true);
+					returns.put("view", e.getToPage().toString());		
+					returns.put("message", "로그아웃에 실패하셨습니다. 관리자에게 문의하세요.");
+					returns.put("messageKind", enumCautionKind.ERROR);
+
+					break;
+				default:
+					
+					returns.put("doLogout", false);
+					returns.put("view", e.getToPage().toString());		
+					returns.put("message", "로그아웃에 실패하셨습니다. 관리자에게 문의하세요.");
+					returns.put("messageKind", enumCautionKind.ERROR);
+					
+					break;
+			}
 			
+			e.printStackTrace();
+			
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	
 		

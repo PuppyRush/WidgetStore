@@ -4,7 +4,7 @@ import property.enums.enumPage;
 
 public enum enumMemberAbnormalState {
 
-	ABNORMAL("isAbnormal"),
+
 	LOST_PASSWORD("lostPassword"),
 	FAILD_LOGIN("failedLogin"),
 	SLEEP("sleep"),

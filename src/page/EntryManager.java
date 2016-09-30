@@ -23,7 +23,13 @@ public class EntryManager implements commandAction {
 		
 	
 		HashMap<String , Object> returns = new HashMap<String , Object>();
-		returns.put("view", enumPage.LOGIN_MANAGER.toString());
+	
+		String sId = request.getRequestedSessionId();
+		Member member = Member.getMember(sId);
+		if(member.isJoin() && member.isJoin() && member.getEmail().equals(enumSystem.ADMIN.toString()))
+			returns.put("view", enumPage.MEMBER_MANAGER.toString());
+		else
+			returns.put("view", enumPage.LOGIN_MANAGER.toString());
 		
 		return returns;
 	}

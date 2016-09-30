@@ -35,7 +35,7 @@ public class VerifyRegistration implements commandAction {
 			String email = request.getParameter("email");
 			String uuid = request.getParameter("number");
 			
-			if(ManageMember.certificateJoin(request.getRequestedSessionId(), email, uuid)){
+			if(ManageMember.certificateJoin(request.getRequestedSessionId(),  email, uuid)){
 				returns.put("view",enumPage.MAIN.toString());
 				returns.put("message","가입인증에 성공하셨습니다. 로그인 하세요.");
 				returns.put("messageKind", enumCautionKind.NORMAL);

@@ -6,6 +6,15 @@
 
 /* Global Styles */
 
+pre {
+			width:auto;
+			max-width:500px;
+    height: auto;
+    max-height:300px;
+    overflow: auto;
+    background-color: #eeeeee;
+}
+
 
 .highlight { background-color: red; }
 

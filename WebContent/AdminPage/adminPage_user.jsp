@@ -1,5 +1,5 @@
 <%@page import="property.enums.member.*, property.enums.*"%>
-<%@page import="manager.MemberManager, java.util.ArrayList, java.util.EnumMap, java.util.HashMap ,javaBean.Member, page.VerifyPage"%>
+<%@page import="java.util.ArrayList, java.util.EnumMap, java.util.HashMap ,javaBean.*, page.VerifyPage"%>
 
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -24,7 +24,7 @@
 	}else{
 		isFailVerify = true; 
 	 
-		members = MemberManager.getAllMember();		
+		members = ManageMember.getAllMember();		
 	}
 	
 %>
@@ -127,6 +127,7 @@
 					<thead>
 						<tr>
 							<th>NO.</th>
+							<th></th>
 							<th>ID</th>
 							<th>이메일</th>
 							<th>가입일</th>
@@ -184,59 +185,6 @@
 <script>
 
 
-Map = function(){
-	 this.map = new Object();
-	};   
-	Map.prototype = {   
-	    put : function(key, value){   
-	        this.map[key] = value;
-	    },   
-	    get : function(key){   
-	        return this.map[key];
-	    },
-	    containsKey : function(key){    
-	     return key in this.map;
-	    },
-	    containsValue : function(value){    
-	     for(var prop in this.map){
-	      if(this.map[prop] == value) return true;
-	     }
-	     return false;
-	    },
-	    isEmpty : function(key){    
-	     return (this.size() == 0);
-	    },
-	    clear : function(){   
-	     for(var prop in this.map){
-	      delete this.map[prop];
-	     }
-	    },
-	    remove : function(key){    
-	     delete this.map[key];
-	    },
-	    keys : function(){   
-	        var keys = new Array();   
-	        for(var prop in this.map){   
-	            keys.push(prop);
-	        }   
-	        return keys;
-	    },
-	    values : function(){   
-	     var values = new Array();   
-	        for(var prop in this.map){   
-	         values.push(this.map[prop]);
-	        }   
-	        return values;
-	    },
-	    size : function(){
-	      var count = 0;
-	      for (var prop in this.map) {
-	        count++;
-	      }
-	      return count;
-	    }
-	};
-	
 
 $( document ).ready(function() {
 	$('#userTable').on( 'over', 'tr', function() {
@@ -274,7 +222,7 @@ window.onload=function(){
 				<%
 				StringBuilder state = new StringBuilder();
 				EnumMap<enumMemberAbnormalState, Boolean> e = members.get(i).getAbnormalState();
-				if(e.get(enumMemberAbnormalState.ABNORMAL)){
+				if(e.containsValue(true)){
 					
 					if(e.get(enumMemberAbnormalState.FAILD_LOGIN))
 							state.append("로그인 5회 이상 실패 시도 / ");

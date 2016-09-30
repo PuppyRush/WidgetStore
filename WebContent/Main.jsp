@@ -17,20 +17,19 @@
 <%
 
 	request.setCharacterEncoding("UTF-8");
+	enumPage to = enumPage.MAIN;
  	boolean isFailVerify;
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MAIN);
 	if(!(boolean)results.get("isSuccessVerify")){
 		isFailVerify =false;
-		enumPage to = (enumPage)results.get("to");
+		to = (enumPage)results.get("to");
+	
 		
-		request.setAttribute("message",  (String)results.get("message"));
-		request.setAttribute("messageKind", results.get("messageKind"));
-
-		return;
 		
-	}else
-		isFailVerify = true; 
-		
+	}else{
+		isFailVerify = true;
+	}
+		%>
 	
 %>
 
@@ -46,7 +45,7 @@
     <meta name="author" content="">
 
     <title>Widget Store - OSS</title>
-    
+      s
 <script src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js" type="text/javascript" charset="utf-8"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -256,10 +255,17 @@
 		</div>
 	</div>
 
+
 <div id="ohsnap" ></div>
 
 <!-- 이하는 폼태그만 존재  -->
-
+		
+<form method="GET" ACTION="<%=to.getString() %>" id="movePage">
+		<input id="message" name="message"  type="hidden" value="<%= (String)results.get("message")%>"/>
+		<input id="messageKind" name="messageKind"  type="hidden" value="<%=results.get("messageKind") %>"/>
+	</form>
+	
+	
 	<form method="GET" ACTION="logout.do" id="logout-form">
 		<input id="sessionId" name="sessionId"  type="hidden" value=<%=session.getId() %> />
 	</form>
@@ -305,16 +311,18 @@
 
 			try{ 
 
+				if(request.getAttribute("initSession")!=null && request.getAttribute("initSession").equals(true)){
+		
+					session.removeAttribute("alreadyLogin");
+					%>signChange('signIn');<%
+				}
+				
 				//자동로그인 처리하기    
 				if(request.getAttribute("doLogout")!= null && 	((String)request.getAttribute("doLogout")).equals("true")){
 					session.removeAttribute("alreayLogin");
-					%>
-					ohsnap("Bye...",{color:'red'});
-						
-					<%
 				}
 
-				else if(request.getAttribute("alreadyLogin") != null &&	((String) request.getAttribute("alreadyLogin")).equals("true")){
+				else if(session.getAttribute("alreadyLogin") != null &&	((String) session.getAttribute("alreadyLogin")).equals("true")){
 								//response.sendRedirect("main.jsp");
 							%>
 									signChange('signOut');
@@ -459,7 +467,7 @@
                 break;
 			case "register-edit-form":
 				if(true){
-					//Ã¬ÂÂ¬ÃªÂ¸Â°Ã¬ÂÂ Ã¬ÂÂÃ«Â¡ÂÃ¬ÂÂÃªÂ¸Â´ Ã«Â¹ÂÃ«Â°ÂÃ«Â²ÂÃ­ÂÂ¸,,
+			
 				}
             default:
                 return false;
@@ -537,19 +545,19 @@
 		var spe = pw.search(/[`~!@@#$%^&*|Ã¢ÂÂ©Ã¢ÂÂ©Ã¢ÂÂ©'Ã¢ÂÂ©";:Ã¢ÂÂ©/?]/gi);
 
 		 if(pw.length < 8 || pw.length > 20){
-			alert("8Ã¬ÂÂÃ«Â¦Â¬ ~ 20Ã¬ÂÂÃ«Â¦Â¬ Ã¬ÂÂ´Ã«ÂÂ´Ã«Â¡Â Ã¬ÂÂÃ«Â Â¥Ã­ÂÂ´Ã¬Â£Â¼Ã¬ÂÂ¸Ã¬ÂÂ.");
+			alert("비밀번호는 8자 이상이여야 합니다.");
 			return false;
 		 }
 		 else if(pw.search(/Ã¢ÂÂ©s/) != -1){
-			alert("Ã«Â¹ÂÃ«Â°ÂÃ«Â²ÂÃ­ÂÂ¸Ã«ÂÂ ÃªÂ³ÂµÃ«Â°Â±Ã¬ÂÂÃ¬ÂÂ´ Ã¬ÂÂÃ«Â Â¥Ã­ÂÂ´Ã¬Â£Â¼Ã¬ÂÂ¸Ã¬ÂÂ.");
+			alert("비밀번호에 특수문자가 포합되어야 합니다.");
 			return false;
 		 } 
 		 else if(num < 0 || eng < 0 || spe < 0 ){
-			alert("Ã¬ÂÂÃ«Â¬Â¸,Ã¬ÂÂ«Ã¬ÂÂ, Ã­ÂÂ¹Ã¬ÂÂÃ«Â¬Â¸Ã¬ÂÂÃ«Â¥Â¼ Ã­ÂÂ¼Ã­ÂÂ©Ã­ÂÂÃ¬ÂÂ¬ Ã¬ÂÂÃ«Â Â¥Ã­ÂÂ´Ã¬Â£Â¼Ã¬ÂÂ¸Ã¬ÂÂ.");
+			alert("비밀번호에 문자, 숫자가 포함되어야 합니다.");
 			return false;
 		 }
 		 else if(str != str2){
-			alert("Ã«Â¹ÂÃ«Â°ÂÃ«Â²ÂÃ­ÂÂ¸ÃªÂ°Â Ã¬ÂÂÃ«Â¡Â Ã«Â§ÂÃ¬Â§Â Ã¬ÂÂÃ¬ÂÂµÃ«ÂÂÃ«ÂÂ¤.");
+			alert("비밀번호가 각각 일치하지 않습니다.");
 			return false;
 		 }
 		 else {

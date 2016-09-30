@@ -2,13 +2,12 @@ package javaBean;
 
 import java.sql.Timestamp;
 
-import property.Widget;
 import property.enums.widget.enumWidgetPosition;
 
 public class EvaluatingWidget extends Widget{
 	
 	private final boolean isUpdate;
-	private final int evaluationNumber;
+	private final int evalId;
 	private final String widgetRoot;
 	private final Timestamp uploadedDate;
 	private final String position;
@@ -16,12 +15,12 @@ public class EvaluatingWidget extends Widget{
 	private final String nickname;
 	private  Timestamp storedDate;
 			
-	public EvaluatingWidget(int id, String name, String kind, Timestamp uploadDate ,String widgetRoot, String pos, int evalNum, boolean isUpdate,int devId ,String nick) throws Exception{
-		super(id,name,kind);
+	public EvaluatingWidget(String name, String kind, Timestamp uploadDate ,String widgetRoot, String pos, int evalNum, boolean isUpdate,int devId ,String nick) throws Exception{
+		super(-1,name,kind);
 		this.devId = devId;
 		nickname = nick;
 		this.isUpdate = isUpdate;
-		this.evaluationNumber = evalNum;
+		this.evalId = evalNum;
 		this.widgetRoot = widgetRoot;
 		this.uploadedDate = uploadDate;
 		position = pos;
@@ -45,8 +44,8 @@ public class EvaluatingWidget extends Widget{
 		return isUpdate;
 	}
 
-	public int getEvaluationNumber() {
-		return evaluationNumber;
+	public int getEvalId() {
+		return evalId;
 	}
 
 	public String getNickname() {
@@ -55,6 +54,11 @@ public class EvaluatingWidget extends Widget{
 
 	public Timestamp getStoredDate() {
 		return storedDate;
+	}
+
+
+	public int getDevId() {
+		return devId;
 	}
 	
 

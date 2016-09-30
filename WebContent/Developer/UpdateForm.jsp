@@ -8,7 +8,7 @@
 <%
 
 	request.setCharacterEncoding("UTF-8");
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.UPDATE_WIDGET);
 	if(!(boolean)results.get("isSuccessVerify")){
 				
 		enumPage to = (enumPage)results.get("to");
@@ -146,45 +146,69 @@
 
 				<!-- Page Heading -->
 
-				<form id="upload-form" method="post" action="updateWidget.do"
-					enctype="multipart/form-data">
-					<input id="sessionId" name="sessionId"
-						value="<%=session.getId() %>" type="hidden">
+					<form id="upload-form" method="post" action="uploadWidget.do"
+						enctype="multipart/form-data">
+						<input id="sessionId" name="sessionId" value=<%=session.getId() %>
+							type="hidden"> 
+							<input id="isUpdate" name="isUpdate" value="true" %>
+							type="hidden"> 
+						<div class="modal-body">
+							<div id="div-lost-msg">
+								<div id="icon-lost-msg"
+									class="glyphicon glyphicon-chevron-right"></div>
+								<span id="text-lost-msg">위젯이름</span>
+							</div>
 
-					<div class="col-md-9">
-						<h1 class="page-header">
-							[WidgetName] <small>[widget category]</small> <small>[update
-								day]</small>
-						</h1>
-						<!-- ì´ë¯¸ì§ íì¼ ì í -->
-						<table class="table table-bordered" width="485" border="1"
-							cellspacing=0 cellpadding=5>
-							<tr>
-								<td align="left" height="105" ondragenter="return false"
-									ondragover="return false" ondrop="dropIt(event)"><output
-										id="thumbs"></output></td>
-							</tr>
-							<tr>
-								<td align="center"><label class="btn btn-block btn-primary">
-										Drag & drop or choose images from your local file system<input
-										accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z"
-										type="file" name="upload[]" multiple />
-								</label></td>
-							</tr>
-						</table>
-						<!-- ìì ¯ íì¼ ì í -->
-						<div class="input-group">
-							<label class="input-group-btn"> <span
-								class="btn btn-primary"> Widget File&hellip; <input
-									type="file" style="display: none;" multiple>
-							</span>
-							</label> <input type="text" class="form-control" readonly>
+							<input id="widget-name" name="widget-name" class="form-control"
+								type="text" placeholder="Widget name" required></br>
+
+
+							<div class="btn-group">
+								<a class="btn btn-default dropdown-toggle btn-select" href="#"
+									data-toggle="dropdown">Category <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li><a href="javascript:;">ì¢ë¥1</a></li>
+									<li><a href="javascript:;">ì¢ë¥2</a></li>
+									<li><a href="javascript:;">ì¢ë¥3</a></li>
+									<li><a href="javascript:;">ì¢ë¥4</a></li>
+								</ul>
+							</div>
+							<br>
+
+
+							<div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
+							<span id="text-lost-msg">압축파일</span> <br> <input
+								accept=" file/zip, file/7z" type="file" name="upload-zip" />
 						</div>
-						<!-- íì¤í¸ ìë ¥ -->
-						<p class="help-block">Input text about update</p>
-						<textarea class="form-control" rows="5"
-							placeholder="ìë°ì´í¸ì ëí ë´ì©ì ìë ¥í´ì£¼ì¸ì."></textarea>
-				</form>
+
+
+
+						<div id="icon-lost-msg" class="glyphicon glyphicon-chevron-right"></div>
+						<span id="text-lost-msg">이미지파일</span> <br> <input
+							accept="image/jpeg,image/jpg,image/png,image/tif,image/png, .zip, .7z"
+							type="file" name="upload-image[]" multiple />
+				</div>
+
+				<br>
+				<textarea class="form-control" name="contents" rows="5"
+					placeholder="위젯의 설명을 입력해주세요"></textarea>
+
+
+
+				<!-- ì£¼ì ì¬í­ -->
+				<div class="modal-footer"></div>
+				<div class="alert alert-warning" role="alert">
+				    1. 업데이트 될 위젯은 소스파일, 사진, 내용, 버전만 변경이 가능합니다. (매니페스트는 이름만 일치하게 하고 나머지는 위젯에 맞게 변경이 가능합니다.)
+				    2. 사진을 업로드 하지 않으면 이전의 사진을 그대로 사용하며 만약 사진을 올리면 대체 됩니다.
+				    3. 나머지 사항은 위젯을 업로드 할 때와 동일합니다.
+				</div>
+
+
+				<div class="modal-footer">
+					<div>
+						<button type="submit" class="btn btn-primary btn-lg btn-block">Upload</button>
+					</div>
+	</form>
 				<!-- ì£¼ì ì¬í­ -->
 				<div class="modal-footer"></div>
 				<div class="alert alert-warning" role="alert">
@@ -204,15 +228,6 @@
 		</div>
 	</div>
 
-	</div>
-	</div>
-	<!-- /.container-fluid -->
-
-	</div>
-	<!-- /#page-wrapper -->
-
-	</div>
-	<!-- /#wrapper -->
 
 	<!-- jQuery -->
 	<script src="js/jquery.js"></script>

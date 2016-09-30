@@ -8,7 +8,6 @@ import java.util.Date;
 import org.mindrot.jbcrypt.BCrypt;
 
 import mail.PostMan;
-import manager.MemberManager;
 import property.enums.member.enumMemberState;
 import property.enums.enumPage;
 import property.enums.enumSystem;
@@ -24,7 +23,7 @@ public class ManageMember {
 	private ManageMember() {
 	}
 
-	public static EnumMap<enumMemberAbnormalState, Boolean> getMemberStates(Member member) throws Throwable{
+	public static EnumMap<enumMemberAbnormalState, Boolean> getMemberStates(Member member) throws SQLException, MemberException{
 
 		Statement _st = null;
 		PreparedStatement _ps = null;
@@ -42,17 +41,16 @@ public class ManageMember {
 			if(_rs.next()){
 				
 				if(_rs.getInt("isAbnormal")==1){
-					_stateMap.put(enumMemberAbnormalState.ABNORMAL, true);
-					for(enumMemberAbnormalState e : enumMemberAbnormalState.values()){
+				
+					for(enumMemberAbnormalState e : enumMemberAbnormalState.values()){												
 						String _attributeName = e.getString();
 						if(_rs.getInt(_attributeName)==1)
 							_stateMap.put(e, true);
+						else
+							_stateMap.put(e, false);
 					}
 				}
-				else if(_rs.getInt("isAbnormal")==0)
-					_stateMap.put(enumMemberAbnormalState.ABNORMAL, false);
-				else
-					throw new SQLException("isAbnormal값은 0,1만 갖을 수 있습니다.");
+				
 			}
 			else
 				throw new SQLException();
@@ -126,9 +124,7 @@ public class ManageMember {
 							break;
 							
 						default :
-							
-							ps.setString(3, (String)val);
-							
+																				
 							break;
 					
 					}
@@ -170,12 +166,12 @@ public class ManageMember {
 	
 
 	
-	public static int sthToId(Member member) throws Throwable{
+	public static int sthToId(Member member) throws SQLException, MemberException {
 		
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;	
 		int id=-1;
-		String attr = "";
+		
 		try{
 			
 			if(member.getEmail() != null && member.getEmail().equals("") == false ){
@@ -190,7 +186,7 @@ public class ManageMember {
 				if(Member.isContainsMember(member.getSessionId()))
 					return Member.getMember(member.getSessionId()).getId();
 				else
-					throw new Exception("sessionId가 memberMap에 존재하지 않습니다. ");
+					throw new MemberException(enumMemberState.NOT_EXIST_MEMBER_FROM_MAP, enumPage.ERROR404);
 			}
 			else{
 				throw new SQLException("닉네임과 메일이 입력되지 않았습니다.");
@@ -233,7 +229,7 @@ public class ManageMember {
 		
 		ResultSet rs = null;
 		PreparedStatement pstmt = null;	
-		int id=-1;
+		
 
 		pstmt = conn.prepareStatement("select u_id from user where email = ? ");
 		pstmt.setString(1, email);
@@ -241,7 +237,7 @@ public class ManageMember {
 		rs = pstmt.executeQuery();
 		rs.next();
 		
-		return id = rs.getInt("u_id");		
+		return rs.getInt("u_id");		
 		
 	}
 	
@@ -280,7 +276,7 @@ public class ManageMember {
 						
 				if(_rs.next()){
 					if(_rs.getInt("joinCertification")==1){
-						throw new MemberException(enumMemberState.NOT_CERTIFICATION, enumPage.MAIN);
+						throw new MemberException( "가입후  인증하지 않은 상태입니다.메일 인증 후 로그인 하세요" ,enumMemberState.NOT_JOIN_CERTIFICATION, enumPage.MAIN);
 					}
 				}else
 					throw new SQLException("id"+id+"가 userState에 존재하지 않습니다.");
@@ -329,17 +325,20 @@ public class ManageMember {
 					
 			//insert certification table and send mail 
 				
-			String _uuid = UUID.randomUUID().toString();
+			String _uuid =  UUID.randomUUID().toString();
+			String hashedUUID =  BCrypt.hashpw(_uuid, BCrypt.gensalt(12));
 			_ps = conn.prepareStatement("insert into joinCertification (u_id, certificationNumber ) values(?,?)" );
 			_ps.setInt(1,_key);
 			_ps.setString(2, _uuid);	
 			_ps.executeUpdate();
 			
-			String _toPageUrl = new StringBuilder("http://").append(enumPage.ROOT).append("/").append(enumPage.CERTIFICATE).append("?email=").append(member.getEmail()).
-					append("&number=").append(_uuid).toString();
-			PostMan.sendCeriticationJoin(member.getEmail(), _toPageUrl );
-								
-			conn.commit();
+			String _fullUrl = new StringBuilder(enumPage.ROOT.toString()).append(enumPage.CERTIFICATE.toString()).append("?email=").append(member.getEmail()).
+					append("&number=").append(hashedUUID).toString();
+			if(PostMan.sendCeriticationJoin(member.getEmail(), _fullUrl ))
+				conn.commit();
+			else{
+				conn.rollback();
+			}
 		}
 		finally {
 			if(conn!=null) 
@@ -370,60 +369,103 @@ public class ManageMember {
 	}
 
 	/**
+	 * @throws Exception 
 	 * @param member  가입할 유저의 정보의 객체 
 	 * @param request jsp페이지로부터  넘어온 attribute값을 이용하기 위함 
 	 * @return 로그인 무사히 성사됐는지 여부를 반환
 	 * @throws  
 	 */
-	public static boolean loginMember(Member member) throws SQLException {
+	public static boolean loginMember(Member member) throws Exception {
 		
-		Statement st = conn.createStatement();
-		PreparedStatement ps = null;
-		ResultSet rs=null;
-		boolean res=false;
-		int id = member.getId();
+		PreparedStatement __ps =null;
+		ResultSet __rs = null;
+		Statement _st = conn.createStatement();
+		PreparedStatement _ps = null;
+		ResultSet _rs=null;
+		boolean _res=false;
+		int _id = member.getId();
 		try {				
 			
-			ps = conn.prepareStatement("select password from user where u_id = ? ");
-			ps.setInt(1, member.getId());
-			rs = ps.executeQuery();	
-			
-			rs = ps.executeQuery();
-			rs.next();
-			String hashedpw =  rs.getString(1);
+			_ps = conn.prepareStatement("select * from user where u_id = ? ");
+			_ps.setInt(1, member.getId());
+			_rs = _ps.executeQuery();	
+			_rs.next();
+			String hashedpw =  _rs.getString("password");
 
 			//String hashed = BCrypt.hashpw(member.getPassword(), BCrypt.gensalt(12));	
 			//비밀번호 일치.
 			if( BCrypt.checkpw( member.getPlanePassword(), hashedpw ) ){
 				
-				res =  true;
+				_res =  true;
 				
 
 				////// 마지막 로그인 날짜 갱신 
 				Timestamp t = new Timestamp(System.currentTimeMillis());
-				setSthJustOne("userDetail", "u_id", id, "lastLoginDate" , t);
+				setSthJustOne("userDetail", "u_id", _id, "lastLoginDate" , t);
 		
 				//실패횟수 초기화			
-				setSthJustOne("userDetail", "u_id", id, "failedLoginCount", 0);
+				setSthJustOne("userDetail", "u_id", _id, "failedLoginCount", 0);
 				
 				//잠금상태 해제 
 				//sleep인경우?
+				
 		
 				member.setLogin(true);
+				
+				//////user
+
+			
+				member.setEmail( _rs.getString("email"));
+				member.setNickname(_rs.getString("nickname"));
+				member.setRegDate(_rs.getTimestamp("registrationDate"));
+				
+				
+//				
+				//developer
+				
+				__ps = conn.prepareStatement("select * from developer where u_id = ?");
+				__ps.setInt(1, member.getId());
+				__rs = __ps.executeQuery();
+				if(__rs.next()){
+					member.setDeveloper(true);
+					member.setDeveloperId(__rs.getInt("d_id"));					
+				}else{
+					member.setDeveloper(false);					
+				}
+				__ps.close();
+				__rs.close();
+				
+		
+				
+				//downloadedWidget
+				__ps = conn.prepareStatement("select * from widgetInfo join widget using(widget_id) where u_id = ? ");
+		  		__ps.setInt(1,member.getId());
+				__rs = __ps.executeQuery();
+				while(__rs.next()){
+					
+					DownloadedWidget _widget = 
+							new DownloadedWidget.Builder(__rs.getInt("widget_id"), __rs.getString("title"),__rs.getString("kind")).developerId(__rs.getInt("d_id"))
+							.setSize(__rs.getInt("x"), __rs.getInt("y"), __rs.getInt("width"), __rs.getInt("height"))
+							.sourceRoot(__rs.getString("HTML")).build();
+					
+					member.addDownloadedWidget(_widget);							
+				
+				}
+				
 			}
 			//불일치
 			else{
-				res = false;
+				_res = false;
 				
-				int failedLoginCount = (int)getSthJustOne("userDetail", "u_id", id, "failedLoginCount");				
+				int failedLoginCount = (int)getSthJustOne("userDetail", "u_id", _id, "failedLoginCount");				
 				
 				
 				failedLoginCount +=1;	
-				setSthJustOne("userDetail","u_id", id, "failedLoginCount", failedLoginCount);
+				setSthJustOne("userDetail","u_id", _id, "failedLoginCount", failedLoginCount);
 				//st.executeUpdate("update userDetail set failedCountLogin = " + failedCountLogin + " where id = " + id);
 				
 				if(failedLoginCount >= Integer.valueOf(enumMemberStandard.POSSIBILLTY_FAILD_LOGIN_NUM.getString()))				
-					setSthJustOne("userDetail", "u_id", id, "isAbnormal", 1);
+					setSthJustOne("userDetail", "u_id", _id, "isAbnormal", 1);
 
 				member.setLogin(false);
 				
@@ -431,30 +473,30 @@ public class ManageMember {
 		
 		}
 		finally {
-			if (ps != null)
+			if (_ps != null)
 				try {
-					ps.close();
+					_ps.close();
 				} catch (SQLException ex) {
 					System.out.println(ex.getMessage());
 					ex.printStackTrace();
 				}
-			if (rs != null)
+			if (_rs != null)
 				try {
-					rs.close();
+					_rs.close();
 				} catch (SQLException ex) {
 					System.out.println(ex.getMessage());
 					ex.printStackTrace();
 				}
-			if (st != null)
+			if (_st != null)
 				try {
-					st.close();
+					_st.close();
 				} catch (SQLException ex) {
 					System.out.println(ex.getMessage());
 					ex.printStackTrace();
 				}
 		}
 
-		return res;
+		return _res;
 	}
 
 	public static boolean loginManager(Member member) throws Throwable{
@@ -545,12 +587,12 @@ public class ManageMember {
 	 * @param member
 	 * @throws Throwable 
 	 */
-	public static void logoutMember(Member member) throws Throwable{
+	public static void logoutMember(Member member) throws Throwable {
 		
 		member.setId(sthToId(member));
 		setSthJustOne("userDetail","u_id",member.getId(),"lastLogoutDate", new Timestamp(System.currentTimeMillis()) );
-		
-		member.setLogout(true);
+		Member.getMemberMap().remove(member);
+		member = null;
 		
 	}
 	
@@ -558,7 +600,7 @@ public class ManageMember {
 	
 		ResultSet _rs = null;
 		PreparedStatement _ps = null;
-		int _key=-1;
+
 		boolean _result = false;
 	
 		if(member.getNickname().equals("")==false){
@@ -686,11 +728,15 @@ public class ManageMember {
 	/**
 	 * 	가입 후 인증메일로 받은 email과 인증번호를 비교하여 결과를 반환한다.
 	 * @param email 가입당시 사용한 메
-	 * @param uuid  가입인증을 위해 발급된 인증번호
+	 * @param hashedUUID  가입인증을 위해 발급된 인증번호(해시된 비번)
 	 * @return
+	 * @throws Exception 
 	 * @throws Throwable 
 	 */
-	public static boolean certificateJoin(String uId, String email, String uuid) throws Throwable{
+	public static boolean certificateJoin(String sId, String email, String hashedUUID) throws Exception {
+		
+		PreparedStatement _ps = null;
+		ResultSet _rs = null;
 		
 		try{
 			
@@ -698,30 +744,29 @@ public class ManageMember {
 			
 			 
 			int _id = sthToId(email);
-		
+			Member member = Member.getMember(sId);
 			if(_id<=0)
 				throw new Exception("아이디의 값이 불일치 합니다.");
 			
-			PreparedStatement _ps= conn.prepareStatement("select certificationNumber from joinCertification where u_id = ? ");
+			 _ps= conn.prepareStatement("select certificationNumber from joinCertification where u_id = ? ");
 			_ps.setInt(1, _id);
-			ResultSet _rs = _ps.executeQuery();
+			_rs = _ps.executeQuery();
 			
-			_rs.last();
-			if(_rs.getRow()==0 || _rs.getRow()>=2)
+			if(!_rs.next())
 				throw new SQLException(email+","+_id+"joinCertification테이블에 id가 둘 이상 존재하거나 한개도 존재하지 않습니다.");
+			 			
+			String planeUUID = _rs.getString(1);
 			
-			String _getUUID = _rs.getString(1);
-			
-			if(_getUUID.equals(uuid)){
+			if(BCrypt.checkpw( planeUUID, hashedUUID )){
 				
 				_ps = conn.prepareStatement("delete from joinCertification where u_id = ?");
 				_ps.setInt(1, _id);
 				_ps.executeUpdate();
 				
-			/*	_ps = conn.prepareStatement("update userState set joinCertification = 1 where u_id = ?");
+				_ps = conn.prepareStatement("update userState set joinCertification = 0 where u_id = ?");
 				_ps.setInt(1, _id);
 				_ps.executeUpdate();
-				
+				/*
 				_ps = conn.prepareStatement("update userState set isAbnormal = 0 where u_id = ?");
 				_ps.setInt(1, _id);
 				_ps.executeUpdate();*/
@@ -736,22 +781,16 @@ public class ManageMember {
 				
 				_ps.executeUpdate();
 					
+				PostMan.sendWelcomeMail(member.getNickname(), member.getEmail());
 				
 				conn.commit();
 			}else
-				return false;	
-			
-			
-			
-		}catch (SQLException e){
-			e.printStackTrace();
-			return false;
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			return false;
-		}
+				throw new SQLException();
 		
+			
+		}finally{
+			
+		}
 		
 		return true;
 	}
@@ -1115,6 +1154,7 @@ public class ManageMember {
 							throw new SQLException("해당하는 " +  where_attr +"나 " + where_val +"," + columnName +"이 존재하지 않습니다");				
 
 					}
+					break;
 									
 				case "userDetail":
 					
@@ -1233,6 +1273,183 @@ public class ManageMember {
 			
 	}
 
+	private static void setAbnormalState(int uId) throws SQLException{
+		
+		
+		PreparedStatement _ps = null;
+		ResultSet _rs = null;
+		
+		try{
+			_ps = conn.prepareStatement("select * from usetState where u_id = ?");
+			_ps.setInt(1, uId);
+			_rs = _ps.executeQuery();
+			if(!_rs.next())
+					throw new SQLException("userState 테이블에 "+uId+"가 없습니다.");
+			
+			boolean isAbnormal=false;
+			for(enumMemberAbnormalState e: enumMemberAbnormalState.values()){
+				if(e.getString().equals("isAbnormal") || e.getString().equals("u_id"))
+					continue;
+				
+				if(_rs.getInt(e.getString())==1)
+					isAbnormal=true;
+			}
+			_ps.close();
+			
+			_ps = conn.prepareStatement("update userState set isAbnormal = ? where u_id = ?");
+			if(isAbnormal)
+				_ps.setInt(1, 1);
+			else
+				_ps.setInt(1, 0);
+			
+			_ps.setInt(2, uId);
+			_ps.executeQuery();		
+			
+			
+		}finally{
+			try {
+				_ps.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			try {
+				_rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+		
+	}
+	
+	public static void withdrawMember(int uId, String nickname, String email, String reason) throws SQLException{
+		
+		PreparedStatement _ps= null;
+		try{
+			
+			conn.setAutoCommit(false);
+		
+		
+			_ps= conn.prepareStatement("delete from user where u_id = ?");
+			_ps.setInt(1, uId);
+			_ps.executeQuery();			
+			
+			PostMan.sendWithdraw(nickname, email, reason);
+			
+			conn.commit();
+		}finally{
+			
+			_ps.close();
+		}
+		
+	}
+	
+	public static ArrayList<Member> getAllMember(){
+		
+		ArrayList<Member> _members = new ArrayList<Member>();
+		PreparedStatement _ps=null, __ps=null;
+		ResultSet _rs=null, __rs=null;
+		
+		
+		try{
+			
+			 _ps = conn.prepareStatement("select * from user");
+			 _rs = _ps.executeQuery();
+			
+			while(_rs.next()){
+											
+				Member m = new Member();
+				m.setEmail( _rs.getString("email"));
+				m.setId( _rs.getInt("u_id"));
+				m.setNickname(_rs.getString("nickname"));
+				m.setRegDate(_rs.getTimestamp("registrationDate"));
+								
+				__ps = conn.prepareStatement("select * from developer where u_id = ?");
+				__ps.setInt(1, m.getId());
+				__rs = __ps.executeQuery();
+				if(__rs.next()){
+					m.setDeveloper(true);
+					m.setDeveloperId(__rs.getInt("d_id"));					
+				}else{
+					m.setDeveloper(false);					
+				}
+				
+				__ps.close();
+				__rs.close();
+				
+				__ps = conn.prepareStatement("select * from userState where u_id = ?");
+				__ps.setInt(1, m.getId());
+				__rs = __ps.executeQuery();
+				__rs.next();
+				
+				EnumMap<enumMemberAbnormalState, Boolean> state = new EnumMap<>(enumMemberAbnormalState.class);
+				
+				
+				if(__rs.getInt("isAbnormal")==1){
+		
+					
+					if(__rs.getInt(enumMemberAbnormalState.LOST_PASSWORD.getString())==1)
+						state.put(enumMemberAbnormalState.LOST_PASSWORD, true);
+					else
+						state.put(enumMemberAbnormalState.LOST_PASSWORD, false);
+					
+					if(__rs.getInt(enumMemberAbnormalState.FAILD_LOGIN.getString())==1)
+						state.put(enumMemberAbnormalState.FAILD_LOGIN, true);
+					else
+						state.put(enumMemberAbnormalState.FAILD_LOGIN, false);
+					
+					if(__rs.getInt(enumMemberAbnormalState.SLEEP.getString())==1)
+						state.put(enumMemberAbnormalState.SLEEP, true);
+					else
+						state.put(enumMemberAbnormalState.SLEEP, false);
+					
+					if(__rs.getInt(enumMemberAbnormalState.OLD_PASSWORD.getString())==1)
+						state.put(enumMemberAbnormalState.OLD_PASSWORD, true);
+					else
+						state.put(enumMemberAbnormalState.OLD_PASSWORD, false);
+					
+					if(__rs.getInt(enumMemberAbnormalState.JOIN_CERTIFICATION.getString())==1)
+						state.put(enumMemberAbnormalState.JOIN_CERTIFICATION, true);
+					else
+						state.put(enumMemberAbnormalState.JOIN_CERTIFICATION, false);
+				}
+		
+				m.setAbnormalState(state);
+				_members.add(m);
+				
+			}
+			
+		
+		}catch(Throwable e){
+			
+		}finally{
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+			if (__ps != null)
+				try {
+					__ps.close();
+				} catch (SQLException ex) {
+				}
+			if (__rs != null)
+				try {
+					__rs.close();
+				} catch (SQLException ex) {
+				}
+		}
+		return _members;
+	}
+	
 }
 
 

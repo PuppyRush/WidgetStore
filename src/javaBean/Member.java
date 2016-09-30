@@ -26,29 +26,14 @@ import property.enums.member.enumMemberType;
  */
 public class Member {
 
-	
-	public static class MyAddedWidgets{
-		
-		private final int wId;
-		private final String wName;
-		private final String originPath;
-		private final Point point;
-				
-		public MyAddedWidgets(int id, String name, String originPath, Timestamp updatedDate, Point point){
-			
-			wId = id;
-			wName = name;
-			this.originPath = originPath;
-			this.point = point;
-		}
-		
-	}
-	
-	private static Connection conn = ConnectMysql.getConnector();
-	private EnumMap<enumMemberAbnormalState, Boolean> abnormalState;
+
 	private static Map<String, Member> MemberMap = new HashMap<String, Member>();
-	private DevelopedWidget developedWidget;
-	private DownloadedWidget downloadedWidget;
+	private static Connection conn = ConnectMysql.getConnector();
+	
+	private EnumMap<enumMemberAbnormalState, Boolean> abnormalState;
+	
+	private ArrayList<DevelopedWidget> developedWidget;
+	private ArrayList<DownloadedWidget> downloadedWidget;
 	
 	public static final int DEFAULT_VALUE = -1;
 	private int id;
@@ -76,8 +61,8 @@ public class Member {
 		email="";
 		regDate =  new Timestamp(System.currentTimeMillis());
 		sessionId= "";
-		downloadedWidget = null;
-		developedWidget = null;
+		downloadedWidget = new ArrayList<>();
+		developedWidget = new ArrayList<>();
 	}
 	
 	public Member(Member mdb){
@@ -93,17 +78,7 @@ public class Member {
 		developedWidget = mdb.developedWidget;
 	}
 	
-	public Member(int id, String email, String name, String pw, enumMemberType idType, Timestamp reg_date){
-		this.id = id;
-		this.dev_id = dev_id;
-		this.email = email;
-		this.nickname = name;
-		this.planPassword = pw;
-		this.userType = idType;
-		this.regDate = reg_date;
-		this.developedWidget = null;
-		this.downloadedWidget = null;
-	}
+
 	
 	////getter setter////
 	
@@ -196,21 +171,6 @@ public class Member {
 		return MemberMap;
 	}
 
-	public DevelopedWidget getDevelopedWidget() {
-		return developedWidget;
-	}
-
-	public void setDevelopedWidget(DevelopedWidget developedWidget) {
-		this.developedWidget = developedWidget;
-	}
-
-	public DownloadedWidget getDownloadedWidget() {
-		return downloadedWidget;
-	}
-
-	public void setDownloadedWidget(DownloadedWidget downloadedWidget) {
-		this.downloadedWidget = downloadedWidget;
-	}
 
 	public EnumMap<enumMemberAbnormalState, Boolean> getAbnormalState() {
 		return abnormalState;
@@ -220,29 +180,95 @@ public class Member {
 		this.abnormalState = abnormalState;
 	}
 	
+
+	public ArrayList<DevelopedWidget> getDevelopedWidget() {
+		return developedWidget;
+	}
+
+	public void addDevelopedWidget(DevelopedWidget w) throws Exception {
+		
+		
+		for(DevelopedWidget widget : developedWidget){
+			if(widget.getWidgetId() == w.getWidgetId())
+				throw new Exception("이미 리스트에 위젯이 존재합니다.");
+		}
+		
+		developedWidget.add(w);
+	
+	}
+
+	public void addDevelopedWidget(ArrayList<DevelopedWidget> widgets) throws Exception {
+		
+		for(DevelopedWidget widget : developedWidget){
+			for(DevelopedWidget _widget : widgets)
+				if(widget.getWidgetId() == _widget.getWidgetId())
+					throw new Exception("이미 리스트에 위젯이 존재합니다.");
+		}
+		
+		for(DevelopedWidget w : widgets)
+			developedWidget.add(w);
+	}
+	
+	public ArrayList<DownloadedWidget> getDownloadedWidgetList() {
+		return downloadedWidget;
+	}
+
+	public void addDownloadedWidget(DownloadedWidget w) throws Exception {
+		
+		for(DownloadedWidget widget : downloadedWidget){
+			if(widget.getWidgetId() == w.getWidgetId())
+				throw new Exception("이미 리스트에 위젯이 존재합니다.");
+		}
+		
+		downloadedWidget.add(w);
+	}
+
+	public void addDownloadedWidget(ArrayList<DownloadedWidget> widgets) throws Exception {
+		
+		for(DownloadedWidget widget : downloadedWidget){
+			for(DownloadedWidget _widget : widgets)
+				if(widget.getWidgetId() == _widget.getWidgetId())
+					throw new Exception("이미 리스트에 위젯이 존재합니다.");
+		}
+		
+		for(DownloadedWidget w : widgets)
+			downloadedWidget.add(w);
+	}
+
+	
 	/////method/////
 	
 	/**
-	 * 	로그인 후 member객체의 정보를 모두 DB로 부터 읽어온다. 
+	 * 	로그인 시도중 가입한 사람이면  member객체의 정보를 모두 DB로 부터 읽어온다. 
 	 * @param sId		sessionId
 	 * @param nickname	페이지로부터 넘어온 nickname string
+	 * @throws SQLException 
+	 * @throws MemberException 
 	 * @throws Throwable member, sql exception을 던진다
 	 */
-	public static Member setMemberFromDB_Nickname(Member member, String sId, String nickname) throws Throwable{
+	public static Member setMemberFromDB(Member member) throws SQLException, MemberException{
 		
-	
-		PreparedStatement _ps = conn.prepareStatement("select * from user where nickname = ?");
-		_ps.setString(1, nickname);
+		PreparedStatement _ps = null; 
+		
+		if(member.getEmail()!=null && !member.getEmail().equals("")){
+			_ps = conn.prepareStatement("select * from user where email = ?");
+			_ps.setString(1, member.getEmail());
+		}
+		else if(member.getNickname()!=null && !member.getNickname().equals("")){
+			_ps = conn.prepareStatement("select * from user where nickname = ?");
+			_ps.setString(1, member.getNickname());
+		}
+		
 		ResultSet _rs = _ps.executeQuery();
 
 		if(_rs.next()){
 			
-			member.setNickname(nickname);
+			member.setNickname("nickname");
 			member.setId(_rs.getInt("u_id"));
 			member.setEmail(_rs.getString("email"));
 			member.setRegDate(_rs.getTimestamp("registrationDate"));
-			member.setSessionId(sId);
 			member.setJoin(true);
+			
 			
 			boolean _isExist = false;
 			for(enumMemberType e : enumMemberType.values()){
@@ -270,55 +296,6 @@ public class Member {
 		return member;
 	}
 	
-	
-	/**
-	 * 	로그인 후 member객체의 정보를 모두 DB로 부터 읽어온다. 
-	 * @param sId		sessionId
-	 * @param email	페이지로부터 넘어온 email string
-	 * @throws Throwable member, sql exception을 던진다
-	 */
-	public static Member setMemberFromDB_Email(Member member, String sId, String email) throws Throwable{
-		
-		
-		
-		PreparedStatement _ps = conn.prepareStatement("select * from user where email = ?");
-		_ps.setString(1, email);
-		ResultSet _rs = _ps.executeQuery();
-
-		if(_rs.next()){
-			
-			member.setEmail(email);
-			member.setId(_rs.getInt("u_id"));
-			member.setNickname(_rs.getString("nickname"));
-			member.setRegDate(_rs.getTimestamp("registrationDate"));
-			member.setSessionId(sId);
-			member.setJoin(true);
-			
-			boolean _isExist = false;
-			for(enumMemberType e : enumMemberType.values()){
-				if(e.getString().equals(_rs.getString("registrationKind"))){
-					_isExist = true;
-					member.setIdType(e);
-				}
-			}
-			if(!_isExist)
-				throw new MemberException(enumMemberState.NOT_EXIST_IN_DB, enumPage.MAIN);
-			
-			_ps = conn.prepareStatement("select d_id from developer where u_id = ?");
-			_ps.setInt(1, member.getId());
-			_rs = _ps.executeQuery();
-			
-			if(_rs.next()){
-				member.setDeveloperId(_rs.getInt("d_id"));
-				member.setDeveloper(true);
-			}
-			else
-				member.setDeveloper(false);
-			
-		}
-		return member;
-		
-	}
 	
 	public static boolean isContainsMember(String sId){
 		
@@ -326,15 +303,13 @@ public class Member {
 						
 	}
 	
-
-	
 	/**
 	 * 	로그인한 유저를 대상으로 HashMap으로 객체를 보유하고 없으면 새로 생성한다. 
 	 * @param sId	브라우져 sessionId를 통해 유저의 객체를 찾는다. 
 	 * @return	sId key에 맞는 객체 value를 반환. 
 	 * @throws Throwable	sId가 null이거나 sId를 통해 객체를 찾지 못핳는 경우 예외 발생. 
 	 */
-	public static Member getMember(String sId) throws Throwable{
+	public static Member getMember(String sId){
 		
 		if(sId==null)
 			throw new NullPointerException();
@@ -355,8 +330,6 @@ public class Member {
 		
 		return member;
 	}
-	
-
 	
 	public static void addMember(Member m){
 		Member.getMemberMap().put(m.getSessionId(), m);
@@ -404,7 +377,4 @@ public class Member {
 	}
 
 
-
-
-	
 }

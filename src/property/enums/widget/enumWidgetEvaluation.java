@@ -4,9 +4,6 @@ import java.util.HashMap;
 
 public enum enumWidgetEvaluation {
 
-	
-	
-	
 	PASS("1"),
 	EVALUATING("2"),
 	UNALLOWANCE("3");
@@ -50,8 +47,7 @@ public enum enumWidgetEvaluation {
 		MANIFEST_ERROR("3"),
 		IMAGE_ERROR("3"),
 		UNKWON_ERROR("4");
-		
-		
+				
 		
 		private String UnallowanceReason;
 		

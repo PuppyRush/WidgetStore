@@ -10,7 +10,7 @@
 <%
 	request.setCharacterEncoding("UTF-8");
 	boolean isFailVerify;
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.STORE);
 	if(!(boolean)results.get("isSuccessVerify")){
 		isFailVerify =false;
 		enumPage to = (enumPage)results.get("to");

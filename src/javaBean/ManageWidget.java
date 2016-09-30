@@ -1,75 +1,654 @@
 package javaBean;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+import com.sun.org.apache.xml.internal.security.signature.Manifest;
+
+import developer.EvaluationException;
+import developer.ManageEvaluation;
+import developer.ManageManifest;
+import developer.ManageManifest.RecommandInfo.Ratio;
+import page.PageException;
+import property.enums.enumPage;
+import property.enums.enumPageError;
+import property.enums.enumSystem;
+import property.enums.widget.enumWidgetEvaluation;
+import property.enums.widget.enumWidgetPosition;
+import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
+
+
 public class ManageWidget {
 
 	private static Connection conn = ConnectMysql.getConnector();
-	
-	public static void addWidgetToStore(int uId, int wId){
-		
-	
+
+	/**
+	 * 평가가 끝난후 스토어에 위젯을 올리기 위해 db에 관련 정보를 모두 추가한다.
+	 * 
+	 * @param devId
+	 *                개발자의 id
+	 * @param wId
+	 */
+	public static void addWidget(int devId, int evalId) {
+
 	}
-	
-	public static void removeWidget(int uId, int wId){
-		
-		
-		
+
+	/**
+	 * widget테이블을 삭제하면 나머지는 모두 DB의 프로시져가 알아서 제거한다.
+	 * 
+	 * @param devId
+	 *                개발자 id
+	 * @param wId
+	 *                위젯 id
+	 * @throws SQLException
+	 * @throws PageException
+	 */
+	public static void removeWidget(int devId, int wId) throws SQLException, PageException {
+
+		PreparedStatement _ps = null;
+		ResultSet _rs = null;
+
+		try {
+			conn.setAutoCommit(false);
+
+			// 삭제하려는 위젯이 유저가 갖고 있는 위젯과 일치하는지 검사.
+			_ps = conn.prepareStatement("select developerId from widget where widget_num = ?");
+			_ps.setInt(1, wId);
+			_rs = _ps.executeQuery();
+			_rs.next();
+			if (devId != _rs.getInt(1))
+				throw new PageException("파라메터가 일치하지 안습니다.", enumPageError.UNKNOWN_PARA_VALUE);
+			_ps.close();
+			_rs.close();
+
+			_ps = conn.prepareStatement("delete from widget where widget_num = ?");
+			_ps.setInt(1, wId);
+			_ps.executeUpdate();
+
+			conn.commit();
+
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+		}
+
 	}
+
+
+	/**
+	 * 
+	 * 업데이트 될 위젯이 평가 될 수 있도록 처리한다.
+	 * 
+	 * @param eval
+	 * @return
+	 * @throws SQLException
+	 */
+	public static enumWidgetEvaluation addUpdatingWidget(ManageEvaluation widget, enumWidgetEvaluation eval)
+			throws SQLException {
+
+		ResultSet _rs = null;
+		PreparedStatement _ps = null;
+		try {
+			if (conn.isClosed()) {
+				eval = enumWidgetEvaluation.UNALLOWANCE;
+				throw new SQLException("DB오류. 개발자에게 문의하세요. ");
+			}
+			conn.setAutoCommit(false);
+
+			//////////// to get oldManifest key
+			int _oldManifestId;
+
+			_ps = conn.prepareStatement("select manifest_id from widget where developer = ? ");
+			_ps.setInt(1, widget.getMember().getDeveloperId());
+
+			_rs = _ps.executeQuery();
+			if (_rs.next())
+				_oldManifestId = _rs.getInt("manifest_id");
+			else
+				throw new SQLException();
+
+			/*
+			 * //////////// evaluationManifest table _ps.close();
+			 * _rs.close(); _ps = conn.prepareStatement(
+			 * "insert into WidgetManifest (manifest_version,   widget_version,    widget_kind,   git_tag,   git_branch, "
+			 * +
+			 * "is_support_resolution, resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? ,?)"
+			 * , PreparedStatement.RETURN_GENERATED_KEYS);
+			 * 
+			 * _ps.setInt(1, widget.getManifestVersion());
+			 * _ps.setFloat(2, widget.getWidgetVersion());
+			 * _ps.setString(3, widget.getKind().getString());
+			 * _ps.setString(4, widget.getGit()._tag);
+			 * _ps.setString(5, widget.getGit()._branch);
+			 * if(widget.getRecommandInfo()._isSupportResolution){
+			 * _ps.setInt(6, 1); } else _ps.setInt(6, 0);
+			 * 
+			 * _ps.setString(7,
+			 * widget.getRecommandInfo()._resolutionMethod);
+			 * _ps.setInt(8,
+			 * widget.getRecommandInfo().maxHeightSize);
+			 * _ps.setInt(9,
+			 * widget.getRecommandInfo().maxWidthSize);
+			 * _ps.setInt(10,
+			 * widget.getRecommandInfo().minWidthSize);
+			 * _ps.setInt(11,
+			 * widget.getRecommandInfo().minHeightSize);
+			 * 
+			 * _ps.executeUpdate();
+			 * 
+			 * _rs = _ps.getGeneratedKeys(); _rs.next(); int
+			 * _newManifestId = _rs.getInt(1);
+			 */
+
+			/////////////// widgetEvaluation Table
+			_ps.close();
+			_rs.close();
+			_ps = conn.prepareStatement(
+					"insert into widgetEvaluation ( evalState, developer) values (?,?,?)");
+
+			int evalState = Integer.valueOf(eval.getString());
+			_ps.setInt(1, evalState);
+			_ps.setInt(2, widget.getMember().getDeveloperId());
+			_ps.executeUpdate();
+
+			conn.commit();
+
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+
+		}
+
+		return eval;
+	}
+
+	/**
+	 * 새로 업로드 된 위젯의 자동검사가 끝나면 이를 DB에 업데이트한다 evaluationManifest,
+	 * widgetEvaluation, widget, widgetDetail 의 테이블에 모두 insert된다.
+	 * 
+	 * @param eval
+	 * @throws SQLException
+	 */
+	public static enumWidgetEvaluation addEvaluatingWidget(ManageEvaluation widget, enumWidgetEvaluation eval) throws SQLException {
+
+		ResultSet _rs = null;
+		PreparedStatement _ps = null;
+		try {
+			if (conn.isClosed()) {
+				eval = enumWidgetEvaluation.UNALLOWANCE;
+				throw new SQLException("DB오류. ");
+			}
+			conn.setAutoCommit(false);
+
 	
-	public static boolean updateWidget(int uId, int wId,float version, String root ,String wName){
+
+			/////////////// widgetEvaluation Table
+			_ps = conn.prepareStatement(
+					"insert into widgetEvaluation ( evalState, developer) values (?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+
+			int evalState = Integer.valueOf(eval.getString());
+			_ps.setInt(1, evalState);
+			_ps.setInt(2, widget.getMember().getDeveloperId());
+			_ps.executeUpdate();
+
+			_rs = _ps.getGeneratedKeys();
+			_rs.next();
+			int eval_id = _rs.getInt(1);
 		
-		PreparedStatement st  = null;
-		ResultSet rs = null;
+			_ps.close();
+			_rs.close();
+			
+			///////////////evaluationManifest
+			
+			
+			_ps = conn.prepareStatement("insert into evaluationManifest ( eval_id, title, kind, contents, version, main_image, sub_image, widget_root ,position ) values (?,?,?,?, ?,?,?,?, ?)");
+			_ps.setInt(1,eval_id);
+			_ps.setString(2, widget.getWidgetName());
+			_ps.setString(3,widget.getKind().toString() );
+			_ps.setString(4,widget.getContents() );
+			_ps.setFloat(5,widget.getManifest().getWidgetVersion() );
+			_ps.setString(6, widget.getMainImageFullPath() );
+			_ps.setString(7, widget.getSubImageFullPath());
+			_ps.setString(8, widget.getWidgetRoot());
+			_ps.setString(9, widget.getManifest().getPosition().toString());
+			_ps.executeUpdate();
+			
+			conn.commit();
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+		}
 		
-	  	try {
-	  		conn.setAutoCommit(false);
-	  		
-	  		st = conn.prepareStatement("select widget_num from widget where developer = ? and title = ? ", ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-	  		st.setInt(1,uId);
-	  		st.setString(2, wName);
-	  		rs = st.executeQuery();
-	  		
-	  		rs.last();
-	  		if(rs.getRow()!=1)
-	  			throw new SQLException();
-	  			
-	  	
-	  		
-			st = conn.prepareStatement("update widget set currentVersion = ? , HTML = ? where title = ? and developer = ?  ");
-		  	st.setFloat(1,  version);
-		  	st.setString(2, root);
-		  	st.setString(3, wName);
-		  	st.setInt(4, uId);
-			 
-			st.executeUpdate();		
+		return enumWidgetEvaluation.PASS;
+	}
+
+	/**
+	 *  	새로 업로드된 위젯의 평가가 모두 끝나면 DB를 갱신하고 해당 멤버가 로그인 중이면 이를 리스트에 추가한다.
+	 *     
+	 * 	
+	 * @param widget manifest정보가 포함된 변수 
+	 * @param evalId db의 evalId
+	 * @throws Exception 
+	 */
+	public static void addEvaluatedWidget(ManageManifest mani, String sId, int evalId) throws Exception{
+		
+	
+		ResultSet _rs = null;
+		PreparedStatement _ps = null;
+		try {
+			if (conn.isClosed()) 
+				throw new SQLException("DB오류. ");
+			else if(mani == null)
+				throw new NullPointerException("manifest 변수가 null입니다.");
+			
+			conn.setAutoCommit(false);
+
+//////////////get
+			
+			///////////get evaluationManifest
+			
+			_ps = conn.prepareStatement("select * from evaluationManifest where eval_id = ?");
+			_ps.setInt(1, evalId);
+			_rs = _ps.executeQuery();
+			_rs.next();
+			String _widgetName = _rs.getString("title");
+			String _kind = _rs.getString("kind");
+			String _contents = _rs.getString("contents");
+			float _version = _rs.getFloat("version");
+			String _mainImageFullPath = _rs.getString("main_image");
+			String _subImageFullPath = _rs.getString("sub_image");
+			String _widgeRoot = _rs.getString("widget_root");
+			String _position = _rs.getString("position");
+			
+			_ps.close();
+			_rs.close();
 			
 			
+			/////////////get widgetEvaluation
+			_ps = conn.prepareStatement("select * from widgetEvaluation where eval_id = ?");
+			_ps.setInt(1, evalId);
+			_rs = _ps.executeQuery();
+			_rs.next();
+			int _dId = _rs.getInt("developer");
+			Timestamp _updatedDate = _rs.getTimestamp("evaluationBeginDate");
 			
-			//manifest에 업로드.
+			_ps.close();
+			_rs.close();
+			////////////get 
+			
+			_ps = conn.prepareStatement("select * from developer where d_id = ?");
+			_ps.setInt(1, _dId);
+			_rs = _ps.executeQuery();
+			_rs.next();
+			int _uId = _rs.getInt("u_id");
+			
+			_ps.close();
+			_rs.close();
+			
+			////////////get developerName
+			
+			_ps = conn.prepareStatement("select nickname from userwhere u_id = ?");
+			_ps.setInt(1, _uId);
+			_rs = _ps.executeQuery();
+			_rs.next();
+			String nickname = _rs.getString("nickname");
+
+			_ps.close();
+			_rs.close();
+			
+/////////////set			
+			
+			//////widgetManifest
+			_ps = conn.prepareStatement("insert into widgetManifest (manifest_version,   widget_version,    widget_kind,   git_tag,   git_branch, "
+					+ "is_support_resolution, resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? ,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			
+			_ps.setInt(1, mani.getManifestVersion()); 
+			_ps.setFloat(2, mani.getWidgetVersion());
+			_ps.setString(3, _kind );
+			_ps.setString(4, mani.getGit()._tag);
+			_ps.setString(5, mani.getGit()._branch);
+			if(mani.getRecommandInfo()._isSupportResolution){
+				_ps.setInt(6, 1);
+			}
+			else
+				_ps.setInt(6, 0);
+			
+			_ps.setString(7, mani.getRecommandInfo()._resolutionMethod);
+			_ps.setInt(8, mani.getRecommandInfo().maxHeightSize);
+			_ps.setInt(9, mani.getRecommandInfo().maxWidthSize);
+			_ps.setInt(10, mani.getRecommandInfo().minWidthSize);
+			_ps.setInt(11, mani.getRecommandInfo().minHeightSize);
+			
+			_ps.executeUpdate();
+		
+			_rs = _ps.getGeneratedKeys();
+			_rs.next();
+			int _manifestId = _rs.getInt(1);
+			
+			/////////////////widget Ratio
+			if(mani.getRecommandInfo()._isSupportResolution){
+				for(Ratio ary : mani.getRecommandInfo()._ratioArray){
+					_ps = conn.prepareStatement("insert into widgetRatio (manifest_id, widthRatio, heightRatio, widthSize, heightSize) values (?,?,?,?,?) ");
+					_ps.setInt(1,_manifestId);
+					_ps.setInt(2,ary.widthRatio);
+					_ps.setInt(3,ary.heightRatio);
+					_ps.setInt(4,ary.widthSize);
+					_ps.setInt(5,ary.heightSize);
+					
+					_ps.executeUpdate();
+				}
+			}
+			
+			_ps.close();
+			_rs.close();
+			//////////// widget table
 		  	
+			_ps = conn.prepareStatement("insert into widget (developer,title, kind, currentVersion, registrationPosition, registrationDate, HTML, manifest_id)"
+					+ " values(?,?,?,?,  ?,?,?,?) ", PreparedStatement.RETURN_GENERATED_KEYS);
+			
+			_ps.setInt(1, _dId);
+			_ps.setString(2, _widgetName);
+			_ps.setString(3, _kind);
+			_ps.setFloat(4, mani.getWidgetVersion());
+			_ps.setString(5, mani.getPosition().toString());
+			_ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()) );
+			_ps.setString(7, new StringBuilder(_widgeRoot).append(enumSystem.SOURCE_FOLDER_NAME).append("/").append(mani.getRootUrl()).toString());
+			_ps.setInt(8, _manifestId);
+			
+			_ps.executeUpdate();
+			_rs = _ps.getGeneratedKeys();
+			_rs.next();
+			int _wId= _rs.getInt(1);
+			
+			_ps.close();
+			_rs.close();
+			//	///////////////widgetDetail Table
+			
+			_ps = conn.prepareStatement("insert into widgetDetail (widget_num, main_image, sub_image, explane, widgetRoot) values(?,?,?,?,?)");
+			_ps.setInt(1, _wId);
+			_ps.setString(2, new StringBuilder(_widgeRoot).append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+			_ps.setString(3, new StringBuilder(_widgeRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+			_ps.setString(4, _contents);
+			_ps.setString(5,_widgeRoot);
+			_ps.executeUpdate();
+			
+			_ps.close();
+			_rs.close();
+			
+	
+/////////////////delete
+			
+			_ps = conn.prepareStatement("delete from widgetEvaluation where eval_id = ?");
+			_ps.setInt(1, evalId);
+			_ps.executeUpdate();
+			
+			
+			
+///////////////////user
+			
+			if(Member.isContainsMember(sId)){
+				
+				Member member = Member.getMember(sId);
+				////멤버가 로그인 중이라 객체에 위젯 정보 추가
+				
+				if(member.getDevelopedWidget()==null)
+					throw new NullPointerException("devlopedWideget list가 null입니다.");
+					
+				DevelopedWidget widget = new DevelopedWidget.Builder(_wId, _widgetName, _kind)
+						.contents(_contents)
+						.developerId(_dId)
+						.developer(nickname)
+						.mainImagePath( _mainImageFullPath)
+						.subImagePath(_subImageFullPath)
+						.position(_position)
+						.sourceRoot(_widgeRoot)
+						.updatedDate(_updatedDate).build();
+
+				member.addDevelopedWidget(widget);
+				
+			}
+			
+			
 		  	conn.commit();
-		  
-		  	
+			
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+			}
+		}
+		
+	}
+	
+	/**
+	 * 
+	 *   업데이트 신청한 위젯의 평가가 모두 끝나면 DB를 갱신하고 해당 멤버가 로그인 중이면 이를 추가한다.
+	 * 
+	 * @param widget
+	 * @throws SQLException
+	 */
+	public static void addEvaludatedUpdatedWidget(ManageManifest mani, String sId, int evalId) throws SQLException{
+		
+	
+		ResultSet _rs = null;
+		PreparedStatement _ps = null;
+		try {
+			if (conn.isClosed()) 
+				throw new SQLException("DB오류. ");
+			else if(mani == null)
+				throw new NullPointerException("manifest 변수가 null입니다.");
+			
+			conn.setAutoCommit(false);
+		
+			
+			
+			
+			
+			
+		  	conn.commit();
+			
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+			}
+		}
+		
+	}
+	
+	
+	public static ArrayList<EvaluatingWidget> getAllEvaluatingWidgets() {
+
+		ArrayList<EvaluatingWidget> _widgets = new ArrayList<EvaluatingWidget>();
+		PreparedStatement _ps = null, __ps = null;
+		ResultSet _rs = null, __rs = null;
+
+		try {
+
+			// _ps = conn.prepareStatement("select developer,
+			// widget_num, evalNum, evalState,
+			// evaluationBeginDate,developer,isUpdate, title, kind,
+			// registartionPosition from widgetEvaluation join
+			// widget");
+			_ps = conn.prepareStatement("select * from widgetEvaluation join evaluationManifest using(eval_id)");
+			_rs = _ps.executeQuery();
+
+			if (_rs.next()) {
+
+				String name = _rs.getString("title");
+				int evalId = _rs.getInt("eval_id");
+				String kind = _rs.getString("kind");
+				Timestamp date = _rs.getTimestamp("evaluationBeginDate");
+				String pos = _rs.getString("position");
+				int developerId = _rs.getInt("developer");
+				boolean isUpdate = _rs.getInt("isUpdate") == 1 ? true : false;
+
+				__ps = conn.prepareStatement(
+						"select widget_root from evaluationManifest where eval_id = ?");
+				__ps.setInt(1, evalId);
+				__rs = __ps.executeQuery();
+				__rs.next();
+				String widgetRoot = __rs.getString("widget_root");
+				__ps.close();
+				__rs.close();
+
+				__ps = conn.prepareStatement(
+						"select nickname from user join developer using(u_id) where d_id = ?");
+				__ps.setInt(1, developerId);
+				__rs = __ps.executeQuery();
+				__rs.next();
+				String nickname = __rs.getString("nickname");
+		
+				EvaluatingWidget w = new EvaluatingWidget( name, kind, date, widgetRoot, pos,
+						evalId, isUpdate, developerId, nickname);
+				_widgets.add(w);
+			
+				__ps.close();
+				__rs.close();
+			}
+
 		} catch (SQLException e) {
+			e.printStackTrace();
+
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+		} finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+			if (__ps != null)
+				try {
+					__ps.close();
+				} catch (SQLException ex) {
+				}
+			if (__rs != null)
+				try {
+					__rs.close();
+				} catch (SQLException ex) {
+				}
 		}
-		return true;
+		return _widgets;
 	}
-	
-	public static ArrayList<HashMap<String,String>> getUserWidgets(String uId){
-		ArrayList<HashMap<String,String>> _list = new ArrayList<HashMap<String,String>>(); 
-		
-		
-		
-		
-		return _list;
+
+	/**
+	 *  개발자가 등록한 평가가 끝난  위젯을 모두 반환한다. 단, 최초에 한번만 DB를 통해 모두 가져온다. *
+	 * 
+	 * @param sId
+	 *                개발자의 id
+	 * @return 개발자가 등록한 위젯 정보가 들은 객체의 배열이 반환된다.
+	 * @throws Throwable
+	 */
+	public static ArrayList<DevelopedWidget> getMyDevelopedWidget(String sId) throws Throwable {
+
+		Member member = null;
+		try {
+			member = Member.getMember(sId);
+			if (member.getDevelopedWidget() != null && member.getDevelopedWidget().size() != 0)
+				return member.getDevelopedWidget();
+
+			ArrayList<DevelopedWidget> ary = new ArrayList<>();
+
+			PreparedStatement _ps = conn.prepareStatement(
+					"select * from widget join widgetDetail using(widget_id) where d_id = ?");
+			_ps.setInt(1, member.getDeveloperId());
+			ResultSet _rs = _ps.executeQuery();
+
+			while (_rs.next()) {
+
+				DevelopedWidget _widget = new DevelopedWidget.Builder(_rs.getInt("widget_id"),
+						_rs.getString("title"), _rs.getString("kind"))
+								.version(_rs.getFloat("currentVersion"))
+								.updatedDate(_rs.getTimestamp("updatedDate"))
+								.sourceRoot(_rs.getString("HTML"))
+								.contents(_rs.getString("explain"))
+								.subImagePath(_rs.getString("sub_image"))
+								.mainImagePath(_rs.getString("main_image"))
+								.totalReview(_rs.getFloat("totalReview"))
+								.reviewCount(_rs.getInt("count")).build();
+
+				_widget.setWidgetId(member.getDeveloperId());
+
+				ary.add(_widget);
+
+			}
+
+			member.addDevelopedWidget(ary);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
+		return Member.getMember(sId).getDevelopedWidget();
+
 	}
-	
+
+
 }
