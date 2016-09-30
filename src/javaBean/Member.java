@@ -32,6 +32,7 @@ public class Member {
 	
 	private EnumMap<enumMemberAbnormalState, Boolean> abnormalState;
 	
+
 	private ArrayList<DevelopedWidget> developedWidget;
 	private ArrayList<DownloadedWidget> downloadedWidget;
 	

@@ -30,6 +30,7 @@ public class Login implements commandAction {
 	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			{
 		
+		
 	
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		Member member = null;

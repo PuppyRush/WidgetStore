@@ -9,6 +9,7 @@
 
 <%@page import="javaBean.*"%>
 <%@page import="java.util.*"%>
+<%@page import="java.sql.*"%>
 <%@page import="page.VerifyPage"%>
 <%@page import="property.enums.enumPage"%>
 
@@ -91,7 +92,22 @@
 </head>
 
 <body>
+<script type="text/javascript">
+<%
+// load info in DB
+%>
 
+function setWidget(){
+	var frame = document.createElement("iframe");
+	frame.style.left = "100px";
+	frame.style.left = "100px";
+}
+
+</script>
+<!--  add widget in board -->
+<iframe x = "100", y = "100" width = "200px" height = "200px" ></iframe>
+<script type="text/javascript">
+</script>
     <!-- Navigation -->
     <a id="menu-toggle" href="#" class="btn btn-dark btn-md toggle"><i class="fa fa-th-large"></i></a>
     <nav id="sidebar-wrapper">
