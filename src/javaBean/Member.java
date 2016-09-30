@@ -11,11 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.EnumMap;
 
-<<<<<<< 0471dfebbf7e3387401db732d512f5612ac6c92d
-import org.apache.catalina.connector.Connector;
 
-=======
->>>>>>> 157402d4865c65be2745771a59a303a5a63ce5a2
 import property.enums.enumPage;
 import property.enums.member.enumMemberAbnormalState;
 import property.enums.member.enumMemberState;
