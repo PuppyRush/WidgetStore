@@ -381,7 +381,7 @@ public class ManageManifest {
 			_col = (Node) _xpath.evaluate("*/required/position", _doc, XPathConstants.NODE);
 			__col = (Node) _xpath.evaluate("*/required/position", __doc, XPathConstants.NODE);
 			if (!_col.getNodeName().equals(__col.getNodeName()))
-				throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",
+				throw new EvaluationException("--------" ,
 						enumEvalFailCase.MANIFEST_ERROR);
 			else {
 				String _pos = ((Element) ((NodeList) _xpath.evaluate("*/required/position", _doc,

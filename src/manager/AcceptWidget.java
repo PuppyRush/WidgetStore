@@ -3,9 +3,13 @@ package manager;
 import page.PageException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import developer.ManageManifest;
+
 import java.sql.Timestamp;
 import java.util.HashMap;
 import javaBean.ManageMember;
+import javaBean.ManageWidget;
 import javaBean.Member;
 import netscape.javascript.JSObject;
 import property.commandAction;
@@ -27,9 +31,19 @@ public class AcceptWidget implements commandAction {
 		Member member = new Member();
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		try{
-			if(request.getParameter("wId")==null )
+			if(request.getParameter("wId")==null || request.getParameter("evalId")==null || request.getParameter("widgetRoot")==null   )
 				throw new PageException(enumPageError.NO_PARAMATER);
 			
+			String widgetRoot = request.getParameter("evalId");
+			int wId = Integer.valueOf(request.getParameter("wId"));
+			int evalId = Integer.valueOf(request.getParameter("evalId"));
+			
+			ManageManifest manifest = new ManageManifest(widgetRoot);
+			
+			if(ManageWidget.isUpdatingWidget(evalId))
+				ManageWidget.addEvaludatedUpdatedWidget(manifest, request.getRequestedSessionId(), evalId );
+			else
+				ManageWidget.addEvaluatedWidget(manifest, request.getRequestedSessionId(), evalId);
 			
 			
 			

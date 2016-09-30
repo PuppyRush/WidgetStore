@@ -168,6 +168,16 @@
 	</div>
 	<!-- /#wrapper -->
 
+
+
+<form action="withdraw.do" method="post" id="withdrawForm">
+
+	<input type="hidden" id="uId" name="uId">
+
+	
+
+</form>
+
 	<!-- jQuery -->
 	<script src="/AdminPage/js/jquery.js"></script>
 
@@ -184,7 +194,7 @@
 
 <script>
 
-
+var selectedIdx;
 
 $( document ).ready(function() {
 	$('#userTable').on( 'over', 'tr', function() {
@@ -197,6 +207,13 @@ $( document ).ready(function() {
           alert('You clicked row '+ ($(this).index()+1) );
         });
 });
+
+function withdraw(){
+	
+	selectedIdx = $("#widgetTable").closest("tr").index();
+	
+
+}
 
 
 window.onload=function(){
@@ -256,7 +273,7 @@ window.onload=function(){
 				
 			 $("#userTable > tbody:last").append('<tr><td>'+ (i+1) +'</td><td><div class="checkbox"><label><input type="checkbox"> </label> </div></td><td>'+
 					 m.get("nickname") + '</td><td>' + m.get("email")	+ '</td><td>' + m.get("date") + '</td><td>' + m.get("isDeveloper")
-						+ '</td><td>' + m.get("state") + '</td><td> <button type="button" id="withdrawal" name="withdrawal" class="btn btn-primary btn-sm">탈퇴</button> </td></tr> ' ); 
+						+ '</td><td>' + m.get("state") + '</td><td> <button type="button" id="withdrawal" name="withdrawal" class="btn btn-primary btn-sm" onClick="withdraw()">탈퇴</button> </td></tr> ' ); 
 		
 		}
 	

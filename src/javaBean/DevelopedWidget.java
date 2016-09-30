@@ -2,9 +2,7 @@ package javaBean;
 
 import java.sql.Timestamp;
 
-import property.enums.enumSystem;
-import property.enums.member.enumMemberState;
-import property.enums.widget.enumWidgetKind;
+
 import property.enums.widget.enumWidgetPosition;
 
 public class DevelopedWidget extends Widget{
