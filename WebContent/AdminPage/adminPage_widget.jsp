@@ -246,7 +246,14 @@
 	<!-- /#wrapper -->
 
 
+<form action="acceptWidget.do" method="post" id="acceptForm">
 
+	<input type="hidden" id="widgetId" name="widgetId">
+	<input type="hidden" id="widgetRoot" name="widgetRoot">
+	<input type="hidden" id="evalId" name="evalId">
+	
+
+</form>
 
 
 	<!-- jQuery -->
@@ -260,7 +267,8 @@
 	<script type="text/javascript"
 		src="/AdminPage/js/locales/bootstrap-datetimepicker.ko.js"
 		charset="UTF-8"></script>
-	<script src="/AdminPage/js/commanJs.js"></script>
+		<script type="text/javascript"	src="/AdminPage/js/commanJs.js"		charset="UTF-8"></script>
+	
 	<script
 		src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.7.0/highlight.min.js"></script>
 	<script>hljs.initHighlightingOnLoad();</script>
@@ -273,17 +281,46 @@
 
 <script>
 
+var _widgets = null;
+var _selectedWidgetIdx;
+var _sourceRoot;
+
 function showIdx(){
 
-	 alert($("#widgetTable").closest("tr").index());
-	   
+	 _selectedWidgetIdx = $("#widgetTable").closest("tr").index();
+	 
+		var m = new Map();
+		m = _widgets[_selectedWidgetIdx];
+		
+	 $("#widgetId").val(_widgets[_selectedWidgetIdx].get("widgetId"));
+	 $("#widgetRoot").val(_widgets[_selectedWidgetIdx].get("root"));
+	 $("#evalId").val(_widgets[_selectedWidgetIdx].get("evalId"));	 
+	 $("#acceptForm").submit();
 
 }
 
 
+function viewSource(){
 
-var _widgets = null;
-var _selectedWidgetIdx;
+	 
+	 _selectedWidgetIdx = $("#widgetTable").closest("tr").index();
+	 
+		var m = new Map();
+		m = _widgets[_selectedWidgetIdx];
+		_sourceRoot = m.get("root");
+
+}
+
+$(document).ready( function() {
+	$('#sourceTree').fileTree({
+				root: _sourceRoot,
+				script: 'SourceTree.jsp',
+				multiFolder: false },
+				function(file){
+				
+					$("pre code").load(file);
+				}); 						
+});
 
 window.onload=function(){
 	
@@ -300,6 +337,7 @@ window.onload=function(){
 				map.put("widgetName","<%=widgets.get(i).getWidgetName()%>");
 				map.put("uploadedDate","<%=widgets.get(i).getUploadedDate()%>");
 				map.put("kind","<%=widgets.get(i).getKind()%>");
+				map.put("widgetId","<%=widgets.get(i).getWidgetId()%>");
 				map.put("position","<%=widgets.get(i).getPosition()%>");
 				map.put("root","<%=widgets.get(i).getWidgetRoot()%>");
 				_widgets[<%=i%>] = map;
@@ -314,10 +352,12 @@ window.onload=function(){
 			 	 
 				 $("#widgetTable > tbody:last").append('<tr><td>'+ (i+1) +'</td><td>' + '<div class="checkbox"><label><input type="checkbox"> </label> </div></td><td>' +
 						 m.get("developer") + '</td><td>' + m.get("widgetName")	+ '</td><td>' + m.get("uploadedDate") + '</td><td>' + m.get("kind") + '</td><td>' + m.get("position") +
-						'</td><td> <button type="button" id="acceptWidget" class="btn btn-primary btn-sm">승인</button> <button type="button" id="viewSource" class="btn btn-primary btn-sm" onClick="showIdx()" >소스 보기</button> </td></tr> ');
-				  
+						'</td><td> <button type="button" id="acceptWidget" class="btn btn-primary btn-sm  onClick="showIdx()">승인</button> <button type="button" id="viewSource" class="btn btn-primary btn-sm" onClick="viewSource()" >소스 보기</button> </td></tr> ');
+			if(i==0)
+				_sourceRoot = m.get("root");
 		}
 			 
+	 
 	}
 
 

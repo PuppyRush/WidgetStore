@@ -1,59 +1,26 @@
 package javaBean;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
-import com.sun.org.apache.xml.internal.security.signature.Manifest;
-
-import developer.EvaluationException;
 import developer.ManageEvaluation;
 import developer.ManageManifest;
 import developer.ManageManifest.RecommandInfo.Ratio;
 import page.PageException;
-import property.enums.enumPage;
 import property.enums.enumPageError;
 import property.enums.enumSystem;
 import property.enums.widget.enumWidgetEvaluation;
-import property.enums.widget.enumWidgetPosition;
-import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
 
 
 public class ManageWidget {
 
 	private static Connection conn = ConnectMysql.getConnector();
 
-	/**
-	 * 평가가 끝난후 스토어에 위젯을 올리기 위해 db에 관련 정보를 모두 추가한다.
-	 * 
-	 * @param devId
-	 *                개발자의 id
-	 * @param wId
-	 */
-	public static void addWidget(int devId, int evalId) {
-
-	}
 
 	/**
 	 * widget테이블을 삭제하면 나머지는 모두 DB의 프로시져가 알아서 제거한다.
@@ -234,6 +201,7 @@ public class ManageWidget {
 			_ps.setString(6, widget.getMainImageFullPath() );
 			_ps.setString(7, widget.getSubImageFullPath());
 			_ps.setString(8, widget.getWidgetRoot());
+			System.out.println(widget.getManifest().getPosition().toString());
 			_ps.setString(9, widget.getManifest().getPosition().toString());
 			_ps.executeUpdate();
 			
@@ -694,6 +662,33 @@ public class ManageWidget {
 		
 	}
 	
+	public static boolean isUpdatingWidget(int evalId) throws SQLException{
+	
+		ResultSet _rs = null;
+		PreparedStatement _ps = null;
+		try {
+
+			_ps = conn.prepareStatement("select * from updatingWidget where eval_id = ?");
+			_ps.setInt(1, evalId);
+			_rs = _ps.executeQuery();
+			
+			return _rs.next();
+						
+			
+		}finally {
+			if (_ps != null)
+				try {
+					_ps.close();
+				} catch (SQLException ex) {
+				}
+			if (_rs != null)
+				try {
+					_rs.close();
+				} catch (SQLException ex) {
+				}
+		}
+		
+	}
 	
 	public static ArrayList<EvaluatingWidget> getAllEvaluatingWidgets() {
 
@@ -795,7 +790,7 @@ public class ManageWidget {
 			ArrayList<DevelopedWidget> ary = new ArrayList<>();
 
 			PreparedStatement _ps = conn.prepareStatement(
-					"select * from widget join widgetDetail using(widget_id) where d_id = ?");
+					"select * from widget join widgetDetail using(widget_id) where developer = ?");
 			_ps.setInt(1, member.getDeveloperId());
 			ResultSet _rs = _ps.executeQuery();
 
