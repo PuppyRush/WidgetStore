@@ -31,6 +31,8 @@ public class widgetLoad implements commandAction {
 			int num = 0;
 			int x = 0;
 			int y = 0;
+			int w = 0;
+			int h = 0;
 			boolean remote = false;
 			
 			while(rs.next()){
@@ -39,6 +41,8 @@ public class widgetLoad implements commandAction {
 				html = rs.getString("HTML");
 				x = rs.getInt("x");
 				y = rs.getInt("y");
+				w = rs.getInt("width");
+				h = rs.getInt("height");
 				
 				System.out.println(title + "widget call");
 				
@@ -47,8 +51,10 @@ public class widgetLoad implements commandAction {
 
 				// System.out.println(code);
 				
+				// class widget
+				// int num, String name, String tag, int pX, int pY, int width, int height, boolean remote
 				returns.put(Integer.toString(num),
-						new widget(num, title, html, x, y, remote));
+						new widget(num, title, html, x, y, w, h, remote));
 			} // end of while
 			
 		}catch(Exception e){

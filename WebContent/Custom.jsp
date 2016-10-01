@@ -27,26 +27,31 @@
 			String tag = "";
 			int pX = 0;
 			int pY = 0;
+			int width = 0;
+			int height = 0;
 			Enumeration<String> eNum = request.getAttributeNames();
 			while (eNum.hasMoreElements()) {
 				obj = request.getAttribute(eNum.nextElement());
 				/* 불러오기일 경우 */
 				if (null != obj && obj instanceof widget) {
 										
-					w = (widget) obj;%>
+					w = (widget) obj;
+					%>
 					
 					num = <%=w.getNum()%>;
 					name = "<%=w.getName()%>";
 					tag = "<%=w.getTag()%> ";
 					pX = <%=w.getPointX()%>;
 					pY = <%=w.getPointY()%>;
+					width = <%=w.getWidth()%> + "px";
+					height = <%=w.getHeight()%> + "px";
 					<%/* 이미 배치된 위젯을 불러오는 부분 */
 					if (w.getRemote()) {%>
-						obMouse.setWidget(num, name, tag);
+						obMouse.setWidget(num, name, tag, width, height);
 						obMouse.setLocation(pX, pY);
-						addWidget(num, name, tag);
-					<%} /* 유저가 내려받은 위젯을 리모콘에 추가한다 */
-					else {%> addWidget(num, name, tag); <%}
+					<%} 
+					/* 유저가 내려받은 위젯을 리모콘에 추가한다 */
+					%> addWidget(num, name, tag, width, height); <%
 				}
 				/*
 				* Save를 했을 경우
@@ -125,27 +130,31 @@
 							/**
 							 * select control에 정보 집어넣는 부분
 							 */
-							function addWidget(num, name, tag) {
+							function addWidget(num, name, tag, width, height) {
 								var op = document.createElement("option");
 
 								op.value = tag;
 								op.text = name;
 								op.id = num;
+								op.width = width;
+								op.height = height;
 								
 								document.form.widgetSel.options.add(op);
 							}
 
 							// select box 에서 위젯 선택시
 							function getWidget() {
-
 								var f = document.form.widgetSel;
 								var idx = f.selectedIndex; //인덱스
+								
 								var widgetTag = f.options[idx].value; //인덱스 값
 								var name = f.options[idx].text; // 인텍스 이름
 								var id = f.options[idx].id // 인덱스 id
+								var width = f.options[idx].width;
+								var height = f.options[idx].height;
 
 								if (widgetTag != '') {
-									obMouse.setWidget(id, name, widgetTag);
+									obMouse.setWidget(num, name, tag, width, height);
 								}
 							}
 						</script>
@@ -248,14 +257,19 @@
 		var name;
 		var id;
 
-		//좌표
+		// size
+		var width, height;
+		
+		// widget point
 		var px, py;
 
-		this.setWidget = function(id, name, tag) {
+		this.setWidget = function(num, name, tag, width, height) {
 			have = 1;
-			this.id = id;
+			this.id = num;
 			this.name = name;
 			this.widgetTag = tag;
+			this.width = width;
+			this.height = height;
 		}
 
 		this.setLocation = function(x, y) {
@@ -276,8 +290,8 @@
 			
 			div.id = this.id;
 			div.innerText = this.name;
-			div.style.width = "560px";
-			div.style.height = "315px";
+			div.style.width = this.width;
+			div.style.height = this.height;
 			div.style.backgroundColor = "red";
 			div.style.position = "absolute";
 			div.style.left = x + "px";

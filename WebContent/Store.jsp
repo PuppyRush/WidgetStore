@@ -190,6 +190,7 @@
 					<%
 					} // end of while
 					%>
+					
 					<!--  글 추가 끝  -->
 						<script type="text/javascript">
 						var WIDGET_ID;

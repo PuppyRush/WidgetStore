@@ -9,6 +9,7 @@
 
 <%@page import="javaBean.*"%>
 <%@page import="java.util.*"%>
+<%@page import="handler.*" %>
 <%@page import="java.sql.*"%>
 <%@page import="page.VerifyPage"%>
 <%@page import="property.enums.enumPage"%>
@@ -31,9 +32,6 @@
 		isFailVerify = true;
 	}
 		%>
-	
-%>
-
 <!DOCTYPE html>
 <html>
 
@@ -46,7 +44,6 @@
     <meta name="author" content="">
 
     <title>Widget Store - OSS</title>
-      s
 <script src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js" type="text/javascript" charset="utf-8"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -92,21 +89,44 @@
 </head>
 
 <body>
+
+<!--  add widget in board -->
 <script type="text/javascript">
 <%
+/*
+
+			유저 id를 받아옴.
+
+*/
+int u_id = 3;
+String sql = "select * from widgetInfo natural join widget where u_id = "+ Integer.toString(u_id) +";";
+DBhandler dbhandler = new DBhandler();
+ResultSet rs;
+rs = dbhandler.executeSQL(sql);
+while(rs.next()){
+	int x = rs.getInt("x");
+	int y = rs.getInt("y");
+	if(x ==-1) continue;
+	int w = rs.getInt("width");
+	int h = rs.getInt("height");
+	String html = rs.getString("HTML");
+	%> setWidget(<%=x%>, <%=y%>,<%=w%>,<%=h%>,"<%=html%>");
+	<%
+}
 // load info in DB
 %>
 
-function setWidget(){
-	var frame = document.createElement("iframe");
-	frame.style.left = "100px";
-	frame.style.left = "100px";
+function setWidget(x,y,w,h,src){
+	var div = document.createElement("div");
+	div.style.left = x + "px";
+	div.style.top = y + "px"
+	div.style.width = w + "px";
+	div.style.height = h + "px";
+	div.style.position = "absolute";
+	div.innerHTML = src;
+	document.body.appendChild(div);
 }
 
-</script>
-<!--  add widget in board -->
-<iframe x = "100", y = "100" width = "200px" height = "200px" ></iframe>
-<script type="text/javascript">
 </script>
     <!-- Navigation -->
     <a id="menu-toggle" href="#" class="btn btn-dark btn-md toggle"><i class="fa fa-th-large"></i></a>
@@ -330,7 +350,7 @@ function setWidget(){
 				if(request.getAttribute("initSession")!=null && request.getAttribute("initSession").equals(true)){
 		
 					session.removeAttribute("alreadyLogin");
-					%>signChange('signIn');<%
+					%> signChange('signIn'); <%
 				}
 				
 				//자동로그인 처리하기    
