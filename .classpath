@@ -13,10 +13,6 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-<<<<<<< f70d7d5f87fca8da0259d76f1ff2d3fc46d73351
-=======
-	<classpathentry kind="lib" path="/home/cmk/workspace/WidgetStore/WebContent/WEB-INF/lib/cos.jar"/>
->>>>>>> 92cdc1be2c51be02dba220910c54229b6e3b4806
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/annotations-api.jar"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/catalina.jar"/>
 	<classpathentry kind="lib" path="/usr/local/tomcat/lib/catalina-ant.jar"/>

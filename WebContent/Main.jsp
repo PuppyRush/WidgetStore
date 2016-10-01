@@ -32,12 +32,6 @@
 		isFailVerify = true;
 	}
 		%>
-<<<<<<< f70d7d5f87fca8da0259d76f1ff2d3fc46d73351
-=======
-
-
-
->>>>>>> 92cdc1be2c51be02dba220910c54229b6e3b4806
 <!DOCTYPE html>
 <html>
 
@@ -50,10 +44,6 @@
     <meta name="author" content="">
 
     <title>Widget Store - OSS</title>
-<<<<<<< f70d7d5f87fca8da0259d76f1ff2d3fc46d73351
-=======
-      
->>>>>>> 92cdc1be2c51be02dba220910c54229b6e3b4806
 <script src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js" type="text/javascript" charset="utf-8"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script language="Javascript" type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
@@ -156,7 +146,7 @@ function setWidget(x,y,w,h,src){
                 <a href="./Store.jsp" data-toggle="modal" >Store</a>
             </li>
             <li>
-                <a href="./Custom.jsp"  data-toggle="modal">Custom</a>
+                <a href="./Cutsom.jsp"  data-toggle="modal">Custom</a>
             </li>
             <li>
                 <a href="Developer/ManageDeveloper.jsp" data-toggle="modal">Developer</a>

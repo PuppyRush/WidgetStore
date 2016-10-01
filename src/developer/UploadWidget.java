@@ -41,7 +41,7 @@ public class UploadWidget implements commandAction {
 	private final int sizeLimit = 10*1024*1024;
 
 	private String contents, sessionId;
-	private int widgetId;
+
 	private String zipFileName;
 	private boolean isUpdate;
 	private String widgetName;
@@ -92,10 +92,6 @@ public class UploadWidget implements commandAction {
 			sessionId = (String)multi.getParameter("sessionId");
 			kind = (String)multi.getParameter("kind");
 			isUpdate = multi.getParameter("isUpdate").equals("true");
-			if(multi.getParameter("widgetId")==null)
-				widgetId = -1;
-			else
-				widgetId = Integer.valueOf((String)multi.getParameter("widgetId"));
 			
 			//멤버 초기화 함수 만들기 테스트를 위한.
 			//Member.addMember(Member.makePerfectMember(sessionId));
@@ -149,7 +145,7 @@ public class UploadWidget implements commandAction {
 		
 	
 		
-		ManageEvaluation me = new ManageEvaluation(member, widgetName,contents, _defaultTempPath,kind,widgetId, false);
+		ManageEvaluation me = new ManageEvaluation(member, widgetName,contents, _defaultTempPath,kind, false);
 		Thread t = new Thread(me);
 		t.run();
 

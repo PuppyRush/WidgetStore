@@ -58,6 +58,17 @@ Map = function(){
 	
 	
 	
+
+	$(document).ready( function() {
+				$('#sourceTree').fileTree({
+							root: "upload/32/das/source",
+							script: 'SourceTree.jsp',
+							multiFolder: false },
+							function(file){
+							
+								$("pre code").load(file);
+							}); 						
+		});
 	$('.uploadDate').datetimepicker({
         language:  'eu',
         weekStart: 1,

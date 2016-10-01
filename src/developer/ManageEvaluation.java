@@ -63,7 +63,6 @@ public class ManageEvaluation implements Runnable{
 	private String mainImageFullPath;
 	private String subImageFullPath;
 	
-	private final int WidgetId;
 	private final String defaultTempUUIDPath;
 	private final Member member;
 	private final String widgetName;
@@ -71,7 +70,7 @@ public class ManageEvaluation implements Runnable{
 	private final boolean isUpdate;
 	Connection conn = ConnectMysql.getConnector();
 	
-	public ManageEvaluation(Member member, String widgetName,String contents, String tempFolderPath, String kind,int widgetId, boolean isUpdate) throws Exception{
+	public ManageEvaluation(Member member, String widgetName,String contents, String tempFolderPath, String kind, boolean isUpdate) throws Exception{
 							
 		if(member==null || widgetName == null || contents==null || tempFolderPath ==null)
 			throw new NullPointerException("ManageEvaluation 생성자의 파라메타에 null 존재합니다.");
@@ -83,7 +82,6 @@ public class ManageEvaluation implements Runnable{
 				break;
 			}
 		}
-		this.WidgetId = widgetId;
 		imagesNames = new HashMap<Integer,String>();
 		widgetRoot =  (new StringBuilder(enumSystem.UPLOAD_PATH.toString()).append(member.getId()).append("/").append(widgetName).append("/")).toString();
 		this.contents = contents;
@@ -125,9 +123,13 @@ public class ManageEvaluation implements Runnable{
 								
 				fileMove(tempFileFullPath, originImagePath+name);
 			}
+
+		
+			mainImageFullPath = widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(1);
+			subImageFullPath = widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(2);
+			
 		}
-		mainImageFullPath = widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(1);
-		subImageFullPath = widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(2);
+		
 		zipDecompress(zipFileName, originSourcePath);
 		
 		if(!isSuccessZipFile){
@@ -163,11 +165,7 @@ public class ManageEvaluation implements Runnable{
 				if(eval.equals(enumWidgetEvaluation.UNALLOWANCE))
 					throw new EvaluationException(eval.getFailCase());
 				
-<<<<<<< f70d7d5f87fca8da0259d76f1ff2d3fc46d73351
 				eval = ManageWidget.addUpdatingWidget(this, eval,  );
-=======
-				eval = ManageWidget.addUpdatingWidget(this, eval, WidgetId);
->>>>>>> 92cdc1be2c51be02dba220910c54229b6e3b4806
 			}
 			else	
 				eval = ManageWidget.addEvaluatingWidget(this, eval);
@@ -203,7 +201,6 @@ public class ManageEvaluation implements Runnable{
 	   ZipEntry zipentry = null;
 	   try {
 		//파일 스트림
-		   System.out.println(zipFile);
 		   fis = new FileInputStream(zipFile);
 		//Zip 파일 스트림
 		   zis = new ZipInputStream(fis);
