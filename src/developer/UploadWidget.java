@@ -30,8 +30,7 @@ import property.enums.enumPage;
 import property.enums.widget.enumWidgetKind;
 import property.enums.widget.enumWidgetEvaluation.enumEvalFailCase;
 
-public class UploadWidget implements commandAction {
-	
+public class UploadWidget implements commandAction {	
 
 	private String _sourcePath;
 	private String _imagePath;

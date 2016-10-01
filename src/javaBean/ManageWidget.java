@@ -107,13 +107,13 @@ public class ManageWidget {
 
 	/**
 	 * 
-	 * 업데이트 될 위젯이 평가 될 수 있도록 처리한다.
+	 * 업데이트 될 위젯이 평가 될 수 있도록 DB를 갱신한다.
 	 * 
 	 * @param eval
 	 * @return
 	 * @throws SQLException
 	 */
-	public static enumWidgetEvaluation addUpdatingWidget(ManageEvaluation widget, enumWidgetEvaluation eval)
+	public static enumWidgetEvaluation addUpdatingWidget(ManageEvaluation widget, enumWidgetEvaluation eval, int oldWidgetKey)
 			throws SQLException {
 
 		ResultSet _rs = null;
@@ -125,60 +125,46 @@ public class ManageWidget {
 			}
 			conn.setAutoCommit(false);
 
-			//////////// to get oldManifest key
-			int _oldManifestId;
-
-			_ps = conn.prepareStatement("select manifest_id from widget where developer = ? ");
-			_ps.setInt(1, widget.getMember().getDeveloperId());
-
-			_rs = _ps.executeQuery();
-			if (_rs.next())
-				_oldManifestId = _rs.getInt("manifest_id");
-			else
-				throw new SQLException();
-
-			/*
-			 * //////////// evaluationManifest table _ps.close();
-			 * _rs.close(); _ps = conn.prepareStatement(
-			 * "insert into WidgetManifest (manifest_version,   widget_version,    widget_kind,   git_tag,   git_branch, "
-			 * +
-			 * "is_support_resolution, resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? ,?)"
-			 * , PreparedStatement.RETURN_GENERATED_KEYS);
-			 * 
-			 * _ps.setInt(1, widget.getManifestVersion());
-			 * _ps.setFloat(2, widget.getWidgetVersion());
-			 * _ps.setString(3, widget.getKind().getString());
-			 * _ps.setString(4, widget.getGit()._tag);
-			 * _ps.setString(5, widget.getGit()._branch);
-			 * if(widget.getRecommandInfo()._isSupportResolution){
-			 * _ps.setInt(6, 1); } else _ps.setInt(6, 0);
-			 * 
-			 * _ps.setString(7,
-			 * widget.getRecommandInfo()._resolutionMethod);
-			 * _ps.setInt(8,
-			 * widget.getRecommandInfo().maxHeightSize);
-			 * _ps.setInt(9,
-			 * widget.getRecommandInfo().maxWidthSize);
-			 * _ps.setInt(10,
-			 * widget.getRecommandInfo().minWidthSize);
-			 * _ps.setInt(11,
-			 * widget.getRecommandInfo().minHeightSize);
-			 * 
-			 * _ps.executeUpdate();
-			 * 
-			 * _rs = _ps.getGeneratedKeys(); _rs.next(); int
-			 * _newManifestId = _rs.getInt(1);
-			 */
 
 			/////////////// widgetEvaluation Table
-			_ps.close();
-			_rs.close();
 			_ps = conn.prepareStatement(
-					"insert into widgetEvaluation ( evalState, developer) values (?,?,?)");
+					"insert into widgetEvaluation ( evalState, developer) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 
 			int evalState = Integer.valueOf(eval.getString());
 			_ps.setInt(1, evalState);
 			_ps.setInt(2, widget.getMember().getDeveloperId());
+			_ps.executeUpdate();
+
+			_rs = _ps.getGeneratedKeys();
+			_rs.next();
+			int eval_id = _rs.getInt(1);
+		
+			_ps.close();
+			_rs.close();
+
+			////////////////updatingWidget   필요
+			ㅇㄴㅁ
+			_ps = conn.prepareStatement(
+					"insert into updatingWidget(eval_id, old_widget_key) values (?,?)");
+			
+			_ps.setInt(1, eval_id);
+			_ps.setInt(2, oldWidgetKey);
+			_ps.executeUpdate();	
+			
+			
+			///////////////evaluationManifest
+			
+			
+			_ps = conn.prepareStatement("insert into evaluationManifest ( eval_id, title, kind, contents, version, main_image, sub_image, widget_root ,position ) values (?,?,?,?, ?,?,?,?, ?)");
+			_ps.setInt(1,eval_id);
+			_ps.setString(2, widget.getWidgetName());
+			_ps.setString(3,widget.getKind().toString() );
+			_ps.setString(4,widget.getContents() );
+			_ps.setFloat(5,widget.getManifest().getWidgetVersion() );
+			_ps.setString(6, widget.getMainImageFullPath() );
+			_ps.setString(7, widget.getSubImageFullPath());
+			_ps.setString(8, widget.getWidgetRoot());
+			_ps.setString(9, widget.getManifest().getPosition().toString());
 			_ps.executeUpdate();
 
 			conn.commit();
@@ -491,11 +477,199 @@ public class ManageWidget {
 				throw new NullPointerException("manifest 변수가 null입니다.");
 			
 			conn.setAutoCommit(false);
+
+		//////////////get
+					
+					//////////get oldWidgetKey
+			
+					_ps = conn.prepareStatement("select * from updatingWidget where eval_id = ?");
+					_ps.setInt(1, evalId);
+					_rs = _ps.executeQuery();
+					_rs.next();
+					int _oldWidgetKey = _rs.getInt("old_widget_key");
 		
+					_rs.close();
+					_ps.close();
+					
+					//////////get widgetManifesId
 			
-			
-			
-			
+					_ps = conn.prepareStatement("select * from widget where widget_id = ?");
+					_ps.setInt(1, _oldWidgetKey);
+					_rs = _ps.executeQuery();
+					_rs.next();
+					int _widgetManifestId = _rs.getInt("manifest_id");
+		
+					_rs.close();
+					_ps.close();
+					
+							
+					
+					///////////get evaluationManifest
+					
+					_ps = conn.prepareStatement("select * from evaluationManifest where eval_id = ?");
+					_ps.setInt(1, evalId);
+					_rs = _ps.executeQuery();
+					_rs.next();
+					
+					String _contents = _rs.getString("contents");
+					float _version = _rs.getFloat("version");
+					String _mainImageFullPath = _rs.getString("main_image");
+					String _subImageFullPath = _rs.getString("sub_image");
+					String _widgeRoot = _rs.getString("widget_root");
+					String _position = _rs.getString("position");
+					
+					_ps.close();
+					_rs.close();
+					
+					/////////////get widgetEvaluation
+					_ps = conn.prepareStatement("select * from widgetEvaluation where eval_id = ?");
+					_ps.setInt(1, evalId);
+					_rs = _ps.executeQuery();
+					_rs.next();
+					int _dId = _rs.getInt("developer");
+					Timestamp _updatedDate = _rs.getTimestamp("evaluationBeginDate");
+					
+					_ps.close();
+					_rs.close();
+					
+					////////////get u_id 
+					
+					_ps = conn.prepareStatement("select * from developer where d_id = ?");
+					_ps.setInt(1, _dId);
+					_rs = _ps.executeQuery();
+					_rs.next();
+					int _uId = _rs.getInt("u_id");
+					
+					_ps.close();
+					_rs.close();
+					
+					////////////get developerName
+					
+					_ps = conn.prepareStatement("select nickname from userwhere u_id = ?");
+					_ps.setInt(1, _uId);
+					_rs = _ps.executeQuery();
+					_rs.next();
+					String nickname = _rs.getString("nickname");
+
+					_ps.close();
+					_rs.close();
+																			
+	
+//////////////////set
+					
+				//////widgetManifest
+					_ps = conn.prepareStatement("update widgetManifest  set manifest_version =? ,"
+							+ " widget_version = ? ,  git_tag =? , git_branch = ? ,"
+							+ "is_support_resolution = ?, resolution_method = ? , maxHeight = ?, maxWidth = ?"
+							+ ", minWidth=? , minHeight =?, manifest_id = ?");
+					
+					_ps.setInt(1, mani.getManifestVersion()); 
+					_ps.setFloat(2, mani.getWidgetVersion());
+					_ps.setString(3, mani.getGit()._tag);
+					_ps.setString(4, mani.getGit()._branch);
+					_ps.setInt(5, mani.getRecommandInfo()._isSupportResolution ? 1 : 0);
+					
+					_ps.setString(6, mani.getRecommandInfo()._resolutionMethod);
+					_ps.setInt(7, mani.getRecommandInfo().maxHeightSize);
+					_ps.setInt(8, mani.getRecommandInfo().maxWidthSize);
+					_ps.setInt(9, mani.getRecommandInfo().minWidthSize);
+					_ps.setInt(10, mani.getRecommandInfo().minHeightSize);
+					_ps.setInt(11, _widgetManifestId);
+					_ps.executeUpdate();
+					
+					/////////////////widget Ratio
+					
+					_ps = conn.prepareStatement("delete from widgetRatio where manifest_id = ?");
+					_ps.setInt(1, _widgetManifestId);
+					_ps.executeQuery();
+					_ps.close();
+					_rs.close();
+					
+					if(mani.getRecommandInfo()._isSupportResolution){
+						for(Ratio ary : mani.getRecommandInfo()._ratioArray){
+							_ps = conn.prepareStatement("insert into widgetRatio (manifest_id, widthRatio, heightRatio, widthSize, heightSize) values (?,?,?,?,?) ");
+							_ps.setInt(1,_widgetManifestId);
+							_ps.setInt(2,ary.widthRatio);
+							_ps.setInt(3,ary.heightRatio);
+							_ps.setInt(4,ary.widthSize);
+							_ps.setInt(5,ary.heightSize);
+							
+							_ps.executeUpdate();
+						}
+					}
+					
+					_ps.close();
+					_rs.close();
+					//////////// widget table
+				  	
+					_ps = conn.prepareStatement("update widget set developer = ?,currentVersion = ? , "
+							+ "registrationPosition = ? , HTML= ? where widget_id ");
+					
+					_ps.setInt(1, _dId);
+					_ps.setFloat(2, mani.getWidgetVersion());
+					_ps.setString(3, mani.getPosition().toString());
+					_ps.setString(4, new StringBuilder(_widgeRoot).append(enumSystem.SOURCE_FOLDER_NAME).append("/").append(mani.getRootUrl()).toString());
+					_ps.setInt(5, _oldWidgetKey);
+					
+					_ps.executeUpdate();
+					
+					_ps.close();
+					_rs.close();
+					//	///////////////widgetDetail Table
+					
+					_ps = conn.prepareStatement("update widgetDetail set main_image = ? , sub_image = ?, "
+							+ "explain = ? , widgetRoot= ? where widget_id");
+
+					_ps.setString(1, new StringBuilder(_widgeRoot).append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+					_ps.setString(2, new StringBuilder(_widgeRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+					_ps.setString(3, _contents);
+					_ps.setString(4,_widgeRoot);
+					_ps.setInt(5, _oldWidgetKey);
+					_ps.executeUpdate();
+					
+					_ps.close();
+					_rs.close();
+					
+		/////////////////delete
+					
+					_ps = conn.prepareStatement("delete from widgetEvaluation where eval_id = ?");
+					_ps.setInt(1, evalId);
+					_ps.executeUpdate();
+										
+
+		///////////////////user
+					
+					if(Member.isContainsMember(sId)){
+						
+						Member member = Member.getMember(sId);
+						if(member.isJoin() && member.isLogin() && member.isDeveloper()){
+						////멤버가 로그인 중이라 객체에 위젯 정보 추가
+								
+								
+							if(member.getDevelopedWidget()==null)
+								throw new NullPointerException("devlopedWideget list가 null입니다.");
+
+							boolean isEmppy = true;
+							for(DevelopedWidget w : member.getDevelopedWidget()){
+								if(w.getWidgetId() == _oldWidgetKey){
+									
+								}
+
+							}
+							
+							DevelopedWidget widget = new DevelopedWidget.Builder(_oldWidgetKey, _, _kind)
+									.contents(_contents)
+									.developerId(_dId)
+									.developer(nickname)
+									.mainImagePath( _mainImageFullPath)
+									.subImagePath(_subImageFullPath)
+									.position(_position)
+									.sourceRoot(_widgeRoot)
+									.updatedDate(_updatedDate).build();
+	
+							member.addDevelopedWidget(widget);
+						}							
+					}
 			
 		  	conn.commit();
 			
