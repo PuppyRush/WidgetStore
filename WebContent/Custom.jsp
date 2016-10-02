@@ -159,6 +159,7 @@
 							 * select control에 정보 집어넣는 부분
 							 */
 
+
 							function addWidget(id, name, tag, width, height) {
 
 								var op = document.createElement("option");
@@ -166,7 +167,6 @@
 								op.value = tag;
 								op.text = name;
 								op.id = id;
-
 								op.width = width;
 								op.height = height;
 
@@ -297,9 +297,9 @@
 		// widget point
 		var px, py;
 
-		this.setWidget = function(num, name, tag, width, height) {
+		this.setWidget = function(id, name, tag, width, height) {
 			have = 1;
-			this.id = num;
+			this.id = id;
 			this.name = name;
 			this.widgetTag = tag;
 			this.width = width;
