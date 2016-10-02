@@ -8,24 +8,6 @@
 %>
 
 
-<%
-
-	request.setCharacterEncoding("UTF-8");
-		
-	enumPage to = enumPage.MAIN;
- 	boolean isFailVerify;
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MAIN);
-	if(!(boolean)results.get("isSuccessVerify")){
-		isFailVerify =false;
-		to = (enumPage)results.get("to");
-	
-		
-		
-	}else{
-				
-		isFailVerify = true;
-	}
-%>
 
 
 
