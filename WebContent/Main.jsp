@@ -21,6 +21,7 @@
 	request.setCharacterEncoding("UTF-8");
 	enumPage to = enumPage.MAIN;
  	boolean isFailVerify;
+ 	Member member = Member.getMember(session.getId());
 	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MAIN);
 	if(!(boolean)results.get("isSuccessVerify")){
 		isFailVerify =false;
@@ -95,27 +96,28 @@
 <!--  add widget in board -->
 <script type="text/javascript">
 <%
-/*
-
-			유저 id를 받아옴.
-
-*/
-int u_id = 3;
-String sql = "select * from widgetInfo natural join widget where u_id = "+ Integer.toString(u_id) +";";
-DBhandler dbhandler = new DBhandler();
-ResultSet rs;
-rs = dbhandler.executeSQL(sql);
-while(rs.next()){
-	int x = rs.getInt("x");
-	int y = rs.getInt("y");
-	if(x ==-1) continue;
-	int w = rs.getInt("width");
-	int h = rs.getInt("height");
-	String html = rs.getString("HTML");
-	%> setWidget(<%=x%>, <%=y%>,<%=w%>,<%=h%>,"<%=html%>");
-	<%
+	if(isFailVerify){
+	/*
+				유저 id를 받아옴.
+	*/
+	int u_id = member.getId();
+	String sql = "select * from widgetInfo natural join widget where u_id = "+ Integer.toString(u_id) +";";
+	DBhandler dbhandler = new DBhandler();
+	ResultSet rs;
+	rs = dbhandler.executeSQL(sql);
+	while(rs.next()){
+		int x = rs.getInt("x");
+		int y = rs.getInt("y");
+		if(x ==-1) continue;
+		int w = rs.getInt("width");
+		int h = rs.getInt("height");
+		String html = rs.getString("HTML");
+		%> 
+		setWidget(<%=x%>, <%=y%>,<%=w%>,<%=h%>,"<%=html%>");
+		<%
+	}
+	// load info in DB
 }
-// load info in DB
 %>
 
 function setWidget(x,y,w,h,src){

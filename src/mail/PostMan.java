@@ -127,6 +127,47 @@ public class PostMan {
 	  }
 	 }
 	
+	 public static void sendSuccessEvaludatedWidget(String wName, String uName, String to) {
+		  
+			SimpleDateFormat sdfCurrent = new SimpleDateFormat ("yyyy-mm-dd hh:mm:ss"); 
+			Timestamp currentTime = new Timestamp(System.currentTimeMillis()); 
+			String today = sdfCurrent.format(currentTime); 
+			 
+			 
+			 String from = "gooddaumi@gmail.com";    // 메일 보내는 사람
+			  String cc = "";     // 참조
+			  String subject =  new StringBuilder("[WidetStore] 위젯'").append(wName).append("'의 스토어에 업로드 되었습니다..").toString();// 제목
+			  String content = new StringBuilder("안녕하세요. 위젯스토어에 올리신' ").append(wName).append("'위젯이 '").append("1,2차 심사에 모두 통과하여 스토어에 업로드 되었습니다."
+			  		+"개발자 페이지에서 "+uName+"님의 위젯을 확인해보세요.").toString();
+
+		  
+		  if(from.trim().equals("")) {
+		   System.out.println("보내는 사람을 입력하지 않았습니다.");
+		  }
+		  else if(to.trim().equals("")) {
+		   System.out.println("받는 사람을 입력하지 않았습니다.");
+		  }
+		  else {
+		   try {
+			   SMTPConnector mt = new SMTPConnector();
+		    
+		    // 메일보내기
+		    mt.sendEmail(from, to, cc, subject, content);
+		    System.out.println("메일 전송에 성공하였습니다.");
+		   }
+		   catch(MessagingException me) {
+		    System.out.println("메일 전송에 실패하였습니다.");
+		    System.out.println("실패 이유 : " + me.getMessage());
+		   }
+		   catch(Exception e) {
+		    System.out.println("메일 전송에 실패하였습니다.");
+		    System.out.println("실패 이유 : " + e.getMessage());
+		   }
+		  }
+		 
+		
+	 }
+	 
 	 public static void sendSuccessAutoEvaluation(String wName, String uName, String to) {
 		  
 			SimpleDateFormat sdfCurrent = new SimpleDateFormat ("yyyy-mm-dd hh:mm:ss"); 

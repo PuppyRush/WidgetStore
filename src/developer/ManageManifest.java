@@ -100,7 +100,7 @@ public class ManageManifest {
 
 	private   float widgetVersion;
 	private   enumWidgetPosition position;
-	private   String rootUrl;
+	private   String mainHTML;
 
 	private RecommandInfo recommandInfo = null;
 	private GitInfo git = null;
@@ -139,8 +139,8 @@ public class ManageManifest {
 		return position;
 	}
 
-	public String getRootUrl() {
-		return rootUrl;
+	public String getMainHTML() {
+		return mainHTML;
 	}
 
 	
@@ -174,6 +174,7 @@ public class ManageManifest {
 		try{
 			getManifestInformation();				
 		}catch(EvaluationException e){
+			e.printStackTrace();
 			result = enumWidgetEvaluation.UNALLOWANCE;
 			result.setFailCase(e.getFailCsae());
 			result.setErrMsg(e.getMessage());
@@ -376,7 +377,7 @@ public class ManageManifest {
 			if (!_col.getNodeName().equals(__col.getNodeName()))
 				throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",
 						enumEvalFailCase.MANIFEST_ERROR);
-			rootUrl = _col.getTextContent();
+			mainHTML =   _col.getTextContent();
 
 			_col = (Node) _xpath.evaluate("*/required/position", _doc, XPathConstants.NODE);
 			__col = (Node) _xpath.evaluate("*/required/position", __doc, XPathConstants.NODE);
@@ -386,13 +387,15 @@ public class ManageManifest {
 			else {
 				String _pos = ((Element) ((NodeList) _xpath.evaluate("*/required/position", _doc,
 						XPathConstants.NODESET)).item(0)).getAttribute("kind");
+				boolean _isEmpty = true;
 				for (enumWidgetPosition p : enumWidgetPosition.values()) {
-					if (p.getString().equals(_pos)) {
+					if (p.getString().equalsIgnoreCase(_pos)) {
 						this.position = p;
+						_isEmpty = false;
 						break;
 					}
 				}
-				if (this.position == null) {
+				if (_isEmpty) {
 					throw new EvaluationException(
 							"유저 매니페스트의 position 값이 시스템에 존재하지 않습니다. 매니패스트 메뉴얼을 참조하세요. ",
 							enumEvalFailCase.MANIFEST_ERROR);

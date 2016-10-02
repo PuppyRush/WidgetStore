@@ -22,10 +22,12 @@ import property.enums.member.enumMemberState;
 			try{
 		
 				String sId = request.getRequestedSessionId();
-				Member member = Member.getMember(sId);
+				Member member = null;
 				
 				if(!Member.isContainsMember(sId))
 					throw new MemberException(enumMemberState.NOT_EXIST_MEMBER_FROM_MAP, enumPage.MAIN);
+				else
+					member = Member.getMember(sId);
 				
 				if(!member.isLogin())
 					throw new MemberException("로그인 한 유저가 아닙니다.", enumMemberState.NOT_LOGIN, enumPage.MAIN);

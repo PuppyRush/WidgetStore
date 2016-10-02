@@ -37,7 +37,13 @@ public class VerifyPage {
 			switch(page){
 			
 				case MAIN:
-					
+					if(!member.isJoin()){
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.MAIN);
+						
+					}
+					else if(!member.isLogin()){
+						throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.MAIN);
+					}
 					
 					break;
 					

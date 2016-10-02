@@ -192,7 +192,7 @@ public class ManageWidget {
 			///////////////evaluationManifest
 			
 			
-			_ps = conn.prepareStatement("insert into evaluationManifest ( eval_id, title, kind, contents, version, main_image, sub_image, widget_root ,position ) values (?,?,?,?, ?,?,?,?, ?)");
+			_ps = conn.prepareStatement("insert into evaluationManifest ( eval_id, title, kind, contents, version, main_image, sub_image, widget_root ,position , main_html) values (?,?,?,?, ?,?,?,?, ?,?)");
 			_ps.setInt(1,eval_id);
 			_ps.setString(2, widget.getWidgetName());
 			_ps.setString(3,widget.getKind().toString() );
@@ -201,8 +201,8 @@ public class ManageWidget {
 			_ps.setString(6, widget.getMainImageFullPath() );
 			_ps.setString(7, widget.getSubImageFullPath());
 			_ps.setString(8, widget.getWidgetRoot());
-			System.out.println(widget.getManifest().getPosition().toString());
 			_ps.setString(9, widget.getManifest().getPosition().toString());
+			_ps.setString(10, widget.getManifest().getMainHTML());
 			_ps.executeUpdate();
 			
 			conn.commit();
@@ -257,7 +257,8 @@ public class ManageWidget {
 			float _version = _rs.getFloat("version");
 			String _mainImageFullPath = _rs.getString("main_image");
 			String _subImageFullPath = _rs.getString("sub_image");
-			String _widgeRoot = _rs.getString("widget_root");
+			String _widgetRoot =_rs.getString("widget_root");
+			String _main_html =    "<iframe width='100%' height='100%' src=" + _widgetRoot+ _rs.getString("main_html" ) + "></iframe>" ;
 			String _position = _rs.getString("position");
 			
 			_ps.close();
@@ -287,7 +288,7 @@ public class ManageWidget {
 			
 			////////////get developerName
 			
-			_ps = conn.prepareStatement("select nickname from userwhere u_id = ?");
+			_ps = conn.prepareStatement("select nickname from user where u_id = ?");
 			_ps.setInt(1, _uId);
 			_rs = _ps.executeQuery();
 			_rs.next();
@@ -343,7 +344,7 @@ public class ManageWidget {
 			_rs.close();
 			//////////// widget table
 		  	
-			_ps = conn.prepareStatement("insert into widget (developer,title, kind, currentVersion, registrationPosition, registrationDate, HTML, manifest_id)"
+			_ps = conn.prepareStatement("insert into widget (developer,title, kind, currentVersion, position,  registrationDate, HTML, manifest_id)"
 					+ " values(?,?,?,?,  ?,?,?,?) ", PreparedStatement.RETURN_GENERATED_KEYS);
 			
 			_ps.setInt(1, _dId);
@@ -352,7 +353,7 @@ public class ManageWidget {
 			_ps.setFloat(4, mani.getWidgetVersion());
 			_ps.setString(5, mani.getPosition().toString());
 			_ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()) );
-			_ps.setString(7, new StringBuilder(_widgeRoot).append(enumSystem.SOURCE_FOLDER_NAME).append("/").append(mani.getRootUrl()).toString());
+			_ps.setString(7, _main_html);
 			_ps.setInt(8, _manifestId);
 			
 			_ps.executeUpdate();
@@ -364,12 +365,12 @@ public class ManageWidget {
 			_rs.close();
 			//	///////////////widgetDetail Table
 			
-			_ps = conn.prepareStatement("insert into widgetDetail (widget_num, main_image, sub_image, explane, widgetRoot) values(?,?,?,?,?)");
+			_ps = conn.prepareStatement("insert into widgetDetail (widget_id, main_Image, sub_Image, contents,  widget_root) values(?,?,?,?,?)");
 			_ps.setInt(1, _wId);
-			_ps.setString(2, new StringBuilder(_widgeRoot).append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
-			_ps.setString(3, new StringBuilder(_widgeRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+			_ps.setString(2,_mainImageFullPath);
+			_ps.setString(3, _subImageFullPath);
 			_ps.setString(4, _contents);
-			_ps.setString(5,_widgeRoot);
+			_ps.setString(5, _widgetRoot);
 			_ps.executeUpdate();
 			
 			_ps.close();
@@ -401,7 +402,7 @@ public class ManageWidget {
 						.mainImagePath( _mainImageFullPath)
 						.subImagePath(_subImageFullPath)
 						.position(_position)
-						.sourceRoot(_widgeRoot)
+						.sourceRoot(_widgetRoot)
 						.updatedDate(_updatedDate).build();
 
 				member.addDevelopedWidget(widget);
@@ -485,7 +486,8 @@ public class ManageWidget {
 					float _version = _rs.getFloat("version");
 					String _mainImageFullPath = _rs.getString("main_image");
 					String _subImageFullPath = _rs.getString("sub_image");
-					String _widgeRoot = _rs.getString("widget_root");
+					String _widgetRoot =_rs.getString("widget_root");
+					String _main_html =    "<iframe width='100%' height='100%' src=" + _widgetRoot+ _rs.getString("main_html" ) + "></iframe>" ;
 					String _position = _rs.getString("position");
 					
 					_ps.close();
@@ -578,7 +580,7 @@ public class ManageWidget {
 					_ps.setInt(1, _dId);
 					_ps.setFloat(2, mani.getWidgetVersion());
 					_ps.setString(3, mani.getPosition().toString());
-					_ps.setString(4, new StringBuilder(_widgeRoot).append(enumSystem.SOURCE_FOLDER_NAME).append("/").append(mani.getRootUrl()).toString());
+					_ps.setString(4, _main_html);
 					_ps.setInt(5, _oldWidgetKey);
 					
 					_ps.executeUpdate();
@@ -590,10 +592,10 @@ public class ManageWidget {
 					_ps = conn.prepareStatement("update widgetDetail set main_image = ? , sub_image = ?, "
 							+ "explain = ? , widgetRoot= ? where widget_id");
 
-					_ps.setString(1, new StringBuilder(_widgeRoot).append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
-					_ps.setString(2, new StringBuilder(_widgeRoot).append("/").append(enumSystem.IMAGE_FOLDER_NAME).append("/").toString());
+					_ps.setString(1, _mainImageFullPath);
+					_ps.setString(2, _subImageFullPath);
 					_ps.setString(3, _contents);
-					_ps.setString(4,_widgeRoot);
+					_ps.setString(4,_widgetRoot);
 					_ps.setInt(5, _oldWidgetKey);
 					_ps.executeUpdate();
 					
@@ -638,7 +640,7 @@ public class ManageWidget {
 									.mainImagePath( _mainImageFullPath)
 									.subImagePath(_subImageFullPath)
 									.position(_position)
-									.sourceRoot(_widgeRoot)
+									.sourceRoot(_widgetRoot)
 									.updatedDate(_updatedDate).build();
 	
 							member.addDevelopedWidget(widget);
@@ -672,7 +674,8 @@ public class ManageWidget {
 			_ps.setInt(1, evalId);
 			_rs = _ps.executeQuery();
 			
-			return _rs.next();
+			boolean _isEmpty = _rs.next();
+			return _isEmpty;
 						
 			
 		}finally {
@@ -706,7 +709,8 @@ public class ManageWidget {
 			_ps = conn.prepareStatement("select * from widgetEvaluation join evaluationManifest using(eval_id)");
 			_rs = _ps.executeQuery();
 
-			if (_rs.next()) {
+			
+			while(_rs.next()) {
 
 				String name = _rs.getString("title");
 				int evalId = _rs.getInt("eval_id");
@@ -739,6 +743,7 @@ public class ManageWidget {
 				__ps.close();
 				__rs.close();
 			}
+			
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -801,7 +806,7 @@ public class ManageWidget {
 								.version(_rs.getFloat("currentVersion"))
 								.updatedDate(_rs.getTimestamp("updatedDate"))
 								.sourceRoot(_rs.getString("HTML"))
-								.contents(_rs.getString("explain"))
+								.contents(_rs.getString("contents"))
 								.subImagePath(_rs.getString("sub_image"))
 								.mainImagePath(_rs.getString("main_image"))
 								.totalReview(_rs.getFloat("totalReview"))

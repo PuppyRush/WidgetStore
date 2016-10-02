@@ -261,7 +261,7 @@ window.onload=function(){
 				 $("#widgetTitle").append(m.get("widgetName")+' / <small>'+m.get("kind")+'</small> / <small>'+ m.get("position")+'</small><br><small>'+
 						 	m.get("uploadedDate")+'</small>');
 				 
-				 $("#widgetImage").attr("src",m.get("imageRoot"));
+				 $("#widgetImage").attr("src",m.get("imageRoot"));				 
 				 if(m.get("position")=="git"){
 				 		
 				   }
@@ -270,11 +270,18 @@ window.onload=function(){
 					 
 				 
 			}else{
-			$("#widgetList").append('<li name='+m.get("developerId")+'><a href="javascript:;"> '+
+			$("#widgetList").append('<li  value='+i+' onClick="chageWidget(value)" name='+m.get("developerId")+'><a href="javascript:;"> '+
 					 '<i class="glyphicon glyphicon-console"></i>'+m.get("widgetName")+'</a></li>');
 			}
 		}
 			 
+	}
+	
+	function chageWidget(idx){
+		 $("#widgetTitle").val( _widgets[idx].get("widgetName")+' / <small>'+_widgets[idx].get("kind")+'</small> / <small>'+ _widgets[idx].get("position")+'</small><br><small>'+
+				 _widgets[idx].get("uploadedDate")+'</small>' );
+		 $("#widgetImage").attr("src",_widgets[idx].get("imageRoot"));
+		 $("#widgetContents").html( _widgets[idx].get("contents"));
 	}
 	
 

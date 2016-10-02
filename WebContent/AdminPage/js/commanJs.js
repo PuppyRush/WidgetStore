@@ -107,20 +107,22 @@ $( document ).ready(function() {
 				  });
 	});
 });
-/*
+
 $( document ).ready(function() {
-	$('#widetTable').on( 'over', 'tr', function() {
-
-         var selected = $(this).hasClass("highlight");
-            $("#widetTable tr").removeClass("highlight");
-            if(!selected)
-                    $(this).addClass("highlight");
-
-          alert('You clicked row '+ ($(this).index()+1) );
-        });
+$("#viewSource").on( 'click', function() {
+	 selectedWidgetIdx = $("#widgetTable").index();
+		var m = _widgets[selectedWidgetIdx].get("root");
+		$('#sourceTree').fileTree({
+			root: m,
+			script: 'SourceTree.jsp',
+			multiFolder: false },
+			function(file){
+			
+				$("pre code").load(file);
+			});
+	});
 });
 
-*/
 
 $(function () {
  $('#datetimepicker10').datetimepicker({
@@ -128,5 +130,7 @@ $(function () {
      format: 'MM/YYYY'
  });
 });
+
+
 
 	

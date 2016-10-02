@@ -8,11 +8,16 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.mysql.fabric.xmlrpc.base.Member;
-
 import handler.DBhandler;
 import javaBean.ConnectMysql;
+import javaBean.Member;
+import javaBean.MemberException;
+import page.PageException;
 import property.commandAction;
+import property.enums.enumCautionKind;
+import property.enums.enumPage;
+import property.enums.enumPageError;
+import property.enums.member.enumMemberState;
 
 public class storeDownload implements commandAction {
 
@@ -21,18 +26,29 @@ public class storeDownload implements commandAction {
 			throws Throwable {
 
 		HashMap<String, Object> returns = new HashMap<String, Object>();
-		Member mdb = new Member();
 		
 		String widgetId = request.getParameter("widgetId").toString();
 		Connection conn = ConnectMysql.getConnector();
 		DBhandler dbhandler = new DBhandler();
-		
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		
+		String sId = request.getRequestedSessionId();
+		
 		try{
+			if(!Member.isContainsMember(sId))
+				throw new MemberException(enumMemberState.NOT_EXIST_MEMBER_FROM_MAP, enumPage.MAIN);
+			
+			Member member = Member.getMember(sId);
+			if(!member.isJoin())
+				throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+			if(!member.isLogin())
+				throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.LOGIN);
+			
+		
+
 			/* 유저 불러오는 부분 필요 */
-			int u_id = 11;
+			int u_id = member.getId();
 			
 			// 다운된 위젯인지 확인한다.
 			String sql = "SELECT widget_id FROM widgetInfo WHERE u_id = "+u_id+" && widget_id = "+widgetId+";";
@@ -45,13 +61,23 @@ public class storeDownload implements commandAction {
 				System.out.println(widgetId + " download done");
 			}
 			
-		}catch(Exception e){
-			System.out.println("안됨");
+			returns.put("view", enumPage.STORE.toString());
+				
+		}catch(MemberException e){
+			returns.put("isSuccessVerify", false);
+			returns.put("view", e.getToPage().toString());
+			returns.put("from", enumPage.STORE.toString());
+			returns.put("message", e.getErrCode().getString());
+			returns.put("messageKind", enumCautionKind.ERROR);
+		}
+			catch(Exception e){
+			System.out.println(e.getMessage());
 			e.printStackTrace();
+			returns.put("view", enumPage.MAIN.toString());
 		}
 		
 		returns.put("id", widgetId);
-		returns.put("view", "Store.jsp");
+		
 		return returns;
 
 	}

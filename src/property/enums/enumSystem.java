@@ -8,6 +8,7 @@ public enum enumSystem {
 	UPLOAD_PATH("/home/cmk/workspace/WidgetStore/WebContent/upload/"),
 	IMAGE_FOLDER_NAME("representiveImages"),
 	SOURCE_FOLDER_NAME("source"),
+	UPLOAD_FOLDER_NAME("upload"),
 	ADMIN("gooddaumi@naver.com");
 	
 	private String str;

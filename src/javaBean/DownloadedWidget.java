@@ -13,7 +13,7 @@ public class DownloadedWidget extends Widget{
 	private final int y;
 	
 
-	private final String sourceRoot;
+	private final String htmlRoot;
 	private final int developerId;
 	private float version;
 	
@@ -25,7 +25,7 @@ public class DownloadedWidget extends Widget{
 		private int y;
 		
 	
-		private String sourceRoot;
+		private String html_root;
 		private float version;
 		private int developerId;
 
@@ -50,8 +50,8 @@ public class DownloadedWidget extends Widget{
 		}
 
 
-		public Builder sourceRoot(String root){
-			sourceRoot = root; return this;
+		public Builder htmlRoot(String root){
+			html_root = root; return this;
 		}	
 		
 
@@ -66,7 +66,7 @@ public class DownloadedWidget extends Widget{
 
 	private DownloadedWidget(Builder b) throws Exception{
 		super(b.wId, b.wName, b.kind);
-		this.sourceRoot = b.sourceRoot;
+		this.htmlRoot = b.html_root;
 		
 		
 		this.developerId = b.developerId;
@@ -103,6 +103,30 @@ public class DownloadedWidget extends Widget{
 
 	public int getY() {
 		return y;
+	}
+
+
+
+	public float getVersion() {
+		return version;
+	}
+
+
+
+	public void setVersion(float version) {
+		this.version = version;
+	}
+
+
+
+	public String getHtmlRoot() {
+		return htmlRoot;
+	}
+
+
+
+	public int getDeveloperId() {
+		return developerId;
 	}
 
 

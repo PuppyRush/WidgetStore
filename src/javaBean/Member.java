@@ -167,10 +167,6 @@ public class Member {
 	public void setRegDate(Timestamp regDate) {
 		this.regDate = regDate;
 	}
-	
-	public static Map<String,Member> getMemberMap(){
-		return MemberMap;
-	}
 
 
 	public EnumMap<enumMemberAbnormalState, Boolean> getAbnormalState() {
@@ -333,9 +329,22 @@ public class Member {
 	}
 	
 	public static void addMember(Member m){
-		Member.getMemberMap().put(m.getSessionId(), m);
+		
+		if(MemberMap.containsKey(m))
+			throw new IllegalArgumentException("맴버 객체가 이미 맵에 존합니다.");
+				
+		MemberMap.put(m.getSessionId(), m);
 	}
 		
+	public static void removeMember(Member m){
+		
+		if(!MemberMap.containsValue(m))
+			throw new IllegalArgumentException("맴버 객체가 존재하지 않습니다..");
+		
+		MemberMap.remove(m.getSessionId());
+		m = null;
+	}
+	
 	@Override
 	public int hashCode(){
 		

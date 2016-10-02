@@ -126,8 +126,8 @@ public class ManageEvaluation implements Runnable{
 				fileMove(tempFileFullPath, originImagePath+name);
 			}
 		}
-		mainImageFullPath = widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(1);
-		subImageFullPath = widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(2);
+		mainImageFullPath = (widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(1)).split("WebContent")[1];
+		subImageFullPath =( widgetRoot+enumSystem.IMAGE_FOLDER_NAME.toString()+"/"+imagesNames.get(2)).split("WebContent")[1];
 		zipDecompress(zipFileName, originSourcePath);
 		
 		if(!isSuccessZipFile){
@@ -148,14 +148,14 @@ public class ManageEvaluation implements Runnable{
 	public void run(){
 		
 	
-		
+		enumWidgetEvaluation eval = enumWidgetEvaluation.EVALUATING;
 		try {			
 			beginSetFiles();
 			
 			manifest = new ManageManifest(widgetRoot);
 			
 			
-			enumWidgetEvaluation eval = manifest.doCollectAll();
+			eval = manifest.doCollectAll();
 		
 			if(isUpdate){
 				
@@ -163,19 +163,14 @@ public class ManageEvaluation implements Runnable{
 				if(eval.equals(enumWidgetEvaluation.UNALLOWANCE))
 					throw new EvaluationException(eval.getFailCase());
 				
-<<<<<<< f70d7d5f87fca8da0259d76f1ff2d3fc46d73351
-				eval = ManageWidget.addUpdatingWidget(this, eval,  );
-=======
+
 				eval = ManageWidget.addUpdatingWidget(this, eval, WidgetId);
->>>>>>> 92cdc1be2c51be02dba220910c54229b6e3b4806
+
 			}
 			else	
 				eval = ManageWidget.addEvaluatingWidget(this, eval);
 			
-			if(eval.equals( enumWidgetEvaluation.PASS))
-				PostMan.sendSuccessAutoEvaluation(widgetName, member.getNickname(), member.getEmail());
-			else
-				PostMan.sendFailEvaluation(widgetName, member.getNickname(), eval.getErrMsg(), member.getEmail());
+		
 			
 		}catch(EvaluationException e){
 			
@@ -189,6 +184,11 @@ public class ManageEvaluation implements Runnable{
 			e.printStackTrace();
 		}finally{
 			fileDelete(defaultTempUUIDPath);
+			
+			if(eval.equals( enumWidgetEvaluation.PASS))
+				PostMan.sendSuccessAutoEvaluation(widgetName, member.getNickname(), member.getEmail());
+			else
+				PostMan.sendFailEvaluation(widgetName, member.getNickname(), eval.getErrMsg(), member.getEmail());
 		}
 				
 		

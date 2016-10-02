@@ -446,7 +446,7 @@ public class ManageMember {
 					DownloadedWidget _widget = 
 							new DownloadedWidget.Builder(__rs.getInt("widget_id"), __rs.getString("title"),__rs.getString("kind")).developerId(__rs.getInt("developer"))
 							.setSize(__rs.getInt("x"), __rs.getInt("y"), __rs.getInt("width"), __rs.getInt("height"))
-							.sourceRoot(__rs.getString("HTML")).build();
+							.htmlRoot(__rs.getString("HTML")).build();
 					
 					member.addDownloadedWidget(_widget);							
 				
@@ -588,12 +588,10 @@ public class ManageMember {
 	 * @throws Throwable 
 	 */
 	public static void logoutMember(Member member) throws Throwable {
-		
-		member.setId(sthToId(member));
+			
 		setSthJustOne("userDetail","u_id",member.getId(),"lastLogoutDate", new Timestamp(System.currentTimeMillis()) );
-		Member.getMemberMap().remove(member);
-		member = null;
 		
+		Member.removeMember(member);
 	}
 	
 	public static boolean isMember(Member member) throws SQLException{

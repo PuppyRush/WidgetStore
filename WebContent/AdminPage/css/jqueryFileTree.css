@@ -25,6 +25,19 @@ UL.jqueryFileTree A:hover {
 	background: #BDF;
 }
 
+.demo {
+				width: 200px;
+				height: 400px;
+				border-top: solid 1px #BBB;
+				border-left: solid 1px #BBB;
+				border-bottom: solid 1px #FFF;
+				border-right: solid 1px #FFF;
+				background: #FFF;
+				overflow: scroll;
+				padding: 5px;
+			}
+			
+
 /* Core Styles */
 .jqueryFileTree LI.directory { background: url(images/directory.png) left top no-repeat; }
 .jqueryFileTree LI.expanded { background: url(images/folder_open.png) left top no-repeat; }

@@ -11,7 +11,7 @@
 			*/	
 			
 		    String dir = request.getParameter("dir");
-    			System.out.println(dir)
+    			System.out.println(dir);
 		    if(dir == null)
 			  		return;
 		    		

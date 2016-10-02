@@ -246,16 +246,6 @@
 	<!-- /#wrapper -->
 
 
-<form action="acceptWidget.do" method="post" id="acceptForm">
-
-	<input type="hidden" id="widgetId" name="widgetId">
-	<input type="hidden" id="widgetRoot" name="widgetRoot">
-	<input type="hidden" id="evalId" name="evalId">
-	
-
-</form>
-
-
 	<!-- jQuery -->
 	<!-- <script src="/AdminPage/js/jquery.js"></script> -->
 	<script src="http://code.jquery.com/jquery.min.js"></script>
@@ -285,42 +275,42 @@ var _widgets = null;
 var _selectedWidgetIdx;
 var _sourceRoot;
 
-function showIdx(){
 
-	 _selectedWidgetIdx = $("#widgetTable").closest("tr").index();
+ function viewSource(_idx){
+	
+		var m = _widgets[_idx].get("root");
+		$('#sourceTree').fileTree({
+			root: m,
+			script: 'SourceTree.jsp',
+			multiFolder: false },
+			function(file){
+			
+				$("pre code").load(file);
+			}); 			
+	}
+	
+	
+ function accept(_idx){
+
+	 var data = "";
+
+	 var evalId = _widgets[_idx].get("evalId");
+	 var widgetRoot = _widgets[_idx].get("root");
 	 
-		var m = new Map();
-		m = _widgets[_selectedWidgetIdx];
 		
-	 $("#widgetId").val(_widgets[_selectedWidgetIdx].get("widgetId"));
-	 $("#widgetRoot").val(_widgets[_selectedWidgetIdx].get("root"));
-	 $("#evalId").val(_widgets[_selectedWidgetIdx].get("evalId"));	 
-	 $("#acceptForm").submit();
+	 //jQuery의 Post함수로 입력받은 id값 전달 
+				  $.ajax({
+					   url: '/acceptWidget.do',
+					   type: 'POST',
+					   data: {'evalId':evalId,"widgetRoot":widgetRoot },
+					   dataType: 'json',
+					   success: function(data){
+					    alert(data); // 결과 텍스트를 경고창으로 보여준다.
+					   		}
+				  });
+	}
 
-}
 
-
-function viewSource(){
-
-	 
-	 _selectedWidgetIdx = $("#widgetTable").closest("tr").index();
-	 
-		var m = new Map();
-		m = _widgets[_selectedWidgetIdx];
-		_sourceRoot = m.get("root");
-
-}
-
-$(document).ready( function() {
-	$('#sourceTree').fileTree({
-				root: _sourceRoot,
-				script: 'SourceTree.jsp',
-				multiFolder: false },
-				function(file){
-				
-					$("pre code").load(file);
-				}); 						
-});
 
 window.onload=function(){
 	
@@ -349,12 +339,12 @@ window.onload=function(){
 		for(var i=0; i< _widgets.length ; i++){
 			var m = new Map();
 			m = _widgets[i];
-			 	 
+
 				 $("#widgetTable > tbody:last").append('<tr><td>'+ (i+1) +'</td><td>' + '<div class="checkbox"><label><input type="checkbox"> </label> </div></td><td>' +
-						 m.get("developer") + '</td><td>' + m.get("widgetName")	+ '</td><td>' + m.get("uploadedDate") + '</td><td>' + m.get("kind") + '</td><td>' + m.get("position") +
-						'</td><td> <button type="button" id="acceptWidget" class="btn btn-primary btn-sm  onClick="showIdx()">승인</button> <button type="button" id="viewSource" class="btn btn-primary btn-sm" onClick="viewSource()" >소스 보기</button> </td></tr> ');
-			if(i==0)
-				_sourceRoot = m.get("root");
+						 m.get("developer") + '</td><td>' + m.get("widgetName")	+ '</td><td>' + m.get("uploadedDate") + '</td><td>' + m.get("kind") + '</td><td>' + 
+						 m.get("position")  + '</td><td> <button type="button" id="acceptWidget" class="btn btn-primary btn-sm" value='+i+' onClick="accept(value)">승인</button> </td><td> '+
+						 '<button type="button" id="viewSource" class="btn btn-primary btn-sm"  value='+i+'  onClick="viewSource(value)" >소스 보기</button> </td></tr> ');
+
 		}
 			 
 	 
@@ -366,3 +356,4 @@ window.onload=function(){
 </script>
 
 </html>
+

@@ -1,11 +1,34 @@
 
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="java.util.*"%>
-<%@page import="manageWidget.*"%>
+<%@page import="manageWidget.* , property.enums.*, page.VerifyPage, javaBean.*"%>
 
 <%
 	request.setCharacterEncoding("UTF-8");
 %>
+
+
+<%
+
+	request.setCharacterEncoding("UTF-8");
+		
+	enumPage to = enumPage.MAIN;
+ 	boolean isFailVerify;
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MAIN);
+	if(!(boolean)results.get("isSuccessVerify")){
+		isFailVerify =false;
+		to = (enumPage)results.get("to");
+	
+		
+		
+	}else{
+				
+		isFailVerify = true;
+	}
+%>
+
+
+
 
 <HTML>
 
@@ -20,7 +43,8 @@
 
 		// 유저 정보에 따라 불러와서 유저가 다운받은 위젯을 리모콘에 집어넣음 
 		function setWidgetList() {
-			<%Object obj = null;
+			<%
+			Object obj = null;
 			widget w = null;
 			int num = 0;
 			String name = "";
@@ -135,13 +159,13 @@
 							 * select control에 정보 집어넣는 부분
 							 */
 
-							function addWidget(num, name, tag, width, height) {
+							function addWidget(id, name, tag, width, height) {
 
 								var op = document.createElement("option");
 
 								op.value = tag;
 								op.text = name;
-								op.id = num;
+								op.id = id;
 
 								op.width = width;
 								op.height = height;
@@ -163,7 +187,7 @@
 								var height = f.options[idx].height;
 
 								if (widgetTag != '') {
-									obMouse.setWidget(num, name, tag, width, height);
+									obMouse.setWidget(id, name, tag, width, height);
 								}
 							}
 						</script>

@@ -1,5 +1,11 @@
 <%@page import="property.enums.enumCautionKind"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
 <!doctype html>
 <html lang="en">
  <head>
@@ -8,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-  <title>Widget Store - 패스워드 변경</title>
+  <title>Widget Store - í¨ì¤ìë ë³ê²½</title>
   <link href="../WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
@@ -73,7 +79,7 @@
 			return true;
 		}
 		else{
-			alert("패스워드가 일치하지 않습니다.");
+			alert("í¨ì¤ìëê° ì¼ì¹íì§ ììµëë¤.");
 			return false;
 		}
 	}

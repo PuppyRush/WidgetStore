@@ -41,7 +41,7 @@
 						class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#">WIDGET STORE</a>
+				<a class="navbar-brand" href="/">WIDGET STORE</a>
 			</div>
 			<!-- Collect the nav links, forms, and other content for toggling -->
 			<!-- ìì ë©ë´ -->
@@ -81,7 +81,9 @@
 								<h4 id='widgetDeveloperName'></h4>
 								<h4 id='star'></h4>
 								<h5 id='grade'></h5>
-								<div class='btnBuy' onclick = 'btnDownload()'>Download</div>
+								<br>
+								<div class='btn btn-primary btn-sm' onclick = 'btnDownload()'>Download</div>
+								<br>
 							</div>
 							<!-- image of widget -->
 							<div class='goodsSub'>
@@ -236,7 +238,7 @@
 									if(rs.next()){
 										widgetName = rs.getString("title");
 										developer = rs.getString("nickname");
-										mainExplain = rs.getString("explain");
+										mainExplain = rs.getString("contents");
 										mainIMG = rs.getString("main_Image");
 										subIMG = rs.getString("sub_Image");
 										// set avg of review
