@@ -27,7 +27,7 @@ public class EntryManager implements commandAction {
 		String sId = request.getRequestedSessionId();
 		Member member = Member.getMember(sId);
 		if(member.isJoin() && member.isJoin() && member.getEmail().equals(enumSystem.ADMIN.toString()))
-			returns.put("view", enumPage.MEMBER_MANAGER.toString());
+			returns.put("view", enumPage.MANAGE_EVALUATING_WIDGET.toString());
 		else
 			returns.put("view", enumPage.LOGIN_MANAGER.toString());
 		

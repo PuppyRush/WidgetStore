@@ -52,3 +52,22 @@ body {
 footer {
     margin: 50px 0;
 }
+
+ul.pageControl {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+   vertical-align: middle;
+    max-width: 900px;
+    width: 100%;
+}
+  
+li.list{
+    display: inline-block;
+    padding: 10px;
+    margin-bottom: 5px;
+     vertical-align: middle;
+    border: 1px solid #efefef;
+    font-size: 12px;
+    cursor: pointer;
+}

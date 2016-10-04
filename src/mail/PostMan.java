@@ -98,8 +98,8 @@ public class PostMan {
 	  String from = "gooddaumi@gmail.com";    // 메일 보내는 사람
 	  String cc = "";     // 참조
 	  String subject =  new StringBuilder("[WidetStore] 위젯'").append(wName).append("'의 위젯심사에 실패하였습니다.").toString();// 제목
-	  String content = new StringBuilder("안녕하세요. 위젯스토어에 올리신' ").append(wName).append("'위젯이 '").append(failReason).append("'떄문에 실패하였습니다.\n")
-			  								.append("실패원인을 해결하셔서 다시 업로드하여 주시기 바랍니다. \n\n\n").toString();
+	  String content = new StringBuilder("안녕하세요. 위젯스토어에 올리신' ").append(wName).append("위젯이 다음과 같은 이유로 심사애 실패하였습니다.\n")
+			  								.append("실패원인을 해결하셔서 다시 업로드하여 주시기 바랍니다. \n\n").append(failReason).toString();
 
 	  
 	  if(from.trim().equals("")) {

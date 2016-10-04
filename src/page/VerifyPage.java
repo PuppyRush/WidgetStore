@@ -33,7 +33,9 @@ public class VerifyPage {
 		try{				
 			enumPage page = fromPage;
 			member = Member.getMember(uId);
-
+			if(member.isLogout())
+				throw new MemberException(enumMemberState.NOT_LOGIN, enumPage.MAIN);
+			
 			switch(page){
 			
 				case MAIN:
@@ -48,9 +50,11 @@ public class VerifyPage {
 					break;
 					
 				case DEVELOPER:
-					System.out.println(member.isDeveloper());
+				case DEVELOPER_UPDATE_WIDGET:
+				case DEVELOPER_UPLOAD_WIDGET:
+					
 					if(!member.isJoin()){
-						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.LOGIN);
 						
 					}
 					else if(!member.isLogin()){
@@ -64,7 +68,7 @@ public class VerifyPage {
 				case SETTINGS:
 					
 					if(!member.isJoin()){
-						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.LOGIN);
 						
 					}
 					else if(!member.isLogin()){
@@ -76,7 +80,7 @@ public class VerifyPage {
 				case STORE:
 					
 					if(!member.isJoin()){
-						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.LOGIN);
 						
 					}
 					else if(!member.isLogin()){
@@ -87,9 +91,8 @@ public class VerifyPage {
 			
 					
 				case CUSTOM:
-					
 					if(!member.isJoin()){
-						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.JOIN);
+						throw new MemberException(enumMemberState.NOT_JOIN, enumPage.LOGIN);
 						
 					}
 					else if(!member.isLogin()){
@@ -107,8 +110,10 @@ public class VerifyPage {
 					
 					break;
 					
-				case MEMBER_MANAGER:
-				case WIDGET_MANAGER:
+				case MANAGE_SERVER:
+				case MANAGE_MEMBER:
+				case MANAGE_EVALUATING_WIDGET:
+				case MANAGE_EVALUATED_WIDGET:
 					
 
 					if(!member.getEmail().equals(enumSystem.ADMIN.toString()))

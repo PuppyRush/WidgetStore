@@ -1,3 +1,10 @@
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
+
+
 <!doctype html>
 <html lang="en">
  <head>

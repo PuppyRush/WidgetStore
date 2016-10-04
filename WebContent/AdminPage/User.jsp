@@ -11,7 +11,7 @@
 
 	ArrayList<Member> members = new ArrayList<Member>();
 	boolean isFailVerify;
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MEMBER_MANAGER);
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MANAGE_MEMBER);
 	if(!(boolean)results.get("isSuccessVerify")){
 	isFailVerify =false;
 	enumPage to = (enumPage)results.get("to");
@@ -106,18 +106,18 @@
 			<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
 			<div class="collapse navbar-collapse navbar-ex1-collapse">
 				<ul class="nav navbar-nav side-nav">
-					<li class="active"><a href="/AdminPage/adminPage_user.jsp"><i
+					<li class="active"><a href="<%=enumPage.MANAGE_MEMBER.toString()%>"><i
 							class="glyphicon glyphicon-th-list"></i> 유저 관리</a></li>
-					<li><a href="/AdminPage/adminPage_widget.jsp"><i
-							class="glyphicon glyphicon-list-alt"></i> 위젯 관리</a></li>
-
-					<li><a href="javascript:;"><i
+					<li><a href="<%=enumPage.MANAGE_EVALUATING_WIDGET.toString()%>"><i
+							class="glyphicon glyphicon-list-alt"></i> 평가중 위젯</a></li>
+						<li><a href="<%=enumPage.MANAGE_EVALUATED_WIDGET.toString()%>"><i
+							class="glyphicon glyphicon-list-alt"></i> 평가된 위젯</a></li>
+					<li><a href="<%=enumPage.MANAGE_SERVER.toString()%>"><i
 							class="glyphicon glyphicon-cog"></i> 사이트 설정</a></li>
 				</ul>
 			</div>
 			<!-- /.navbar-collapse -->
 		</nav>
-
 		<div id="page-wrapper">
 
 

@@ -1,4 +1,4 @@
-package manageWidget;
+package manageCustom;
 
 public class widget {
 	private int num = 0;

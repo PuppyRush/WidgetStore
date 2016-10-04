@@ -43,7 +43,7 @@ public class LoginManager implements commandAction{
 			if(!ManageMember.loginManager(member))
 				throw new MemberException(enumMemberState.NOT_EQUAL_PASSWORD, enumPage.LOGIN_MANAGER);
 			
-			returns.put("view", enumPage.MEMBER_MANAGER.toString());
+			returns.put("view", enumPage.MANAGE_MEMBER.toString());
 			
 		}catch(MemberException e){
 			

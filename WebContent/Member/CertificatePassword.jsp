@@ -6,25 +6,6 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<%
-
-/* 	request.setCharacterEncoding("UTF-8");
-	boolean isFailVerify;
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER);
-	if(!(boolean)results.get("isSuccessVerify")){
-		isFailVerify =false;
-		enumPage to = (enumPage)results.get("to");
-		
-		request.setAttribute("message",  (String)results.get("message"));
-		request.setAttribute("messageKind", results.get("messageKind"));
-
-		return;
-		
-	}else
-		isFailVerify = true; */
-
-%>
-
 
 
 

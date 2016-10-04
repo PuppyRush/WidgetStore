@@ -8,7 +8,10 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.EnumMap;
 
 
@@ -260,7 +263,7 @@ public class Member {
 
 		if(_rs.next()){
 			
-			member.setNickname("nickname");
+			member.setNickname(_rs.getString("nickname"));
 			member.setId(_rs.getInt("u_id"));
 			member.setEmail(_rs.getString("email"));
 			member.setRegDate(_rs.getTimestamp("registrationDate"));
@@ -300,13 +303,26 @@ public class Member {
 						
 	}
 	
+	public static boolean isContainsMember(int uId){
+		
+		for(String key : MemberMap.keySet())
+			if(MemberMap.get(key).getId() == uId)
+				return true;
+		
+		return false;
+	
+	}
+	
+	
 	/**
 	 * 	로그인한 유저를 대상으로 HashMap으로 객체를 보유하고 없으면 새로 생성한다. 
 	 * @param sId	브라우져 sessionId를 통해 유저의 객체를 찾는다. 
 	 * @return	sId key에 맞는 객체 value를 반환. 
+	 * @throws MemberException 
+	 * @throws SQLException 
 	 * @throws Throwable	sId가 null이거나 sId를 통해 객체를 찾지 못핳는 경우 예외 발생. 
 	 */
-	public static Member getMember(String sId){
+	public static Member getMember(String sId) throws SQLException, MemberException{
 		
 		if(sId==null)
 			throw new NullPointerException();
@@ -320,13 +336,37 @@ public class Member {
 		else{
 			
 			member = new Member();			 
-			
 			member.setSessionId(sId);
+			if(member.isJoin())
+				Member.setMemberFromDB(member);
 			MemberMap.put(sId, member);
 		}
 		
 		return member;
 	}
+	
+	public static Member getMember(int uId, String sId) throws SQLException, MemberException{
+		
+		if(uId<=0)
+			throw new IllegalArgumentException("userId는 0보다 커야 합니다.");
+		
+	
+				
+		for(String key : MemberMap.keySet()){
+			if(MemberMap.get(key).getId() == uId)
+				return MemberMap.get(key);
+		}
+		
+		Member member = new Member();			 
+		member.setSessionId(sId);
+		if(member.isJoin())
+			Member.setMemberFromDB(member);
+		MemberMap.put(sId, member);
+	
+		
+		return member;
+	}
+	
 	
 	public static void addMember(Member m){
 		

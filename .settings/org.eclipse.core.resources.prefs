@@ -1,10 +1,12 @@
 eclipse.preferences.version=1
-encoding//WebContent/AdminPage/adminPage_user.jsp=UTF-8
-encoding//WebContent/AdminPage/adminPage_widget.jsp=UTF-8
+encoding//WebContent/AdminPage/EvaluatingWidget.jsp=UTF-8
+encoding//WebContent/AdminPage/User.jsp=UTF-8
 encoding//WebContent/Custom.jsp=UTF-8
 encoding//WebContent/Developer/ManageDeveloper.jsp=UTF-8
 encoding//WebContent/Developer/UploadForm.jsp=UTF-8
 encoding//WebContent/Main.jsp=UTF-8
 encoding//WebContent/Member/CheckAuthNum.jsp=UTF-8
-encoding//src/manageWidget=UTF-8
+encoding//WebContent/Member/Login.jsp=UTF-8
+encoding//WebContent/Member/RegistryDeveloper.jsp=UTF-8
+encoding//src/manageCustom=UTF-8
 encoding/<project>=UTF-8

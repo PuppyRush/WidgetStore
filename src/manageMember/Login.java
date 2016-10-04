@@ -39,14 +39,14 @@ public class Login implements commandAction {
 		String sId="";
 		try{
 			//필요조건
-			if(request.getParameter("sessionId")==null || request.getParameter("idType")==null || request.getParameter("login_username")==null ||
+			if(request.getParameter("idType")==null || request.getParameter("login_username")==null ||
 					request.getParameter("login_password")==null)
 				throw new PageException(enumPageError.NO_PARAMATER);
 			
 			nick_or_mail = (String)request.getParameter("login_username");
 					
 			//가입여부 확인
-			sId = (String)request.getParameter("sessionId");
+			sId = request.getRequestedSessionId();
 			member = Member.getMember(sId);
 			if( nick_or_mail.contains("@") )
 				member.setEmail(nick_or_mail);

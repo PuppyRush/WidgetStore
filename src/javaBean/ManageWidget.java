@@ -14,6 +14,7 @@ import developer.ManageManifest.RecommandInfo.Ratio;
 import page.PageException;
 import property.enums.enumPageError;
 import property.enums.enumSystem;
+import property.enums.widget.enumResolutionKind;
 import property.enums.widget.enumWidgetEvaluation;
 
 
@@ -95,7 +96,7 @@ public class ManageWidget {
 
 			/////////////// widgetEvaluation Table
 			_ps = conn.prepareStatement(
-					"insert into widgetEvaluation ( evalState, developer) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+					"insert into widgetEvaluation ( evalState, d_id) values (?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 
 			int evalState = Integer.valueOf(eval.getString());
 			_ps.setInt(1, evalState);
@@ -175,7 +176,7 @@ public class ManageWidget {
 
 			/////////////// widgetEvaluation Table
 			_ps = conn.prepareStatement(
-					"insert into widgetEvaluation ( evalState, developer) values (?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+					"insert into widgetEvaluation ( evalState, d_id) values (?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 
 			int evalState = Integer.valueOf(eval.getString());
 			_ps.setInt(1, evalState);
@@ -230,9 +231,9 @@ public class ManageWidget {
 	 * @param evalId db의 evalId
 	 * @throws Exception 
 	 */
-	public static void addEvaluatedWidget(ManageManifest mani, String sId, int evalId) throws Exception{
+	public static void addEvaluatedWidget(ManageManifest mani,String sId, int uId, int evalId) throws Exception{
 		
-	
+		
 		ResultSet _rs = null;
 		PreparedStatement _ps = null;
 		try {
@@ -258,7 +259,13 @@ public class ManageWidget {
 			String _mainImageFullPath = _rs.getString("main_image");
 			String _subImageFullPath = _rs.getString("sub_image");
 			String _widgetRoot =_rs.getString("widget_root");
-			String _main_html =    "<iframe width='100%' height='100%' src=" + _widgetRoot+ _rs.getString("main_html" ) + "></iframe>" ;
+			
+			String relativeWidgetRoot = new StringBuilder("/").append(enumSystem.UPLOAD_FOLDER_NAME.toString()).append("/").append(uId).append("/").
+					append(mani.getWidgetName()).append("/").append(enumSystem.SOURCE_FOLDER_NAME.toString()).append("/").toString();
+			
+			
+			
+			String _main_html =   "<iframe width='"+mani.getRecommandInfo().fixedWidth+"' height='"+mani.getRecommandInfo().fixedHeight+"' src='" + relativeWidgetRoot+ _rs.getString("main_html" ) + "'></iframe>" ;
 			String _position = _rs.getString("position");
 			
 			_ps.close();
@@ -270,7 +277,7 @@ public class ManageWidget {
 			_ps.setInt(1, evalId);
 			_rs = _ps.executeQuery();
 			_rs.next();
-			int _dId = _rs.getInt("developer");
+			int _dId = _rs.getInt("d_id");
 			Timestamp _updatedDate = _rs.getTimestamp("evaluationBeginDate");
 			
 			_ps.close();
@@ -301,7 +308,7 @@ public class ManageWidget {
 			
 			//////widgetManifest
 			_ps = conn.prepareStatement("insert into widgetManifest (manifest_version,   widget_version,    widget_kind,   git_tag,   git_branch, "
-					+ "is_support_resolution, resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? ,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+					+ " resolution_method, maxHeight, maxWidth, minWidth, minHeight) values (?,?,?,?,?, ?,?,?,?,? )", PreparedStatement.RETURN_GENERATED_KEYS);
 			
 			_ps.setInt(1, mani.getManifestVersion()); 
 			_ps.setFloat(2, mani.getWidgetVersion());
@@ -314,12 +321,36 @@ public class ManageWidget {
 			else
 				_ps.setInt(6, 0);
 			
-			_ps.setString(7, mani.getRecommandInfo()._resolutionMethod);
-			_ps.setInt(8, mani.getRecommandInfo().maxHeightSize);
-			_ps.setInt(9, mani.getRecommandInfo().maxWidthSize);
-			_ps.setInt(10, mani.getRecommandInfo().minWidthSize);
-			_ps.setInt(11, mani.getRecommandInfo().minHeightSize);
+			switch(mani.getRecommandInfo().resolutionKind){
+				
+				case FIXED:
+					_ps.setInt(7, mani.getRecommandInfo().fixedHeight);
+					_ps.setInt(8, mani.getRecommandInfo().fixedWidth);
+					_ps.setInt(9, mani.getRecommandInfo().fixedWidth);
+					_ps.setInt(10, mani.getRecommandInfo().fixedHeight);
+					
+					break;
+					
+				case RATIO:
+					//ration저장은 manifestId가 빌도로 필요 하므로 이후에 다시 저장한다.
+					break;
+					
+				case FREE:
+					_ps.setInt(7, mani.getRecommandInfo().maxHeightSize);
+					_ps.setInt(8, mani.getRecommandInfo().maxWidthSize);
+					_ps.setInt(9, mani.getRecommandInfo().minWidthSize);
+					_ps.setInt(10, mani.getRecommandInfo().minHeightSize);
+					
+					break;
+					
+				case AUTO:
+					//아직 미지원
+					break;
+								
 			
+			
+			}
+	
 			_ps.executeUpdate();
 		
 			_rs = _ps.getGeneratedKeys();
@@ -327,7 +358,8 @@ public class ManageWidget {
 			int _manifestId = _rs.getInt(1);
 			
 			/////////////////widget Ratio
-			if(mani.getRecommandInfo()._isSupportResolution){
+			
+			if(mani.getRecommandInfo().resolutionKind == enumResolutionKind.RATIO){
 				for(Ratio ary : mani.getRecommandInfo()._ratioArray){
 					_ps = conn.prepareStatement("insert into widgetRatio (manifest_id, widthRatio, heightRatio, widthSize, heightSize) values (?,?,?,?,?) ");
 					_ps.setInt(1,_manifestId);
@@ -344,7 +376,7 @@ public class ManageWidget {
 			_rs.close();
 			//////////// widget table
 		  	
-			_ps = conn.prepareStatement("insert into widget (developer,title, kind, currentVersion, position,  registrationDate, HTML, manifest_id)"
+			_ps = conn.prepareStatement("insert into widget (d_id,title, kind, currentVersion, position,  registrationDate, HTML, manifest_id)"
 					+ " values(?,?,?,?,  ?,?,?,?) ", PreparedStatement.RETURN_GENERATED_KEYS);
 			
 			_ps.setInt(1, _dId);
@@ -387,9 +419,11 @@ public class ManageWidget {
 			
 ///////////////////user
 			
-			if(Member.isContainsMember(sId)){
-				
-				Member member = Member.getMember(sId);
+			
+			
+			if(Member.isContainsMember(uId)){
+				Member member = Member.getMember(uId,sId);
+		
 				////멤버가 로그인 중이라 객체에 위젯 정보 추가
 				
 				if(member.getDevelopedWidget()==null)
@@ -434,7 +468,7 @@ public class ManageWidget {
 	 * @param widget
 	 * @throws Exception 
 	 */
-	public static void addEvaludatedUpdatedWidget(ManageManifest mani, String sId, int evalId) throws Exception{
+	public static void addEvaludatedUpdatedWidget(ManageManifest mani, String sId, int uId, int evalId) throws Exception{
 		
 	
 		ResultSet _rs = null;
@@ -498,7 +532,7 @@ public class ManageWidget {
 					_ps.setInt(1, evalId);
 					_rs = _ps.executeQuery();
 					_rs.next();
-					int _dId = _rs.getInt("developer");
+					int _dId = _rs.getInt("d_id");
 					Timestamp _updatedDate = _rs.getTimestamp("evaluationBeginDate");
 					
 					_ps.close();
@@ -574,7 +608,7 @@ public class ManageWidget {
 					_rs.close();
 					//////////// widget table
 				  	
-					_ps = conn.prepareStatement("update widget set developer = ?,currentVersion = ? , "
+					_ps = conn.prepareStatement("update widget set d_id = ?,currentVersion = ? , "
 							+ "registrationPosition = ? , HTML= ? where widget_id ");
 					
 					_ps.setInt(1, _dId);
@@ -611,9 +645,9 @@ public class ManageWidget {
 
 		///////////////////user
 					
-					if(Member.isContainsMember(sId)){
+					if(Member.isContainsMember(uId)){
 						
-						Member member = Member.getMember(sId);
+						Member member = Member.getMember(_uId, sId);
 						if(member.isJoin() && member.isLogin() && member.isDeveloper()){
 						////멤버가 로그인 중이라 객체에 위젯 정보 추가
 								
@@ -717,7 +751,7 @@ public class ManageWidget {
 				String kind = _rs.getString("kind");
 				Timestamp date = _rs.getTimestamp("evaluationBeginDate");
 				String pos = _rs.getString("position");
-				int developerId = _rs.getInt("developer");
+				int developerId = _rs.getInt("d_id");
 				boolean isUpdate = _rs.getInt("isUpdate") == 1 ? true : false;
 
 				__ps = conn.prepareStatement(
@@ -730,14 +764,17 @@ public class ManageWidget {
 				__rs.close();
 
 				__ps = conn.prepareStatement(
-						"select nickname from user join developer using(u_id) where d_id = ?");
+						"select nickname,u_id from user join developer using(u_id) where d_id = ?");
 				__ps.setInt(1, developerId);
 				__rs = __ps.executeQuery();
 				__rs.next();
 				String nickname = __rs.getString("nickname");
-		
+				int uId = __rs.getInt("u_id");
+				
+				
+				
 				EvaluatingWidget w = new EvaluatingWidget( name, kind, date, widgetRoot, pos,
-						evalId, isUpdate, developerId, nickname);
+						evalId, isUpdate, developerId, uId, nickname);
 				_widgets.add(w);
 			
 				__ps.close();
@@ -795,7 +832,7 @@ public class ManageWidget {
 			ArrayList<DevelopedWidget> ary = new ArrayList<>();
 
 			PreparedStatement _ps = conn.prepareStatement(
-					"select * from widget join widgetDetail using(widget_id) where developer = ?");
+					"select * from widget join widgetDetail using(widget_id) where d_id = ?");
 			_ps.setInt(1, member.getDeveloperId());
 			ResultSet _rs = _ps.executeQuery();
 

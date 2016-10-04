@@ -3,6 +3,7 @@ package manageStore;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,8 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import handler.DBhandler;
 import javaBean.ConnectMysql;
+import javaBean.DownloadedWidget;
 import javaBean.Member;
 import javaBean.MemberException;
+import net.sf.json.JSONObject;
 import page.PageException;
 import property.commandAction;
 import property.enums.enumCautionKind;
@@ -26,6 +29,7 @@ public class storeDownload implements commandAction {
 			throws Throwable {
 
 		HashMap<String, Object> returns = new HashMap<String, Object>();
+		//JSONObject obj = new JSONObject();
 		
 		String widgetId = request.getParameter("widgetId").toString();
 		Connection conn = ConnectMysql.getConnector();
@@ -58,9 +62,26 @@ public class storeDownload implements commandAction {
 				sql = "insert into widgetInfo(u_id, widget_id, width, height, x, y) values ('"+u_id+"', '"+widgetId+"', 350, 250, -1, -1);";
 				ps = conn.prepareCall(sql);
 				ps.executeUpdate();
+				
+				ps.close();
+				rs.close();
+				
+				ps = conn.prepareStatement("select * from widget join widgetDetail using(widget_id) where widget_id = ?");
+				ps.setInt(1, Integer.valueOf(widgetId));
+				rs = ps.executeQuery();
+				if(!rs.next())
+					throw new SQLException();
+				
+				DownloadedWidget _widget = 
+						new DownloadedWidget.Builder(rs.getInt("widget_id"), rs.getString("title"),rs.getString("kind")).developerId(rs.getInt("d_id"))
+						.setSize(-1, -1, 0, 0)	.htmlRoot(rs.getString("HTML")).build();
+				
+				member.addDownloadedWidget(_widget);			
+				
 				System.out.println(widgetId + " download done");
 			}
 			
+			//obj.put("result", "true");
 			returns.put("view", enumPage.STORE.toString());
 				
 		}catch(MemberException e){
@@ -69,14 +90,22 @@ public class storeDownload implements commandAction {
 			returns.put("from", enumPage.STORE.toString());
 			returns.put("message", e.getErrCode().getString());
 			returns.put("messageKind", enumCautionKind.ERROR);
+			//obj.put("result", "fail");
 		}
 			catch(Exception e){
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 			returns.put("view", enumPage.MAIN.toString());
+			//obj.put("result", "fail");
 		}
 		
 		returns.put("id", widgetId);
+		
+		// return type은 json으로
+		
+	/*
+		response.setContentType("application/x-json; charset=UTF-8");
+		response.getWriter().print(obj);*/
 		
 		return returns;
 

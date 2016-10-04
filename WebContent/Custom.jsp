@@ -1,13 +1,28 @@
 
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@page import="java.util.*"%>
-<%@page import="manageWidget.* , property.enums.*, page.VerifyPage, javaBean.*"%>
+<%@page import="manageCustom.* , property.enums.*, page.VerifyPage, javaBean.*"%>
 
 <%
+
 	request.setCharacterEncoding("UTF-8");
-%>
-
-
+	enumPage to = enumPage.MAIN;
+ 	boolean isFailVerify;
+ 	Member member = Member.getMember(session.getId());
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.MAIN);
+	if(!(boolean)results.get("isSuccessVerify")){
+		isFailVerify =false;
+		to = (enumPage)results.get("to");
+		request.setAttribute("message",  (String)results.get("message"));
+		request.setAttribute("messageKind", results.get("messageKind"));
+		response.sendRedirect(to.getString());
+		return;
+		
+		
+	}else{
+		isFailVerify = true;
+	}
+		%>
 
 
 

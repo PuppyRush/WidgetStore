@@ -1,4 +1,4 @@
-package manageWidget;
+package manageCustom;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import handler.DBhandler;
 import javaBean.DownloadedWidget;
 import javaBean.Member;
 import property.commandAction;
+import property.enums.enumPage;
 
 public class widgetSave implements commandAction {
 
@@ -37,16 +38,9 @@ public class widgetSave implements commandAction {
 		String py = null;
 		String num = null;
 		int u_id = member.getId();
-		ArrayList<String> listUserWidget = new ArrayList<String>();
+		ArrayList<Integer> listUserWidget = new ArrayList<>();
 
-		// 유저의 id를 꺼내온다.
-		try {
-			/* 유저 불러오는 부분 필요 */
-		} catch (Exception e) {
-			System.out.println("fail to load user id");
-			e.printStackTrace();
-		}
-
+		
 		// 유저가 가지고 있는 위젯의 리스트를 가져온다.
 		if (member.getDownloadedWidgetList() == null) {
 			try {
@@ -55,22 +49,19 @@ public class widgetSave implements commandAction {
 				rs = dbhandler.executeSQL(sql);
 
 				while (rs.next()) {
-					listUserWidget.add(rs.getString("widget_id"));
+					listUserWidget.add(rs.getInt("widget_id"));
 					// System.out.print(rs.getString("widget_id"));
 				}
+
 			} catch (Exception e) {
 				System.out.println("fail to load user widget id");
 				e.printStackTrace();
 			}
 		} else {
-			// user download widget list
-			ArrayList<DownloadedWidget> widget = member.getDownloadedWidgetList();
-			// save widget in the board
 
-			for (DownloadedWidget w : widget) {
-				System.out.println(w.getWidgetId());
-				listUserWidget.add(Integer.toString(w.getWidgetId()));
-			}
+			for (DownloadedWidget w : member.getDownloadedWidgetList()) 
+				listUserWidget.add(w.getWidgetId());
+			
 		}
 
 		// 이제 저장을 시작한다.
@@ -79,31 +70,47 @@ public class widgetSave implements commandAction {
 				// 보드에 있는 위젯을 처리한다.
 				for (int i = 0; i < widget_id.length; i++) {
 					num = widget_id[i];
-					System.out.println(num);
+
 					if (num.equals(""))
 						continue;
-					listUserWidget.remove(num);
+					//listUserWidget.remove(Integer.valueOf(num));
 					// 문자열 내부의 px를 제거
 					px = x[i].replace("px", "");
 					py = y[i].replace("px", "");
+					
 
 					sql = "update widgetInfo set x = " + px + ", y = " + py + " where u_id = " + Integer.toString(u_id)
 							+ "&& widget_id =" + num + ";";
 					dbhandler.updateSQL(sql);
+					
+			
+					for(DownloadedWidget widget : member.getDownloadedWidgetList()){
+						if(String.valueOf(widget.getWidgetId()).equals(num)){
+							widget.setPoint(Integer.valueOf(px), Integer.valueOf(py));
+							break;
+						}
+					}
+				
+							
+					
+					
 				}
 
 				// 리모콘에 있는 위젯을 처리한다.
-				for (String w : listUserWidget) {
+			/*	for (int w : listUserWidget) {
 					// System.out.println(w + " / -1 / -1");
 					sql = "update widgetInfo set x = -1, y = -1 where u_id = " + Integer.toString(u_id)
 							+ "&& widget_id =" + w + ";";
 					dbhandler.updateSQL(sql);
-				}
+				}*/
+				
+				
+				
 			} catch (Exception e) {
 				System.out.println("fail to save widget");
 				e.printStackTrace();
 			}
-		returns.put("view", "Custom.jsp");
+		returns.put("view", enumPage.CUSTOM.toString());
 		return returns;
 	}
 }

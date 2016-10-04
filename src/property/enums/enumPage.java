@@ -2,14 +2,14 @@ package property.enums;
 
 public enum enumPage {
 
-	ROOT("http://114.129.211.123:8282"),
+	ROOT("http://114.129.211.123:"+enumSystem.PORT.toString()+"/"),
 	
 	ERROR404("/error/404error.jsp"),
 	ERROR403("/error/403error.jsp"),
 	
 	MAIN("/Main.jsp"),
 	STORE("/Store.jsp"),
-	CERTIFICATE("/verifyRegistration.do"),
+	CERTIFICATE("verifyRegistration.do"),
 		LOGIN("/Member/Login.jsp"),	//  /Member 폴더에서 시작.
 		JOIN("/Member/Join.jsp"),
 		RESET_PASSWORD("/Member/ResetPassword.jsp"),
@@ -20,15 +20,17 @@ public enum enumPage {
 		CHANGE_OLD_PWD("/Member/ChangeOldPasswodjsp"),
 	
 	DEVELOPER("/Developer/ManageDeveloper.jsp"),
-		UPLOAD_WIDGET("/Developer/UploadForm.jsp"),		//  /Developer 폴더에서 시작.
-		UPDATE_WIDGET("/Developer/UpdateForm.jsp"),
+		DEVELOPER_UPLOAD_WIDGET("/Developer/UploadForm.jsp"),		//  /Developer 폴더에서 시작.
+		DEVELOPER_UPDATE_WIDGET("/Developer/UpdateForm.jsp"),
 	
 	SETTINGS("/Settings.jsp"),
 	CUSTOM("/Custom.jsp"),
 	
-	WIDGET_MANAGER("/AdminPage/adminPage_widget.jsp"),
-	MEMBER_MANAGER("/AdminPage/adminPage_user.jsp"),
-	LOGIN_MANAGER("/AdminPage/AdminLogin.jsp");
+	LOGIN_MANAGER("/AdminPage/AdminLogin.jsp"),
+		MANAGE_EVALUATED_WIDGET("/AdminPage/EvaluatedWidget.jsp"),
+		MANAGE_EVALUATING_WIDGET("/AdminPage/EvaluatingWidget.jsp"),
+		MANAGE_MEMBER("/AdminPage/User.jsp"),
+		MANAGE_SERVER("AdminPage/Server.jsp");
 	
 	private String pageDirection;
 	

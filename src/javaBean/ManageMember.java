@@ -419,8 +419,10 @@ public class ManageMember {
 				member.setNickname(_rs.getString("nickname"));
 				member.setRegDate(_rs.getTimestamp("registrationDate"));
 				
-				
-//				
+				_rs.close();
+				_ps.close();
+
+			
 				//developer
 				
 				__ps = conn.prepareStatement("select * from developer where u_id = ?");
@@ -444,7 +446,7 @@ public class ManageMember {
 				while(__rs.next()){
 					
 					DownloadedWidget _widget = 
-							new DownloadedWidget.Builder(__rs.getInt("widget_id"), __rs.getString("title"),__rs.getString("kind")).developerId(__rs.getInt("developer"))
+							new DownloadedWidget.Builder(__rs.getInt("widget_id"), __rs.getString("title"),__rs.getString("kind")).developerId(__rs.getInt("d_id"))
 							.setSize(__rs.getInt("x"), __rs.getInt("y"), __rs.getInt("width"), __rs.getInt("height"))
 							.htmlRoot(__rs.getString("HTML")).build();
 					
@@ -816,6 +818,38 @@ public class ManageMember {
 			return false;
 		}
 		
+	}
+	
+	public static void registryDeveloper(Member member) throws SQLException, MemberException{
+		
+		conn.setAutoCommit(false);
+		
+		PreparedStatement _ps = conn.prepareStatement("select * from developer where u_id = ?");
+		_ps.setInt(1,member.getId());
+		
+		ResultSet _rs = _ps.executeQuery();
+		
+		if(_rs.next())
+			throw new MemberException(enumMemberState.ALREADY_REG_DEVELOPER, enumPage.MAIN);
+		
+		_ps.close();
+		_rs.close();
+		
+		_ps = conn.prepareStatement("insert into developer (u_id) values(?)", PreparedStatement.RETURN_GENERATED_KEYS);
+		_ps.setInt(1, member.getId());
+		
+		_ps.executeUpdate();
+		
+		_rs = _ps.getGeneratedKeys();
+		_rs.next();
+		int devId = _rs.getInt(1);
+		member.setDeveloperId(devId);
+		member.setDeveloper(true);
+		_rs.close();
+		_ps.close();
+		
+		
+		conn.setAutoCommit(true);
 	}
 	
 	public static boolean changePassword(Member member, String newPasswd) throws Throwable{

@@ -52,6 +52,8 @@ public class UploadWidget implements commandAction {
 	public HashMap<String, Object> requestPro(HttpServletRequest request, HttpServletResponse response)
 			throws Throwable {
 		
+		request.setCharacterEncoding("UTF-8");
+		
 		Member mdb = new Member();
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 	
@@ -69,7 +71,7 @@ public class UploadWidget implements commandAction {
 			if(!tempFolder.exists())
 				tempFolder.mkdirs();
 					
-			MultipartRequest multi = new MultipartRequest(request,_defaultTempPath, sizeLimit, "euc-kr", new DefaultFileRenamePolicy());
+			MultipartRequest multi = new MultipartRequest(request,_defaultTempPath, sizeLimit, "UTF-8", new DefaultFileRenamePolicy());
 			
 		
 			if(multi.getParameter("contents")==null){

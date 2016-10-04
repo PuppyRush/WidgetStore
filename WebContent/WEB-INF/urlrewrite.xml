@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+  <rule>
+    	<from>^/([0-9a-zA-Z]+)($|\/$)</from>
+    	<to>/member?username=$1</to>
+   </rule>

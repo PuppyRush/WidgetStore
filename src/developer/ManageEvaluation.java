@@ -57,6 +57,7 @@ public class ManageEvaluation implements Runnable{
 	private ManageManifest manifest;
 	private final String widgetRoot;
 	
+	
 	private String zipFileName;
 	private enumWidgetKind kind;
 	private boolean isSuccessZipFile; 
@@ -86,6 +87,7 @@ public class ManageEvaluation implements Runnable{
 		this.WidgetId = widgetId;
 		imagesNames = new HashMap<Integer,String>();
 		widgetRoot =  (new StringBuilder(enumSystem.UPLOAD_PATH.toString()).append(member.getId()).append("/").append(widgetName).append("/")).toString();
+		
 		this.contents = contents;
 		this.widgetName = widgetName;
 		this.member = member;
@@ -106,13 +108,13 @@ public class ManageEvaluation implements Runnable{
 			String tempFileFullPath = defaultTempUUIDPath + name;
 							
 			//File file = multi.getFile(name);
-			if(!isSuccessZipFile && name.contains(".zip") || name.contains(".7z")){
+			if(!isSuccessZipFile && name.contains(".zip")){
 				zipFileName = name;
 				isSuccessZipFile = true;
 				fileMove(tempFileFullPath, originSourcePath+name);
 			}
-			else if(name.contains(".jpg") || name.contains(".jpeg") ||
-					name.contains(".tif") || name.contains(".bmp") ||  name.contains(".png") ){
+			else if(name.contains(".jpg") ||name.contains(".JPG") || name.contains(".jpeg") ||name.contains(".JPEG") ||
+					name.contains(".tif") ||name.contains(".TIF") || name.contains(".bmp") || name.contains(".BMP") ||  name.contains(".png") || name.contains(".PNG") ){
 			
 				String _tempString = 	name.substring(0, name.indexOf("."));
 				if(isInteger(_tempString)){
@@ -152,11 +154,11 @@ public class ManageEvaluation implements Runnable{
 		try {			
 			beginSetFiles();
 			
-			manifest = new ManageManifest(widgetRoot);
+			manifest = new ManageManifest(widgetRoot, widgetName);
 			
 			
 			eval = manifest.doCollectAll();
-		
+
 			if(isUpdate){
 				
 				eval = manifest.VerifyUpdatedWidget(member.getDeveloperId(), eval);
@@ -173,12 +175,20 @@ public class ManageEvaluation implements Runnable{
 		
 			
 		}catch(EvaluationException e){
+			e.printStackTrace();
 			
 			fileDelete(widgetRoot);
 			PostMan.sendFailEvaluation(widgetName, member.getNickname(), e.getMessage(), member.getEmail());
+
 		}
+		catch (Exception e){
+			e.printStackTrace();
+			PostMan.sendFailEvaluation(widgetName, member.getNickname(), e.getMessage(), member.getEmail());
+			fileDelete(widgetRoot);
+		}
+		
 		catch (Throwable e) {
-			
+			PostMan.sendFailEvaluation(widgetName, member.getNickname(), e.getMessage(), member.getEmail());
 			fileDelete(widgetRoot);
 			// TODO Auto-generated catch block
 			e.printStackTrace();

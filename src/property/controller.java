@@ -2,6 +2,8 @@ package property;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebInitParam;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.servlet.FilterChain;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
@@ -25,9 +29,11 @@ import javax.servlet.ServletContext;
 /**
  * Servlet implementation class controller
  */
+
+
 @WebServlet(
 		urlPatterns = { 
-				"/",
+				"/WidgetStore",
 				"*.do",
 				"*.do?"
 		}, 
@@ -46,7 +52,27 @@ public class controller extends HttpServlet {
 	    super();
 	    // TODO Auto-generated constructor stub
 		}
-
+/*
+	public void doFilter(ServletRequest req, ServletResponse res,
+			   FilterChain chain) throws IOException, ServletException {
+		
+		  HttpServletRequest request = (HttpServletRequest) req ;
+		  if(excludeUrl(request)){
+			    chain.doFilter(request, res); //걸러내는 URI일 경우 요청값 그대로 처리
+			  }else{
+			     chain.doFilter(new ParameterWrapper(request), res); //아닐경우 요청값 변경
+			  }
+			 }
+	}
+	
+	private boolean excludeUrl(HttpServletRequest request) {
+		  String uri = request.getRequestURI().toString().trim();	
+		  if(uri.startsWith("/admin/")){
+			   return true;
+			  }else{
+			   return false;
+			  }
+	}*/
     //명령어와 처리클래스가 매핑되어 있는 properties 파일을 읽어서 
  //HashMap객체인 commandMap에 저장
 
@@ -127,24 +153,27 @@ public class controller extends HttpServlet {
 				
 				
 				System.out.println(command);	
-								       
-				com = (commandAction)commandMap.get(command);  
-				preSplit = com.requestPro(request, response);
-				view = (String)preSplit.get("view");
-				
-				if(preSplit.size() > 1){
-					preSplit.remove("view");
-				
-					Set<Entry<String, Object>> set = preSplit.entrySet();
-					Iterator<Entry<String, Object>> it = set.iterator();
-					while(it.hasNext()){
-						Map.Entry<String, Object> e = (Map.Entry<String, Object>)it.next();
-						request.setAttribute(e.getKey(), e.getValue());
-						
-					}
-				
+				if(command.contains(".html")){
+					view = command;
 				}
-				
+				else{
+					com = (commandAction)commandMap.get(command);  
+					preSplit = com.requestPro(request, response);
+					view = (String)preSplit.get("view");
+					
+					if(preSplit.size() > 1){
+						preSplit.remove("view");
+					
+						Set<Entry<String, Object>> set = preSplit.entrySet();
+						Iterator<Entry<String, Object>> it = set.iterator();
+						while(it.hasNext()){
+							Map.Entry<String, Object> e = (Map.Entry<String, Object>)it.next();
+							request.setAttribute(e.getKey(), e.getValue());
+							
+						}
+					
+					}
+				}
 			}catch(Throwable e) {
 				e.printStackTrace();
 			}

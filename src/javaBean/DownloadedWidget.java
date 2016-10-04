@@ -7,10 +7,10 @@ import property.enums.widget.enumWidgetPosition;
 
 public class DownloadedWidget extends Widget{
 	
-	private final int width;
-	private final int height;
-	private final int x;
-	private final int y;
+	private  int width;
+	private  int height;
+	private  int x;
+	private  int y;
 	
 
 	private final String htmlRoot;
@@ -19,10 +19,10 @@ public class DownloadedWidget extends Widget{
 	
 	public static class Builder{
 		
-		private int width;
-		private int height;
-		private int x;
-		private int y;
+		 int width;
+		 int height;
+		 int x;
+		 int y;
 		
 	
 		private String html_root;
@@ -44,7 +44,7 @@ public class DownloadedWidget extends Widget{
 			this.x = x; this.y = y; this.width =w; this.height = h;		
 			return this;
 		}
-		
+
 		public Builder developerId(int devId){
 			developerId = devId; return this;
 		}
@@ -105,6 +105,10 @@ public class DownloadedWidget extends Widget{
 		return y;
 	}
 
+	public void setPoint(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
 
 
 	public float getVersion() {
@@ -127,6 +131,30 @@ public class DownloadedWidget extends Widget{
 
 	public int getDeveloperId() {
 		return developerId;
+	}
+
+
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+
+
+	public void setY(int y) {
+		this.y = y;
 	}
 
 

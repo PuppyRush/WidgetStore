@@ -15,6 +15,7 @@ public enum enumMemberState
 	LOST_PASSWORD("비밀번호를 분실하신 상태입니다."),
 	EXCEED_FAILD_LOGIN("비밀번호를 "+enumMemberStandard.POSSIBILLTY_FAILD_LOGIN_NUM.toString()+"회 이상 초과 하셨습니다."),
 	PASSING_CHANGE_PWD("비밀번호를 변경하지 않은지 "+enumMemberStandard.PASSWD_CHANGE_STADNDATE_DATE+"되셨습니다."),
+	ALREADY_REG_DEVELOPER(""),
 	ERROR("unknow error");
 	
 	private String enumStr;

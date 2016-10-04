@@ -1,4 +1,11 @@
-<%@page import="property.enums.enumCautionKind"%>
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="property.enums.*" %>
+<%
+
+	request.setCharacterEncoding("UTF-8");
+
+%>
 
 <!doctype html>
 <html lang="en">
@@ -8,7 +15,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="author" content="">
-<title>Widget Store - 패스워드 변경</title>
+<title>Widget Store - 로그인 </title>
 <link href="../WidgetClientPage/css/bootstrap.min.css" rel="stylesheet">
 
 
@@ -43,6 +50,7 @@
 								class="glyphicon glyphicon-chevron-right"></div>
 							<span id="text-login-msg">Type your username and password.</span>
 						</div>
+						<input type="hidden" name="idType" value="nothing">
 						<input id="login_username" name="login_username"
 							class="form-control" type="text" placeholder="Username" required>
 						<input id="login_password" name="login_password"
@@ -109,7 +117,7 @@
 			return true;
 		}
 		else{
-			alert("패스워드가 일치하지 않습니다.");
+			alert("í¨ì¤ìëê° ì¼ì¹íì§ ììµëë¤.");
 			return false;
 		}
 	}

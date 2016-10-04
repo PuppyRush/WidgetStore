@@ -27,7 +27,7 @@ public class Join implements commandAction {
 		HashMap<String , Object> returns = new HashMap<String , Object>();
 		try{
 			if(request.getParameter("register_email")==null || request.getParameter("idType")==null || request.getParameter("register_username")==null ||
-					request.getParameter("sessionId")==null || request.getParameter("register_password")==null)
+				request.getParameter("register_password")==null)
 				throw new PageException(enumPageError.NO_PARAMATER);
 							
 						
@@ -66,20 +66,28 @@ public class Join implements commandAction {
 										
 			}
 			
-			if (ManageMember.joinMember(member)){
-				returns.put("isSuccessJoin", "true");
-				returns.put("message", "가입에 성공하였습니다. 메일인증을 하신 후 로그인하세요.");
+			if(request.getParameter("to")!=null){
+				returns.put("view", request.getParameter("to"));
+				returns.put("message", "가입에 성공하였습니다. ");
 				returns.put("messageKind", enumCautionKind.NORMAL);
-				
 			}
 			else{
-				returns.put("isSuccessJoin", "false");
-				returns.put("message","가입에 실패하였습니다.");
-				returns.put("messageKind", enumCautionKind.ERROR);
+					returns.put("view",enumPage.MAIN.getString());
+			
+			
+					if (ManageMember.joinMember(member)){
+							returns.put("isSuccessJoin", "true");
+							returns.put("message", "가입에 성공하였습니다. 메일인증을 하신 후 로그인하세요.");
+							returns.put("messageKind", enumCautionKind.NORMAL);
+							
+						}
+					else{
+						returns.put("isSuccessJoin", "false");
+						returns.put("message","가입에 실패하였습니다.");
+						returns.put("messageKind", enumCautionKind.ERROR);
+					}
+			
 			}
-			
-			returns.put("view",enumPage.MAIN.getString());
-			
 			
 		}catch(PageException e){
 			returns.put("view", enumPage.JOIN.getString());

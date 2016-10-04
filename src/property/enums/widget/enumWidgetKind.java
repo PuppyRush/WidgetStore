@@ -8,7 +8,12 @@ public enum enumWidgetKind {
 	SECURITY("security"),
 	HEALTH("health"),
 	VIDEO("video"),
-	FINANCE("finance");
+	FINANCE("finance"),
+	TOOL("development tool"),
+	BLOG("blog"),
+	NEWS("news"),
+	SHOPPING("shopping"),
+	UTIILTY("utility");
 	
 	private String kind;
 	

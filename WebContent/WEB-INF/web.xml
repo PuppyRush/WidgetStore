@@ -12,11 +12,11 @@
   
   <filter>
 
-        <filter-name>encodingFilter</filter-name>
+       <filter-name>encodingFilter</filter-name>
 
-        <filter-class>
+       <filter-class>
 
-            org.apache.catalina.filters.SetCharacterEncodingFilter
+           org.apache.catalina.filters.SetCharacterEncodingFilter
 
     </filter-class>
 
@@ -26,12 +26,10 @@
 
             <param-value>UTF-8</param-value>
 
-        </init-param>
+      </init-param>
 
-</filter>
+	</filter>
 
 
-  
-  
 </web-app>
 

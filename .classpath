@@ -41,5 +41,7 @@
 	<classpathentry exported="true" kind="lib" path="/usr/local/tomcat/lib/tomcat-util-scan.jar"/>
 	<classpathentry exported="true" kind="lib" path="/usr/local/tomcat/lib/tomcat-websocket.jar"/>
 	<classpathentry exported="true" kind="lib" path="/usr/local/tomcat/lib/websocket-api.jar"/>
+	<classpathentry kind="lib" path="/home/cmk/workspace/WidgetStore/WebContent/WEB-INF/lib/urlrewritefilter-4.0.3.jar"/>
+	<classpathentry kind="lib" path="/usr/local/jdk1.8.0_73/jre/lib/ext/json-lib-2.2.2-jdk15.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

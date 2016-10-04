@@ -5,9 +5,9 @@
         <widget>
             <name>MyWidget</name>
             <version>1.0</version>								<!-- dont use charater only use integer or decimal-->
-            <root>./entry.html</root>
+            <root>entry.html</root>
         </widget>
-        <position kind="git">										<!-- default : "nothing", {"nothing", "git"} -->
+        <position kind="git">										<!-- default : "none", {"none", "git"} -->
 			<git>
 			    <id>gooddaumi@naver.com</id>
 			    <repository>WidgetStore</repository>
@@ -18,20 +18,24 @@
      </required>
 
     <recommanded>
-        <isSupportResolution>yes</isSupportResolution>      <!--default:"no", {"yes","no"}-->
-        <resolution method="ratio"/>                      <!--default:"unsupported" {"unsupported", "ratio","free","auto"}-->
-            <ratio>
-                <ratio value="1:1" size="300,300"/>
-                <ratio value="3:4" size="300,400"/>
-                <ratio value="16:9" size="400,300"/>
-            </ratio>
-            <free>
-                <minWidthSize>300</minWidthSize>
-                <minHeightSize>300</minHeightSize>
-                <maxWidthSize>900</maxWidthSize>
-                <maxHeightSize>900</maxHeightSize>
-            </free>           
-
+    		<resolution method="ratio">                      
+				<!--default:"fixed" {"ratio","free","fixed","auto"}-->
+			    <ratio>
+					<ratio value="1:1" size="300,300"/>
+					<ratio value="3:4" size="300,400"/>
+					<ratio value="16:9" size="400,300"/>
+			    </ratio>
+			    <free>
+					<minWidthSize>300</minWidthSize>
+					<minHeightSize>300</minHeightSize>
+					<maxWidthSize>900</maxWidthSize>
+					<maxHeightSize>900</maxHeightSize>
+			    </free>           
+				<fixed>
+					<width>325</width>
+					<height>270</height>
+				</fixed>
+			</resolution>
         <icon-path>./image/icon/title.jpg</icon-path>
     </recommanded>
 

@@ -10,7 +10,7 @@
 
 	request.setCharacterEncoding("UTF-8");
 
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.UPLOAD_WIDGET);
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER_UPLOAD_WIDGET);
 	if(!(boolean)results.get("isSuccessVerify")){
 				
 		enumPage to = (enumPage)results.get("to");
@@ -126,20 +126,7 @@
 								Out</a></li>
 					</ul></li>
 			</ul>
-			<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-			<div class="collapse navbar-collapse navbar-ex1-collapse">
-				<ul class="nav navbar-nav side-nav">
-					<li class="active"><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget001</a></li>
-					<li><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget002</a></li>
-					<li><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget003</a></li>
-					<li><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget004</a></li>
-				</ul>
-			</div>
-			<!-- /.navbar-collapse -->
+
 		</nav>
 
 		<div id="page-wrapper">
@@ -171,10 +158,17 @@
 								<a class="btn btn-default dropdown-toggle btn-select" href="#"
 									data-toggle="dropdown">Category <span class="caret"></span></a>
 								<ul class="dropdown-menu">
-									<li><a href="javascript:;">ì¢ë¥1</a></li>
-									<li><a href="javascript:;">ì¢ë¥2</a></li>
-									<li><a href="javascript:;">ì¢ë¥3</a></li>
-									<li><a href="javascript:;">ì¢ë¥4</a></li>
+									<li><a href="javascript:;">Games</a></li>
+									<li><a href="javascript:;">Sports</a></li>
+									<li><a href="javascript:;">Weather</a></li>
+									<li><a href="javascript:;">Developer Tool </a></li>
+									<li><a href="javascript:;">Blog</a></li>
+									<li><a href="javascript:;">News</a></li>
+									<li><a href="javascript:;">Shopping</a></li>
+									<li><a href="javascript:;">Security</a></li>				
+									<li><a href="javascript:;">Finance</a></li>								
+									<li><a href="javascript:;">Video</a></li>
+									<li><a href="javascript:;">Utility</a></li>
 								</ul>
 							</div>
 							<br>

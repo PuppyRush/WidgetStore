@@ -2,7 +2,7 @@ package property.enums.widget;
 
 public enum enumWidgetPosition {
 
-	NOTHING("nothing"),
+	NONE("none"),
 	GIT("git");
 	
 	

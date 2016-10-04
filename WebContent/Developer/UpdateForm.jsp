@@ -8,7 +8,7 @@
 <%
 
 	request.setCharacterEncoding("UTF-8");
-	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.UPDATE_WIDGET);
+	HashMap<String,Object> results =  VerifyPage.Verify(session.getId(), enumPage.DEVELOPER_UPDATE_WIDGET);
 	if(!(boolean)results.get("isSuccessVerify")){
 				
 		enumPage to = (enumPage)results.get("to");
@@ -124,20 +124,7 @@
 								Out</a></li>
 					</ul></li>
 			</ul>
-			<!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-			<div class="collapse navbar-collapse navbar-ex1-collapse">
-				<ul class="nav navbar-nav side-nav">
-					<li class="active"><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget001</a></li>
-					<li><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget002</a></li>
-					<li><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget003</a></li>
-					<li><a href="javascript:;"><i
-							class="glyphicon glyphicon-console"></i> widget004</a></li>
-				</ul>
-			</div>
-			<!-- /.navbar-collapse -->
+		
 		</nav>
 
 		<div id="page-wrapper">

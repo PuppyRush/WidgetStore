@@ -28,6 +28,7 @@ import javaBean.ConnectMysql;
 import javaBean.Member;
 import javaBean.DownloadedWidget.Builder;
 import property.enums.enumSystem;
+import property.enums.widget.enumResolutionKind;
 import property.enums.widget.enumWidgetEvaluation;
 import property.enums.widget.enumWidgetKind;
 import property.enums.widget.enumWidgetPosition;
@@ -58,6 +59,9 @@ public class ManageManifest {
 			}
 		}
 		
+		public int fixedWidth;
+		public int fixedHeight;
+		
 		public int minWidthSize;
 		public int maxWidthSize;
 		public int minHeightSize;
@@ -65,6 +69,7 @@ public class ManageManifest {
 	
 		public boolean isExistRecommand;
 		public boolean _isSupportResolution;
+		public enumResolutionKind resolutionKind;
 		public String _resolutionMethod;
 		public ArrayList<Ratio> _ratioArray;
 	
@@ -97,11 +102,10 @@ public class ManageManifest {
 	}
 	
 	private   int manifestVersion;
-
 	private   float widgetVersion;
 	private   enumWidgetPosition position;
 	private   String mainHTML;
-
+	private final String widgetName; 
 	private RecommandInfo recommandInfo = null;
 	private GitInfo git = null;
 	private final String originManifestPath;
@@ -110,7 +114,7 @@ public class ManageManifest {
 	private File widgetManifstFile;
 	private enumWidgetEvaluation result;
 	private final Connection conn;
-
+	
 	public RecommandInfo getRecommandInfo() {
 		return recommandInfo;
 	}
@@ -143,21 +147,37 @@ public class ManageManifest {
 		return mainHTML;
 	}
 
+	public String getWidgetName() {
+		return widgetName;
+	}
+
+	public void setWidgetVersion(float widgetVersion) {
+		this.widgetVersion = widgetVersion;
+	}
+
+	public void setPosition(enumWidgetPosition position) {
+		this.position = position;
+	}
+
+	public void setMainHTML(String mainHTML) {
+		this.mainHTML = mainHTML;
+	}
+
 	
 	///////////////method//////////////////
 
 	
-	public ManageManifest(String widgetPath) {
+	public ManageManifest(String widgetPath, String title) {
 		
 		conn = ConnectMysql.getConnector();
 		
-		widgetManifestPath = widgetPath+"source/manifest.xml";
+		widgetManifestPath = widgetPath+enumSystem.SOURCE_FOLDER_NAME.toString()+"/manifest.xml";
 		originManifestPath = enumSystem.MANIFEST_FULLPATH.toString();
 		
 		
 		widgetManifstFile = new File(widgetManifestPath);
 		originManifstFile = new File(originManifestPath);
-		
+		widgetName = title;
 		git = new GitInfo();
 		recommandInfo = new RecommandInfo();
 		
@@ -169,16 +189,11 @@ public class ManageManifest {
 	/*
 	 * 	db를 업데이트 하기 위해 메니페스트의 모든 요소를 수집한다.
 	 */
-	public enumWidgetEvaluation  doCollectAll(){
+	public enumWidgetEvaluation  doCollectAll() throws EvaluationException{
 		
-		try{
-			getManifestInformation();				
-		}catch(EvaluationException e){
-			e.printStackTrace();
-			result = enumWidgetEvaluation.UNALLOWANCE;
-			result.setFailCase(e.getFailCsae());
-			result.setErrMsg(e.getMessage());
-		}
+		
+		getManifestInformation();				
+		
 		
 		return result;
 		
@@ -242,7 +257,7 @@ public class ManageManifest {
 
 			// DB와 비교뒤 결정.
 
-			_ps = conn.prepareStatement("select title, currentVersion from widget where developer = ? ");
+			_ps = conn.prepareStatement("select title, currentVersion from widget where d_id = ? ");
 			_ps.setInt(1, wId);
 			_rs = _ps.executeQuery();
 
@@ -325,11 +340,7 @@ public class ManageManifest {
 			_col = _cols.item(0);
 			__col = __cols.item(0);
 
-			System.out.println(_col.getNodeName());
 
-			if (!_col.getNodeName().equals(__col.getNodeName()))
-				throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",
-						enumEvalFailCase.MANIFEST_ERROR);
 
 			_col = (Node) _xpath.evaluate("*/required/manifest_version", _doc, XPathConstants.NODE);
 			__col = (Node) _xpath.evaluate("*/required/manifest_version", __doc, XPathConstants.NODE);
@@ -356,6 +367,20 @@ public class ManageManifest {
 			if (!_col.getNodeName().equals(__col.getNodeName()))
 				throw new SAXException(_col.getTextContent() + "이 존재하지 않습니다.");
 
+			
+			_col = (Node) _xpath.evaluate("*/required/widget/name", _doc, XPathConstants.NODE);
+			__col = (Node) _xpath.evaluate("*/required/widget/name", __doc, XPathConstants.NODE);
+			if (!_col.getNodeName().equals(__col.getNodeName()))
+				throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",
+						enumEvalFailCase.MANIFEST_ERROR);
+			else{
+				if(_col.getTextContent().equalsIgnoreCase(widgetName) == false)
+					throw new EvaluationException(
+							"매니페스트에 등록된 이름과 페이지에서 지정한 위젯의 이름이 서로 다릅니다. (소 대문자 주의)",
+							enumEvalFailCase.MANIFEST_ERROR);
+			}
+			
+			
 			_col = (Node) _xpath.evaluate("*/required/widget/version", _doc, XPathConstants.NODE);
 			__col = (Node) _xpath.evaluate("*/required/widget/version", __doc, XPathConstants.NODE);
 			if (!_col.getNodeName().equals(__col.getNodeName()))
@@ -406,8 +431,8 @@ public class ManageManifest {
 
 			switch (position) {
 
-				case NOTHING:
-					position = enumWidgetPosition.NOTHING;
+				case NONE:
+					position = enumWidgetPosition.NONE;
 					break;
 
 				case GIT:
@@ -501,22 +526,23 @@ public class ManageManifest {
 
 		} catch (ParserConfigurationException e1) {
 			// TODO Auto-generated catch block
+			result = enumWidgetEvaluation.UNALLOWANCE;
 			e1.printStackTrace();
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
-
+			result = enumWidgetEvaluation.UNALLOWANCE;
 			e1.printStackTrace();
 		} catch (SAXException e1) {
 			// TODO Auto-generated catch block
-
+			result = enumWidgetEvaluation.UNALLOWANCE;
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-
+			result = enumWidgetEvaluation.UNALLOWANCE;
 			e1.printStackTrace();
 		} catch (XPathExpressionException e1) {
 			// TODO Auto-generated catch block
-
+			result = enumWidgetEvaluation.UNALLOWANCE;
 			e1.printStackTrace();
 		}
 		/*
@@ -566,29 +592,32 @@ public class ManageManifest {
 			Document __doc = __builder.parse(originManifstFile);
 			XPath __xpath = XPathFactory.newInstance().newXPath();
 
-			_col = (Node) _xpath.evaluate("*/recommanded/isSupportResolution", _doc, XPathConstants.NODE);
-			__col = (Node) _xpath.evaluate("*/recommanded/isSupportResolution", __doc, XPathConstants.NODE);
-			if (!_col.getNodeName().equals(__col.getNodeName()))
-				throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",
-						enumEvalFailCase.MANIFEST_ERROR);
-
-			if (_col.getTextContent().equals("yes")) {
+/////////////reolsition
 
 				_col = (Node) _xpath.evaluate("*/recommanded/resolution", _doc, XPathConstants.NODE);
-
 				__col = (Node) _xpath.evaluate("*/recommanded/resolution", __doc, XPathConstants.NODE);
 				if (!_col.getNodeName().equals(__col.getNodeName()))
 					throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",
 							enumEvalFailCase.MANIFEST_ERROR);
 				else {
-					String _res = ((Element) ((NodeList) _xpath.evaluate("*/recommanded/resolution",
+					String _resolustion = ((Element) ((NodeList) _xpath.evaluate("*/recommanded/resolution",
 							_doc, XPathConstants.NODESET)).item(0)).getAttribute("method");
-					if (_res == null)
-						throw new EvaluationException("버전의 값이 올바르지 않습니다. 정수 혹은 소수만 입력 바랍니다",
-								enumEvalFailCase.MANIFEST_ERROR);
+				
 
-					switch (_res) {
-						case "ratio":
+					
+					boolean _isEmpty = true;
+					for(enumResolutionKind e : enumResolutionKind.values()){
+						if(e.toString().equalsIgnoreCase(_resolustion)){
+							recommandInfo.resolutionKind = e;
+							_isEmpty = false;
+						}
+					}
+					if(_isEmpty)
+						if (_resolustion == null)
+							throw new EvaluationException("해상도 지원 여부가 지정되어 있지 않습니다.",	enumEvalFailCase.MANIFEST_ERROR);
+					
+					switch (recommandInfo.resolutionKind ) {
+						case RATIO:
 
 							NodeList _ratioNodes = (NodeList) _xpath.evaluate(
 									"//recommanded/resolution/ratio/*", _doc,
@@ -621,17 +650,11 @@ public class ManageManifest {
 							}
 
 							break;
+							//ratio
+							
+						case FREE:
 
-						case "free":
-
-							_col = (Node) _xpath.evaluate("*/recommanded/resolution/free",
-									_doc, XPathConstants.NODE);
-							__col = (Node) _xpath.evaluate("*/recommanded/resolutio/free",
-									__doc, XPathConstants.NODE);
-							if (!_col.getNodeName().equals(__col.getNodeName()))
-								throw new EvaluationException(
-										__col.getNodeName() + "값이 존재하지 않습니다.",
-										enumEvalFailCase.MANIFEST_ERROR);
+		
 
 							NodeList __freeNodes = (NodeList) __xpath.evaluate(
 									"//recommanded/resolution/free/*", __doc,
@@ -674,41 +697,66 @@ public class ManageManifest {
 							if (isInteger(_temp))
 								recommandInfo.minHeightSize = Integer.parseInt(_temp);
 							else
-								throw new EvaluationException("크기의 값은 정수만 허용됩니다.",
-										enumEvalFailCase.MANIFEST_ERROR);
+								throw new EvaluationException("크기의 값은 정수만 허용됩니다.",	enumEvalFailCase.MANIFEST_ERROR);
 
 							// maxWidthSize
 							_e = (Element) _freeNodes.item(2);
 							__e = (Element) __freeNodes.item(2);
 							if (_e.getNodeName().equals(__e.getNodeName()) == false)
 								throw new EvaluationException(
-										__col.getNodeName() + "이 존재하지 않습니다.",
-										enumEvalFailCase.MANIFEST_ERROR);
+										__col.getNodeName() + "이 존재하지 않습니다.",	enumEvalFailCase.MANIFEST_ERROR);
 
 							_temp = _e.getTextContent();
 							if (isInteger(_temp))
 								recommandInfo.maxWidthSize = Integer.parseInt(_temp);
 							else
-								throw new EvaluationException("크기의 값은 정수만 허용됩니다.",
-										enumEvalFailCase.MANIFEST_ERROR);
+								throw new EvaluationException("크기의 값은 정수만 허용됩니다.", enumEvalFailCase.MANIFEST_ERROR);
 
 							// maxHeightSize
 							_e = (Element) _freeNodes.item(3);
 							__e = (Element) __freeNodes.item(3);
-							if (_e.getNodeName().equals(__e.getNodeName()) == false)
-								throw new EvaluationException(
-										__col.getNodeName() + "이 존재하지 않습니다.",
-										enumEvalFailCase.MANIFEST_ERROR);
+							if (_e.getNodeName().equals(__e.getNodeName()) == false)		
+								throw new EvaluationException(		__col.getNodeName() + "이 존재하지 않습니다.",		enumEvalFailCase.MANIFEST_ERROR);
 
 							_temp = _e.getTextContent();
 							if (isInteger(_temp))
 								recommandInfo.maxHeightSize = Integer.parseInt(_temp);
 							else
-								throw new EvaluationException("크기의 값은 정수만 허용됩니다.",
-										enumEvalFailCase.MANIFEST_ERROR);
+								throw new EvaluationException("크기의 값은 정수만 허용됩니다.",					enumEvalFailCase.MANIFEST_ERROR);
 
 							break;
+							//free
 
+						case FIXED:
+							_col = (Node) _xpath.evaluate("*/recommanded/resolution/fixed/width", _doc, XPathConstants.NODE);
+							__col = (Node) _xpath.evaluate("*/recommanded/resolution/fixed/width", __doc, XPathConstants.NODE);
+							if (!_col.getNodeName().equals(__col.getNodeName()))
+								throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",	enumEvalFailCase.MANIFEST_ERROR);
+							
+							String tempStr = _col.getTextContent();
+							if(!isInteger(tempStr))
+								tempStr = tempStr.substring(0, tempStr.indexOf("."));
+								
+							recommandInfo.fixedWidth = Integer.valueOf(tempStr);
+							
+							_col = (Node) _xpath.evaluate("*/recommanded/resolution/fixed/height", _doc, XPathConstants.NODE);
+							__col = (Node) _xpath.evaluate("*/recommanded/resolution/fixed/height", __doc, XPathConstants.NODE);
+							if (!_col.getNodeName().equals(__col.getNodeName()))
+								throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",	enumEvalFailCase.MANIFEST_ERROR);
+							
+							tempStr = _col.getTextContent();
+							if(!isInteger(tempStr))
+								tempStr = tempStr.substring(0, tempStr.indexOf("."));
+								
+							recommandInfo.fixedHeight = Integer.valueOf(tempStr);
+							
+							break;
+							
+						case AUTO:
+							
+							break;
+							
+							
 						default:
 							throw new EvaluationException(
 									"resolution에는 free,auto,ratio만 가능합니다. 매니페스트를 확인하세요.",
@@ -720,11 +768,13 @@ public class ManageManifest {
 
 				_col = (Node) _xpath.evaluate("*/recommanded/icon-path", _doc, XPathConstants.NODE);
 				__col = (Node) _xpath.evaluate("*/recommanded/icon-path", __doc, XPathConstants.NODE);
-				if (!_col.getNodeName().equals(__col.getNodeName()))
-					throw new EvaluationException(__col.getNodeName() + "값이 존재하지 않습니다.",
-							enumEvalFailCase.MANIFEST_ERROR);
-
-				recommandInfo._iconPath = _col.getTextContent();
+				
+				if(_col == null)
+					recommandInfo._iconPath = enumSystem.DEFAULT_ICON_PATH.toString();
+				else if (_col != null && !_col.getNodeName().equals(__col.getNodeName()))
+					throw new EvaluationException(__col.getNodeName() + "이 존재하지 않습니다.",	enumEvalFailCase.MANIFEST_ERROR);
+				else
+					recommandInfo._iconPath = _col.getTextContent();
 
 				/////// recommanded 끝
 
@@ -737,7 +787,7 @@ public class ManageManifest {
 				} else
 					getManifestOfOptional();
 
-			}
+			
 		} catch (ParserConfigurationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -803,6 +853,14 @@ public class ManageManifest {
 			    return true;
 			}
 
+
+
+   private void fileDelete(String deleteFileName) {
+
+	   
+		  File I = new File(deleteFileName);
+		  I.delete();
+		 }
 	
 	
 }
