@@ -41,16 +41,16 @@
 <title>My Widget Set</title>
 
 <!-- Bootstrap Core CSS -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="/Developer/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Custom CSS -->
-<link href="css/sb-admin.css" rel="stylesheet">
+<link href="/Developer/css/sb-admin.css" rel="stylesheet">
 
 <!-- Morris Charts CSS -->
-<link href="css/plugins/morris.css" rel="stylesheet">
+<link href="/Developer/css/plugins/morris.css" rel="stylesheet">
 
 <!-- Custom Fonts -->
-<link href="font-awesome/css/font-awesome.min.css" rel="stylesheet"
+<link href="/Developer/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 	type="text/css">
 
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -137,7 +137,7 @@
 
 				<div class="col-md-9">
 
-					<form id="upload-form" method="post" action="uploadWidget.do"
+					<form id="upload-form" method="post" action="/uploadWidget.do"
 						enctype="multipart/form-data">
 						<input id="isUpdate" name="isUpdate" value="true"		type="hidden"> 
 						<input id="sessionId" name="sessionId" value=<%=session.getId() %>
@@ -221,15 +221,15 @@
 	<!-- /#wrapper -->
 
 	<!-- jQuery -->
-	<script src="js/jquery.js"></script>
+	<script src="/Developer/js/jquery.js"></script>
 
 	<!-- Bootstrap Core JavaScript -->
-	<script src="js/bootstrap.min.js"></script>
+	<script src="/Developer/js/bootstrap.min.js"></script>
 
 	<!-- Morris Charts JavaScript -->
-	<script src="js/plugins/morris/raphael.min.js"></script>
-	<script src="js/plugins/morris/morris.min.js"></script>
-	<script src="js/plugins/morris/morris-data.js"></script>
+	<script src="/Developer/js/plugins/morris/raphael.min.js"></script>
+	<script src="/Developer/js/plugins/morris/morris.min.js"></script>
+	<script src="/Developer/js/plugins/morris/morris-data.js"></script>
 	<script>
 
 

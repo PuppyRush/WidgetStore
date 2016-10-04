@@ -53,18 +53,18 @@
 <title>My Widget Set</title>
 
 <!-- Bootstrap Core CSS -->
-<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="/Developer/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Custom CSS -->
-<link href="../library/popup/style.css" rel="stylesheet">
-<link href="css/sb-admin.css" rel="stylesheet">
+<link href="/library/popup/style.css" rel="stylesheet">
+<link href="/Developer/css/sb-admin.css" rel="stylesheet">
 
 
 <!-- Morris Charts CSS -->
-<link href="css/plugins/morris.css" rel="stylesheet">
+<link href="/Developer/css/plugins/morris.css" rel="stylesheet">
 
 <!-- Custom Fonts -->
-<link href="font-awesome/css/font-awesome.min.css" rel="stylesheet"
+<link href="/Developer/font-awesome/css/font-awesome.min.css" rel="stylesheet"
 	type="text/css">
 
 
@@ -96,7 +96,7 @@
 			</div>
 			<!-- Top Menu Items -->
 			<ul class="nav navbar-right top-nav">
-				<li class="dropdown"><a href="./UploadForm.jsp"><i
+				<li class="dropdown"><a href="/Developer/UploadForm.jsp"><i
 						class="glyphicon glyphicon-share"></i> WidgetUpload</a></li>
 				<li class="dropdown"><a href="#" class="dropdown-toggle"
 					data-toggle="dropdown"><i class="fa fa-user"></i> [NICKNAME] <b
@@ -178,16 +178,16 @@
 
 
 	<!-- jQuery -->
-	<script src="js/jquery.js"></script>
+	<script src="/Developer/js/jquery.js"></script>
 
 	<!-- Bootstrap Core JavaScript -->
-	<script src="js/bootstrap.min.js"></script>
+	<script src="/Developer/js/bootstrap.min.js"></script>
 
 	<!-- Morris Charts JavaScript -->
-	<script src="js/plugins/morris/raphael.min.js"></script>
-	<script src="js/plugins/morris/morris.min.js"></script>
-	<script src="js/plugins/morris/morris-data.js"></script>
-	<script src="js/commanJs.js"></script>
+	<script src="/Developer/js/plugins/morris/raphael.min.js"></script>
+	<script src="/Developer/js/plugins/morris/morris.min.js"></script>
+	<script src="/Developer/js/plugins/morris/morris-data.js"></script>
+	<script src="/Developer/js/commanJs.js"></script>
 	<script
 		src="https://rawgithub.com/justindomingue/ohSnap/master/ohsnap.js"
 		type="text/javascript" charset="utf-8"></script>
